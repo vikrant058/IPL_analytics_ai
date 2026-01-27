@@ -21,19 +21,54 @@ class CricketChatbot:
         self.matches_df = matches_df
         self.deliveries_df = deliveries_df
         self.stats_engine = StatsEngine(matches_df, deliveries_df)
+
+        # Model selection (with environment variable override)
+        self.model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         
-        # Set OpenAI API key
+        # Set OpenAI API key - strip whitespace and ensure it's valid
         if api_key:
-            self.client = OpenAI(api_key=api_key)
+            api_key_to_use = api_key.strip()
         elif os.getenv('OPENAI_API_KEY'):
-            self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+            api_key_to_use = os.getenv('OPENAI_API_KEY').strip()
         else:
             raise ValueError("OpenAI API key not provided. Set OPENAI_API_KEY environment variable.")
+        
+        if not api_key_to_use or not api_key_to_use.startswith('sk-'):
+            raise ValueError(f"Invalid API key format. Expected sk-... format, got: {api_key_to_use[:20] if api_key_to_use else 'empty'}")
+        
+        self.client = OpenAI(api_key=api_key_to_use)
         
         # Get all unique players and venues for context
         self.all_players = self._get_all_players()
         self.all_venues = self._get_all_venues()
         self.all_teams = self._get_all_teams()
+        
+        # Valid filter values
+        self.VALID_MATCH_PHASES = ['powerplay', 'middle_overs', 'death_overs', 'opening', 'closing']
+        self.VALID_MATCH_SITUATIONS = ['chasing', 'defending', 'pressure_chase', 'winning_position']
+        self.VALID_BOWLER_TYPES = ['fast_bowler', 'spin_bowler', 'left_arm', 'right_arm', 'pacer', 'spinner']
+        self.VALID_BATTER_ROLES = ['opener', 'middle_order', 'lower_order', 'finisher']
+        self.VALID_VS_CONDITIONS = ['vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm']
+    
+    def _validate_filter(self, filter_name: str, filter_value: Optional[str]) -> bool:
+        """Validate that filter values are recognized"""
+        if not filter_value:
+            return True
+        
+        filter_value_lower = filter_value.lower().replace(' ', '_')
+        
+        if filter_name == 'match_phase':
+            return filter_value_lower in self.VALID_MATCH_PHASES
+        elif filter_name == 'match_situation':
+            return filter_value_lower in self.VALID_MATCH_SITUATIONS
+        elif filter_name == 'bowler_type':
+            return filter_value_lower in self.VALID_BOWLER_TYPES
+        elif filter_name == 'batter_role':
+            return filter_value_lower in self.VALID_BATTER_ROLES
+        elif filter_name == 'vs_conditions':
+            return filter_value_lower in self.VALID_VS_CONDITIONS
+        
+        return True  # Other filters are always valid
     
     def _get_all_players(self) -> List[str]:
         """Extract all unique player names from dataset"""
@@ -121,7 +156,7 @@ class CricketChatbot:
         """
         
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=300
@@ -134,8 +169,18 @@ class CricketChatbot:
             parsed = json.loads(response_text)
             return parsed
         except json.JSONDecodeError:
+            # Fallback: Try to extract at least a player name from the query
+            query_lower = query.lower()
+            extracted_player = None
+            
+            # Try to find a player from the dataset
+            for player in self.all_players:
+                if player.lower() in query_lower:
+                    extracted_player = player
+                    break
+            
             return {
-                "player1": None,
+                "player1": extracted_player,
                 "player2": None,
                 "venue": None,
                 "seasons": None,
@@ -146,13 +191,14 @@ class CricketChatbot:
                 "batter_role": None,
                 "vs_conditions": None,
                 "form_filter": None,
-                "query_type": "general",
-                "interpretation": "Could not parse query clearly"
+                "query_type": "player_stats" if extracted_player else "general",
+                "interpretation": f"Searching for {extracted_player}" if extracted_player else "Could not parse query clearly"
             }
     
     def get_response(self, query: str) -> str:
         """
         Main method: Takes user query and returns analytics response
+        Validates that query contains cricket-relevant parameters before processing.
         """
         
         # Parse the query
@@ -169,6 +215,13 @@ class CricketChatbot:
         vs_conditions = parsed.get('vs_conditions')
         form_filter = parsed.get('form_filter')
         query_type = parsed.get('query_type')
+        
+        # Validation: Ensure query has cricket-relevant entity (player, team, or venue)
+        # Allow queries that mention at least one cricket entity, even without specific filters
+        has_cricket_entity = player1 or player2 or venue or opposition_team
+        
+        if not has_cricket_entity:
+            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'\n- 'bumrah in pressure situations'\n- 'kohli against left-arm fast bowlers'"
         
         try:
             if query_type == 'head_to_head' and player1 and player2:

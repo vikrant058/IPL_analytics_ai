@@ -9,10 +9,73 @@ from openai_handler import CricketChatbot
 import requests
 import os
 import warnings
+from pathlib import Path
 from dotenv import load_dotenv
+from openai import OpenAI
 
-# Load environment variables from .env file
-load_dotenv()
+DOTENV_PATH = Path(__file__).resolve().parent / ".env"
+
+
+def _read_dotenv_openai_key(dotenv_path: Path = DOTENV_PATH) -> str | None:
+    """Read OPENAI_API_KEY from a .env file without printing it."""
+    try:
+        content = dotenv_path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return None
+    except OSError:
+        return None
+
+    for line in content:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("OPENAI_API_KEY="):
+            return stripped.split("=", 1)[1].strip().strip('"').strip("'")
+    return None
+
+
+def _mask_key(key: str) -> str:
+    if not key:
+        return "(missing)"
+    if len(key) <= 12:
+        return "(set)"
+    return f"{key[:7]}…{key[-4:]}"
+
+
+def _get_openai_api_key() -> tuple[str | None, str]:
+    """Return (api_key, source_label) without exposing the key.
+    
+    Force reload from .env to avoid Streamlit caching stale values.
+    Prioritizes .env over shell environment to prevent old exported keys from interfering.
+    """
+    from dotenv import dotenv_values
+    
+    # First priority: Streamlit secrets (for Streamlit Cloud)
+    try:
+        secrets_key = st.secrets.get("OPENAI_API_KEY")
+        if secrets_key:
+            return secrets_key, "streamlit_secrets"
+    except Exception:
+        pass
+    
+    # Second priority: .env file (explicit, controlled, clean)
+    dotenv_dict = dotenv_values(DOTENV_PATH)
+    dotenv_key = dotenv_dict.get("OPENAI_API_KEY")
+    if dotenv_key:
+        return dotenv_key, "env_file"
+    
+    # Last resort: shell environment variable (may be old/revoked)
+    env_key = os.getenv("OPENAI_API_KEY")
+    if env_key:
+        return env_key, "shell_env"
+    
+    return None, "missing"
+
+
+# Load environment variables from .env file (explicit path so Streamlit CWD doesn't matter).
+# We set override=True to avoid the common situation where an old exported shell variable
+# silently overrides the intended .env key and causes confusing 401s.
+load_dotenv(dotenv_path=DOTENV_PATH, override=True)
 
 warnings.filterwarnings('ignore')
 
@@ -301,38 +364,23 @@ elif page == "AI Chatbot":
     - "mumbai indians performance" - Team stats
     """)
     
-    # Check for OpenAI API key
-    api_key = os.getenv('OPENAI_API_KEY')
+    # Auto-load API key (no UI prompts)
+    api_key, key_source = _get_openai_api_key()
     
-    # If no env key, allow user to input
     if not api_key:
-        with st.expander("🔑 OpenAI API Key Setup", expanded=True):
-            st.warning("⚠️ OpenAI API key not found. Enter it below to enable the chatbot.")
-            api_key = st.text_input(
-                "Enter your OpenAI API key:",
-                type="password",
-                placeholder="sk-...",
-                key="api_key_input"
-            )
-            st.markdown("""
-            **Don't have an API key?** [Get one from OpenAI](https://platform.openai.com/api-keys)
-            
-            **For production:** Set `OPENAI_API_KEY` environment variable:
-            ```bash
-            export OPENAI_API_KEY='your-key'
-            streamlit run app.py
-            ```
-            """)
-    
-    # Initialize chatbot if API key is available
-    if api_key:
+        st.error("❌ OpenAI API key not found in `.env` or Streamlit secrets.")
+        st.markdown("""
+Add your API key to `.env` file:
+```bash
+OPENAI_API_KEY=sk-proj-your-key-here
+```
+Then restart the app.
+""")
+    else:
+        # Initialize chatbot if API key is available
         try:
-            # Initialize chatbot
-            @st.cache_resource
-            def load_chatbot(_api_key):
-                return CricketChatbot(loader.matches_df, loader.deliveries_df, _api_key)
-            
-            chatbot = load_chatbot(api_key)
+            # Initialize chatbot (no caching - always use fresh key)
+            chatbot = CricketChatbot(loader.matches_df, loader.deliveries_df, api_key)
             
             st.divider()
             
@@ -412,8 +460,6 @@ elif page == "AI Chatbot":
         except Exception as e:
             st.error(f"❌ Error initializing chatbot: {str(e)}")
             st.info("Make sure your OpenAI API key is valid and has access to the GPT API.")
-    else:
-        st.info("👆 Please enter your OpenAI API key above to use the chatbot.")
 
 
 elif page == "Head-to-Head":
