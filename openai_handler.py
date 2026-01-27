@@ -76,6 +76,7 @@ class CricketChatbot:
         ADDITIONAL FILTERS:
         - bowler_type: null or one of ['pace', 'spin', 'left_arm', 'right_arm', 'off_spinner', 'leg_spinner', 'medium', 'fast']
         - match_phase: null or one of ['powerplay', 'middle_overs', 'death_overs'] (powerplay: 0-6 overs, middle: 6-15.6, death: 16+)
+        - match_situation: null or one of ['batting_first', 'chasing', 'pressure_chase', 'comfortable_chase'] (batting first vs chasing; pressure: RRR>10, comfortable: RRR<8)
         - opposition_team: opposing team name (if mentioned)
         - batter_role: null or one of ['opener', 'middle_order', 'lower_order']
         - vs_conditions: null or one of ['vs_pace', 'vs_spin', 'home', 'away']
@@ -95,6 +96,7 @@ class CricketChatbot:
             "seasons": [list of integers or null],
             "bowler_type": "string or null",
             "match_phase": "string or null",
+            "match_situation": "string or null",
             "opposition_team": "string or null",
             "batter_role": "string or null",
             "vs_conditions": "string or null",
@@ -110,6 +112,10 @@ class CricketChatbot:
           → player1: "Bumrah", player2: "Siraj", match_phase: "death_overs", query_type: "head_to_head"
         - "virat kohli opening the innings" 
           → player1: "Virat Kohli", batter_role: "opener"
+        - "rohit's chasing performance"
+          → player1: "Rohit", match_situation: "chasing"
+        - "kohli in pressure chases"
+          → player1: "Kohli", match_situation: "pressure_chase"
         
         Return ONLY valid JSON, no other text.
         """
@@ -135,6 +141,7 @@ class CricketChatbot:
                 "seasons": None,
                 "bowler_type": None,
                 "match_phase": None,
+                "match_situation": None,
                 "opposition_team": None,
                 "batter_role": None,
                 "vs_conditions": None,
@@ -156,6 +163,7 @@ class CricketChatbot:
         seasons = parsed.get('seasons')
         bowler_type = parsed.get('bowler_type')
         match_phase = parsed.get('match_phase')
+        match_situation = parsed.get('match_situation')
         opposition_team = parsed.get('opposition_team')
         batter_role = parsed.get('batter_role')
         vs_conditions = parsed.get('vs_conditions')
@@ -165,22 +173,24 @@ class CricketChatbot:
         try:
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
-                                                        match_phase=match_phase, bowler_type=bowler_type)
+                                                        match_phase=match_phase, match_situation=match_situation,
+                                                        bowler_type=bowler_type)
             elif query_type == 'player_stats' and player1:
                 return self._get_player_stats_response(player1, seasons, 
-                                                       match_phase=match_phase, bowler_type=bowler_type,
+                                                       match_phase=match_phase, match_situation=match_situation,
+                                                       bowler_type=bowler_type,
                                                        batter_role=batter_role, vs_conditions=vs_conditions)
             elif query_type == 'team_comparison' and player1:
                 return self._get_team_stats_response(player1)
             else:
-                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit opening performance in death overs'"
+                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'"
         
         except Exception as e:
             return f"Error processing query: {str(e)}\n\nPlease try again with a clearer query."
     
     def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, 
                                     seasons: List[int] = None, match_phase: Optional[str] = None,
-                                    bowler_type: Optional[str] = None) -> str:
+                                    match_situation: Optional[str] = None, bowler_type: Optional[str] = None) -> str:
         """Get head-to-head comparison between two players with additional filters"""
         
         try:
@@ -197,6 +207,8 @@ class CricketChatbot:
                 filters['seasons'] = seasons
             if match_phase:
                 filters['match_phase'] = match_phase
+            if match_situation:
+                filters['match_situation'] = match_situation
             if bowler_type:
                 filters['bowler_type'] = bowler_type
             
@@ -212,7 +224,9 @@ class CricketChatbot:
             if seasons:
                 response += f" **({', '.join(str(s) for s in seasons)})**"
             if match_phase:
-                response += f" **({match_phase})**"
+                response += f" - **{match_phase.replace('_', ' ').title()}**"
+            if match_situation:
+                response += f" - **{match_situation.replace('_', ' ').title()}**"
             response += "\n\n"
             
             response += f"📊 **Deliveries**: {h2h_data['deliveries']}\n"
@@ -231,9 +245,10 @@ class CricketChatbot:
             return f"Error getting head-to-head data: {str(e)}"
     
     def _get_player_stats_response(self, player: str, seasons: List[int] = None, 
-                                    match_phase: Optional[str] = None, bowler_type: Optional[str] = None,
+                                    match_phase: Optional[str] = None, match_situation: Optional[str] = None,
+                                    bowler_type: Optional[str] = None,
                                     batter_role: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
-        """Get player statistics with advanced filters like match phase, bowler type, etc."""
+        """Get player statistics with advanced filters like match phase, match situation, bowler type, etc."""
         
         try:
             # Find player with fuzzy matching
@@ -247,6 +262,8 @@ class CricketChatbot:
                 filters['seasons'] = seasons
             if match_phase:
                 filters['match_phase'] = match_phase
+            if match_situation:
+                filters['match_situation'] = match_situation
             if bowler_type:
                 filters['bowler_type'] = bowler_type
             if batter_role:
@@ -267,6 +284,8 @@ class CricketChatbot:
                 response += f" **({', '.join(str(s) for s in seasons)})**"
             if match_phase:
                 response += f" - **{match_phase.replace('_', ' ').title()}**"
+            if match_situation:
+                response += f" - **{match_situation.replace('_', ' ').title()}**"
             if vs_conditions:
                 response += f" - **{vs_conditions.replace('_', ' ').title()}**"
             response += "\n\n"
