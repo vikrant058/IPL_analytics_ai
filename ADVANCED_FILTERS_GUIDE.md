@@ -1,5 +1,30 @@
 # Advanced Filters for AI Analytics Engine
 
+## 📊 Query Complexity Guide
+
+```
+⭐ Simple (Single Filter)
+   "kohli powerplay stats" → matches + filter1
+
+⭐⭐ Intermediate (2-3 Filters)
+   "kohli powerplay vs pace bowlers" → matches + filter1 + filter2
+
+⭐⭐⭐ Advanced (4+ Filters)
+   "kohli pressure chases vs pace in powerplay at away venues"
+   → matches + filter1 + filter2 + filter3 + filter4
+
+⭐⭐⭐⭐ Expert (Complex Comparisons)
+   "kohli vs bumrah: pressure vs non-pressure with different bowler types"
+   → head-to-head with multiple filter combinations
+
+⭐⭐⭐⭐⭐ Master (Multi-Player Analysis with Trends)
+   "year-on-year comparison of kohli's performance in pressure chases 
+    across different career stages"
+   → time-based + context + career evolution analysis
+```
+
+---
+
 ## ✅ Currently Implemented Filters
 
 ### 1. **Match Phase / Overs**
@@ -111,6 +136,12 @@ aggression: 'conservative' | 'moderate' | 'aggressive' | 'ultra_aggressive'
 ```
 - Grouped by strike rate ranges (SR < 100, 100-130, 130-150, > 150)
 
+**Example Query**: "Bumrah's effectiveness against aggressive batsmen"
+→ Shows how he performs when facing high strike rate players
+
+**Example Query**: "Kohli's consistency in conservative vs aggressive modes"
+→ Compares performance when playing defensive vs attacking cricket
+
 ---
 
 ### D. **Venue & Conditions**
@@ -127,6 +158,12 @@ ground_size: 'small' | 'medium' | 'large'
 ```
 - Affects 6-hitting ability and scoring patterns
 
+**Example Query**: "Sky's performance at small vs large grounds"
+→ Shows how ground dimensions affect boundary hitting stats
+
+**Example Query**: "Compare Bumrah's economy at different ground sizes"
+→ Reveals if ground size affects bowling effectiveness
+
 #### 3. **Pitch Characteristics** (if data available)
 ```
 pitch: 'batting_track' | 'bowling_track' | 'turning_track'
@@ -141,17 +178,29 @@ pitch: 'batting_track' | 'bowling_track' | 'turning_track'
 partnership_type: 'opening_partnership' | 'recovery_partnership' | 'aggressive_partnership' | 'final_overs_partnership'
 ```
 
+**Example Query**: "Opening partnership success in powerplay"
+→ Shows effectiveness of first-wicket partnerships in first 6 overs
+
+**Example Query**: "Recovery partnership performance after early loss of wickets"
+→ Analyzes partnerships formed to stabilize innings after collapse
+
 #### 2. **Innings Situation**
 ```
 innings_position: 'early_innings' | 'middle_innings' | 'end_innings'
 ```
 - Overs 1-8, 9-16, 17-20
 
+**Example Query**: "Dhoni's performance in middle vs end innings"
+→ Shows finisher's effectiveness at different batting stages
+
 #### 3. **Partnership Duration**
 ```
 partnership_length: 'short_partnership' | 'long_partnership'
 ```
 - By number of runs or balls
+
+**Example Query**: "Effectiveness of long vs short partnerships in death overs"
+→ Shows if sustained partnerships or quick cameos work better
 
 ---
 
@@ -162,15 +211,27 @@ partnership_length: 'short_partnership' | 'long_partnership'
 year_comparison: 'improvement' | 'decline' | 'consistent' | 'surge'
 ```
 
+**Example Query**: "Kohli's year-on-year improvement trends"
+→ Shows if player is improving, declining, or consistent over seasons
+
+**Example Query**: "Which year did Bumrah have his best performance?"
+→ Compares performances across different IPL seasons
+
 #### 2. **Career Stage**
 ```
 career_stage: 'early_career' | 'peak_years' | 'late_career'
 ```
 
+**Example Query**: "Dhoni's peak years vs early career stats"
+→ Shows how performance changes across career trajectory
+
 #### 3. **Playing Role Evolution**
 ```
 role_evolution: 'opener_to_middle_order' | 'specialist_role_change' | 'leadership_impact'
 ```
+
+**Example Query**: "How did Rohit's stats change from middle order to opening?"
+→ Tracks performance evolution when role changes
 
 ---
 
@@ -191,10 +252,22 @@ pressure_level: 'high_pressure' | 'medium_pressure' | 'low_pressure'
 comeback_context: 'after_poor_innings' | 'after_injury' | 'recall_performance'
 ```
 
+**Example Query**: "Dhoni's form immediately after injury"
+→ Shows player's mental and physical readiness post-injury
+
+**Example Query**: "Bumrah's performance after poor recent form"
+→ Shows if player bounces back quickly or struggles
+
 #### 3. **Match Impact**
 ```
 match_impact: 'match_winner' | 'match_losing' | 'supporting_role' | 'game_changer'
 ```
+
+**Example Query**: "Bumrah's stats in matches he won vs lost"
+→ Shows if player performance correlates with match outcome
+
+**Example Query**: "Game-changer performances by Kohli"
+→ Shows instances where Kohli turned match momentum
 
 ---
 
