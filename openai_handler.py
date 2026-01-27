@@ -9,6 +9,10 @@ from typing import Dict, List, Tuple, Optional
 from openai import OpenAI
 from data_loader import IPLDataLoader
 from stats_engine import StatsEngine
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class CricketChatbot:
     """
