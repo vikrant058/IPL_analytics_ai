@@ -57,16 +57,29 @@ class CricketChatbot:
         - Player 2 name
         - Venue (if mentioned)
         - Season/Year (if mentioned)
+        - Bowler type (Pace, Spin, Left-arm, Right-arm, etc.)
+        - Match phase (Powerplay 0-6, Middle 6-16, Death 16-20)
+        - Opposition team
         - Query type (h2h, stats, comparison)
         """
         
         prompt = f"""
-        Parse this cricket analytics query and extract the following information in JSON format:
+        Parse this cricket analytics query and extract cricket-specific information in JSON format:
+        
+        REQUIRED FIELDS:
         - player1: first player name (if mentioned)
         - player2: second player name (if mentioned)
         - venue: stadium/venue name (if mentioned)
-        - seasons: list of years/seasons (e.g., [2025] or [2023, 2024] or null if not mentioned)
+        - seasons: list of years/seasons (e.g., [2025] or [2023, 2024] or null)
         - query_type: one of ['head_to_head', 'player_stats', 'team_comparison', 'general']
+        
+        ADDITIONAL FILTERS:
+        - bowler_type: null or one of ['pace', 'spin', 'left_arm', 'right_arm', 'off_spinner', 'leg_spinner', 'medium', 'fast']
+        - match_phase: null or one of ['powerplay', 'middle_overs', 'death_overs'] (powerplay: 0-6 overs, middle: 6-15.6, death: 16+)
+        - opposition_team: opposing team name (if mentioned)
+        - batter_role: null or one of ['opener', 'middle_order', 'lower_order']
+        - vs_conditions: null or one of ['vs_pace', 'vs_spin', 'home', 'away']
+        - form_filter: null or one of ['recent', 'consistent', 'peak_performance']
         
         Available players: {', '.join(self.all_players[:20])}... (and {len(self.all_players)-20} more)
         Available venues: {', '.join(self.all_venues)}
@@ -80,11 +93,24 @@ class CricketChatbot:
             "player2": "string or null", 
             "venue": "string or null",
             "seasons": [list of integers or null],
+            "bowler_type": "string or null",
+            "match_phase": "string or null",
+            "opposition_team": "string or null",
+            "batter_role": "string or null",
+            "vs_conditions": "string or null",
+            "form_filter": "string or null",
             "query_type": "string",
             "interpretation": "brief explanation of what user is asking"
         }}
         
-        For years, extract any 4-digit numbers that represent IPL seasons (2007-2025).
+        EXAMPLES:
+        - "rohit's powerplay performance vs pace bowlers in 2024" 
+          → player1: "Rohit Sharma", match_phase: "powerplay", vs_conditions: "vs_pace", seasons: [2024]
+        - "compare bumrah and siraj in death overs" 
+          → player1: "Bumrah", player2: "Siraj", match_phase: "death_overs", query_type: "head_to_head"
+        - "virat kohli opening the innings" 
+          → player1: "Virat Kohli", batter_role: "opener"
+        
         Return ONLY valid JSON, no other text.
         """
         
@@ -92,7 +118,7 @@ class CricketChatbot:
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
-            max_tokens=200
+            max_tokens=300
         )
         
         response_text = response.choices[0].message.content.strip()
@@ -107,6 +133,12 @@ class CricketChatbot:
                 "player2": None,
                 "venue": None,
                 "seasons": None,
+                "bowler_type": None,
+                "match_phase": None,
+                "opposition_team": None,
+                "batter_role": None,
+                "vs_conditions": None,
+                "form_filter": None,
                 "query_type": "general",
                 "interpretation": "Could not parse query clearly"
             }
@@ -122,23 +154,34 @@ class CricketChatbot:
         player2 = parsed.get('player2')
         venue = parsed.get('venue')
         seasons = parsed.get('seasons')
+        bowler_type = parsed.get('bowler_type')
+        match_phase = parsed.get('match_phase')
+        opposition_team = parsed.get('opposition_team')
+        batter_role = parsed.get('batter_role')
+        vs_conditions = parsed.get('vs_conditions')
+        form_filter = parsed.get('form_filter')
         query_type = parsed.get('query_type')
         
         try:
             if query_type == 'head_to_head' and player1 and player2:
-                return self._get_head_to_head_response(player1, player2, venue, seasons)
+                return self._get_head_to_head_response(player1, player2, venue, seasons, 
+                                                        match_phase=match_phase, bowler_type=bowler_type)
             elif query_type == 'player_stats' and player1:
-                return self._get_player_stats_response(player1, seasons)
+                return self._get_player_stats_response(player1, seasons, 
+                                                       match_phase=match_phase, bowler_type=bowler_type,
+                                                       batter_role=batter_role, vs_conditions=vs_conditions)
             elif query_type == 'team_comparison' and player1:
                 return self._get_team_stats_response(player1)
             else:
-                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in chinnaswamy'\n- 'virat kohli statistics in 2025'\n- 'mumbai indians performance'"
+                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit opening performance in death overs'"
         
         except Exception as e:
             return f"Error processing query: {str(e)}\n\nPlease try again with a clearer query."
     
-    def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, seasons: List[int] = None) -> str:
-        """Get head-to-head comparison between two players"""
+    def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, 
+                                    seasons: List[int] = None, match_phase: Optional[str] = None,
+                                    bowler_type: Optional[str] = None) -> str:
+        """Get head-to-head comparison between two players with additional filters"""
         
         try:
             # Find actual player names using fuzzy matching
@@ -148,13 +191,18 @@ class CricketChatbot:
             if not found_player1 or not found_player2:
                 return f"Could not find players. Searching for: {player1}, {player2}"
             
-            # Build filters dict
+            # Build filters dict with all available filters
             filters = {}
             if seasons:
                 filters['seasons'] = seasons
+            if match_phase:
+                filters['match_phase'] = match_phase
+            if bowler_type:
+                filters['bowler_type'] = bowler_type
             
             # Get H2H stats from stats engine
-            h2h_data = self.stats_engine.get_player_head_to_head(found_player1, found_player2, filters if filters else None)
+            h2h_data = self.stats_engine.get_player_head_to_head(found_player1, found_player2, 
+                                                                  filters if filters else None)
             
             if h2h_data.get('error'):
                 return f"Could not find head-to-head data between {found_player1} and {found_player2}. They may not have faced each other."
@@ -163,6 +211,8 @@ class CricketChatbot:
             response = f"**Head-to-Head: {found_player1} vs {found_player2}**"
             if seasons:
                 response += f" **({', '.join(str(s) for s in seasons)})**"
+            if match_phase:
+                response += f" **({match_phase})**"
             response += "\n\n"
             
             response += f"📊 **Deliveries**: {h2h_data['deliveries']}\n"
@@ -180,8 +230,10 @@ class CricketChatbot:
         except Exception as e:
             return f"Error getting head-to-head data: {str(e)}"
     
-    def _get_player_stats_response(self, player: str, seasons: List[int] = None) -> str:
-        """Get player statistics for specific season(s) if provided"""
+    def _get_player_stats_response(self, player: str, seasons: List[int] = None, 
+                                    match_phase: Optional[str] = None, bowler_type: Optional[str] = None,
+                                    batter_role: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
+        """Get player statistics with advanced filters like match phase, bowler type, etc."""
         
         try:
             # Find player with fuzzy matching
@@ -193,17 +245,30 @@ class CricketChatbot:
             filters = {}
             if seasons:
                 filters['seasons'] = seasons
+            if match_phase:
+                filters['match_phase'] = match_phase
+            if bowler_type:
+                filters['bowler_type'] = bowler_type
+            if batter_role:
+                filters['batter_role'] = batter_role
+            if vs_conditions:
+                filters['vs_conditions'] = vs_conditions
             
-            # Get stats with optional season filter
+            # Get stats with optional filters
             stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
             
             if not stats or 'error' in stats:
                 season_text = f" in {seasons}" if seasons else ""
-                return f"Player '{found_player}' has no data{season_text} in IPL dataset."
+                filter_text = f" {match_phase}" if match_phase else ""
+                return f"Player '{found_player}' has no data{season_text}{filter_text} in IPL dataset."
             
             response = f"**Player Profile: {found_player}**"
             if seasons:
                 response += f" **({', '.join(str(s) for s in seasons)})**"
+            if match_phase:
+                response += f" - **{match_phase.replace('_', ' ').title()}**"
+            if vs_conditions:
+                response += f" - **{vs_conditions.replace('_', ' ').title()}**"
             response += "\n\n"
             
             if 'batting' in stats and stats['batting']:
