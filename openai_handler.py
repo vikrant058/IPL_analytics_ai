@@ -261,6 +261,15 @@ EXAMPLES:
                 if len(parts) >= 2:
                     player2 = self._resolve_player_name(parts[1])
             
+            # Determine query type
+            determined_type = 'general'
+            if player1 and player2:
+                determined_type = 'head_to_head'
+            elif player1:
+                determined_type = 'player_stats'
+            elif team:
+                determined_type = 'team_comparison'
+            
             return {
                 "player1": player1,
                 "player2": player2,
@@ -273,7 +282,7 @@ EXAMPLES:
                 "batter_role": None,
                 "vs_conditions": None,
                 "form_filter": None,
-                "query_type": "head_to_head" if (player1 and player2) else ("player_stats" if player1 else "general"),
+                "query_type": determined_type,
                 "interpretation": f"Comparing {player1} vs {player2}" if (player1 and player2) else (f"Stats for {player1}" if player1 else "Cricket query")
             }
     
@@ -352,6 +361,16 @@ EXAMPLES:
             return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'\n- 'bumrah in pressure situations'\n- 'kohli against left-arm fast bowlers'"
         
         try:
+            # Determine query type if not set correctly
+            if not query_type or query_type == 'general':
+                if player1 and player2:
+                    query_type = 'head_to_head'
+                elif player1:
+                    query_type = 'player_stats'
+                elif opposition_team:
+                    query_type = 'team_comparison'
+            
+            # Route to appropriate handler
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
                                                         match_phase=match_phase, match_situation=match_situation,
@@ -361,8 +380,14 @@ EXAMPLES:
                                                        match_phase=match_phase, match_situation=match_situation,
                                                        bowler_type=bowler_type,
                                                        batter_role=batter_role, vs_conditions=vs_conditions)
-            elif query_type == 'team_comparison' and player1:
-                return self._get_team_stats_response(player1)
+            elif query_type == 'team_comparison' and opposition_team:
+                return self._get_team_stats_response(opposition_team)
+            elif player1:
+                # Default to player stats if we have a player
+                return self._get_player_stats_response(player1, seasons, 
+                                                       match_phase=match_phase, match_situation=match_situation,
+                                                       bowler_type=bowler_type,
+                                                       batter_role=batter_role, vs_conditions=vs_conditions)
             else:
                 return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'"
         
