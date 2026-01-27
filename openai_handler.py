@@ -7,6 +7,7 @@ import os
 import pandas as pd
 from typing import Dict, List, Tuple, Optional
 from openai import OpenAI
+from pathlib import Path
 from data_loader import IPLDataLoader
 from stats_engine import StatsEngine
 
@@ -43,10 +44,14 @@ class CricketChatbot:
         self.all_venues = self._get_all_venues()
         self.all_teams = self._get_all_teams()
         
+        # Load player aliases for smart matching
+        self.player_aliases = self._build_player_aliases()
+        self.team_aliases = self._build_team_aliases()
+        
         # Valid filter values
         self.VALID_MATCH_PHASES = ['powerplay', 'middle_overs', 'death_overs', 'opening', 'closing']
-        self.VALID_MATCH_SITUATIONS = ['chasing', 'defending', 'pressure_chase', 'winning_position']
-        self.VALID_BOWLER_TYPES = ['fast_bowler', 'spin_bowler', 'left_arm', 'right_arm', 'pacer', 'spinner']
+        self.VALID_MATCH_SITUATIONS = ['chasing', 'defending', 'pressure_chase', 'winning_position', 'batting_first']
+        self.VALID_BOWLER_TYPES = ['fast_bowler', 'spin_bowler', 'left_arm', 'right_arm', 'pacer', 'spinner', 'pace']
         self.VALID_BATTER_ROLES = ['opener', 'middle_order', 'lower_order', 'finisher']
         self.VALID_VS_CONDITIONS = ['vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm']
     
@@ -85,115 +90,238 @@ class CricketChatbot:
         teams = pd.concat([self.matches_df['team1'], self.matches_df['team2']]).unique()
         return teams.tolist()
     
+    def _build_player_aliases(self) -> Dict[str, str]:
+        """Load player name aliases from player_aliases.json"""
+        try:
+            aliases_file = Path(__file__).resolve().parent / "player_aliases.json"
+            if aliases_file.exists():
+                with open(aliases_file, 'r') as f:
+                    data = json.load(f)
+                    
+                # Build reverse mapping: alias -> canonical name
+                alias_map = {}
+                for canonical_name, alias_list in data.get("aliases", {}).items():
+                    for alias in alias_list:
+                        alias_map[alias.lower()] = canonical_name
+                
+                return alias_map
+        except Exception as e:
+            print(f"Warning: Could not load player aliases: {e}")
+        
+        return {}
+    
+    def _build_team_aliases(self) -> Dict[str, str]:
+        """Load team aliases from player_aliases.json"""
+        try:
+            aliases_file = Path(__file__).resolve().parent / "player_aliases.json"
+            if aliases_file.exists():
+                with open(aliases_file, 'r') as f:
+                    data = json.load(f)
+                    
+                # Build reverse mapping: alias -> canonical name
+                alias_map = {}
+                for canonical_name, alias_list in data.get("teams", {}).items():
+                    for alias in alias_list:
+                        alias_map[alias.lower()] = canonical_name
+                
+                return alias_map
+        except Exception as e:
+            print(f"Warning: Could not load team aliases: {e}")
+        
+        return {}
+    
+    def _resolve_player_name(self, query_text: str) -> Optional[str]:
+        """Intelligently resolve player name from query using aliases and fuzzy matching"""
+        query_lower = query_text.lower()
+        
+        # Check for exact aliases first
+        for alias, full_name in self.player_aliases.items():
+            if alias in query_lower:
+                return full_name
+        
+        # Check for partial matches in all players
+        for player in self.all_players:
+            if player and not pd.isna(player):
+                player_lower = player.lower()
+                if player_lower in query_lower or query_lower in player_lower:
+                    return player
+        
+        return None
+    
+    def _resolve_team_name(self, query_text: str) -> Optional[str]:
+        """Intelligently resolve team name from query using aliases"""
+        query_lower = query_text.lower()
+        
+        # Check for exact aliases first
+        for alias, full_name in self.team_aliases.items():
+            if alias in query_lower:
+                return full_name
+        
+        # Check for partial matches
+        for team in self.all_teams:
+            if team and not pd.isna(team):
+                team_lower = team.lower()
+                if team_lower in query_lower:
+                    return team
+        
+        return None
+    
     def parse_query(self, query: str) -> Dict:
         """
-        Parse natural language query using GPT to extract:
-        - Player 1 name
-        - Player 2 name
-        - Venue (if mentioned)
-        - Season/Year (if mentioned)
-        - Bowler type (Pace, Spin, Left-arm, Right-arm, etc.)
-        - Match phase (Powerplay 0-6, Middle 6-16, Death 16-20)
-        - Opposition team
-        - Query type (h2h, stats, comparison)
+        Parse natural language query using GPT to intelligently extract cricket-specific information.
+        Leverages loaded player/team aliases for smart entity resolution.
         """
         
-        prompt = f"""
-        Parse this cricket analytics query and extract cricket-specific information in JSON format:
+        # Build context about available aliases for the prompt
+        player_alias_samples = {k: v for k, v in list(self.player_aliases.items())[:8]}
+        team_alias_samples = {k: v for k, v in list(self.team_aliases.items())[:6]}
         
-        REQUIRED FIELDS:
-        - player1: first player name (if mentioned)
-        - player2: second player name (if mentioned)
-        - venue: stadium/venue name (if mentioned)
-        - seasons: list of years/seasons (e.g., [2025] or [2023, 2024] or null)
-        - query_type: one of ['head_to_head', 'player_stats', 'team_comparison', 'general']
+        prompt = f"""You are an expert cricket analytics assistant. Parse this cricket query intelligently.
+
+USE THESE PLAYER ALIASES TO RESOLVE NAMES:
+{json.dumps(player_alias_samples, indent=2)}
+... and {len(self.player_aliases)-8} more aliases loaded from player_aliases.json
+
+USE THESE TEAM ALIASES:
+{json.dumps(team_alias_samples, indent=2)}
+... and {len(self.team_aliases)-6} more team aliases
+
+CRICKET FILTER OPTIONS:
+- match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs)
+- match_situation: 'batting_first', 'chasing', 'pressure_chase', 'comfortable_chase'
+- bowler_type: 'pace', 'spin', 'left_arm', 'right_arm', 'fast', 'off_spinner', 'leg_spinner'
+- batter_role: 'opener', 'middle_order', 'lower_order', 'finisher'
+- vs_conditions: 'vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm'
+
+USER QUERY: "{query}"
+
+Return ONLY valid JSON (NO other text):
+{{
+    "player1": "Full player name (use aliases if needed) or null",
+    "player2": "Second player (for comparisons) or null",
+    "venue": "Venue name or null",
+    "seasons": [List of years mentioned or null],
+    "bowler_type": "Bowler type or null",
+    "match_phase": "Match phase or null",
+    "match_situation": "Match situation or null",
+    "opposition_team": "Full team name or null",
+    "batter_role": "Batter role or null",
+    "vs_conditions": "Condition or null",
+    "form_filter": "Form or null",
+    "query_type": "head_to_head|player_stats|team_comparison|general",
+    "interpretation": "What the user is asking"
+}}
+
+EXAMPLES:
+- "virat vs bumrah" → player1: "V Kohli", player2: "JJ Bumrah", query_type: "head_to_head"
+- "rohit powerplay" → player1: "RG Sharma", match_phase: "powerplay", query_type: "player_stats"
+- "kohli chasing mi" → player1: "V Kohli", match_situation: "chasing", opposition_team: "Mumbai Indians"
+- "bumrah pace against csk" → player1: "JJ Bumrah", bowler_type: "pace", opposition_team: "Chennai Super Kings"
+- "sky vs spin 2024" → player1: "SA Yadav", vs_conditions: "vs_spin", seasons: [2024]"""
         
-        ADDITIONAL FILTERS:
-        - bowler_type: null or one of ['pace', 'spin', 'left_arm', 'right_arm', 'off_spinner', 'leg_spinner', 'medium', 'fast']
-        - match_phase: null or one of ['powerplay', 'middle_overs', 'death_overs'] (powerplay: 0-6 overs, middle: 6-15.6, death: 16+)
-        - match_situation: null or one of ['batting_first', 'chasing', 'pressure_chase', 'comfortable_chase'] (batting first vs chasing; pressure: RRR>10, comfortable: RRR<8)
-        - opposition_team: opposing team name (if mentioned)
-        - batter_role: null or one of ['opener', 'middle_order', 'lower_order']
-        - vs_conditions: null or one of ['vs_pace', 'vs_spin', 'home', 'away']
-        - form_filter: null or one of ['recent', 'consistent', 'peak_performance']
-        
-        Available players: {', '.join(self.all_players[:20])}... (and {len(self.all_players)-20} more)
-        Available venues: {', '.join(self.all_venues)}
-        Available teams: {', '.join(self.all_teams)}
-        
-        Query: "{query}"
-        
-        Response format:
-        {{
-            "player1": "string or null",
-            "player2": "string or null", 
-            "venue": "string or null",
-            "seasons": [list of integers or null],
-            "bowler_type": "string or null",
-            "match_phase": "string or null",
-            "match_situation": "string or null",
-            "opposition_team": "string or null",
-            "batter_role": "string or null",
-            "vs_conditions": "string or null",
-            "form_filter": "string or null",
-            "query_type": "string",
-            "interpretation": "brief explanation of what user is asking"
-        }}
-        
-        EXAMPLES:
-        - "rohit's powerplay performance vs pace bowlers in 2024" 
-          → player1: "Rohit Sharma", match_phase: "powerplay", vs_conditions: "vs_pace", seasons: [2024]
-        - "compare bumrah and siraj in death overs" 
-          → player1: "Bumrah", player2: "Siraj", match_phase: "death_overs", query_type: "head_to_head"
-        - "virat kohli opening the innings" 
-          → player1: "Virat Kohli", batter_role: "opener"
-        - "rohit's chasing performance"
-          → player1: "Rohit", match_situation: "chasing"
-        - "kohli in pressure chases"
-          → player1: "Kohli", match_situation: "pressure_chase"
-        
-        Return ONLY valid JSON, no other text.
-        """
-        
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=300
-        )
-        
-        response_text = response.choices[0].message.content.strip()
-        
-        # Parse JSON response
         try:
-            parsed = json.loads(response_text)
-            return parsed
-        except json.JSONDecodeError:
-            # Fallback: Try to extract at least a player name from the query
-            query_lower = query.lower()
-            extracted_player = None
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=500
+            )
             
-            # Try to find a player from the dataset
-            for player in self.all_players:
-                if player.lower() in query_lower:
-                    extracted_player = player
-                    break
+            response_text = response.choices[0].message.content.strip()
+            parsed = json.loads(response_text)
+            
+            # Normalize and validate player/team names
+            if parsed.get('player1'):
+                canonical = self._get_canonical_player_name(str(parsed['player1']))
+                if canonical:
+                    parsed['player1'] = canonical
+            
+            if parsed.get('player2'):
+                canonical = self._get_canonical_player_name(str(parsed['player2']))
+                if canonical:
+                    parsed['player2'] = canonical
+            
+            if parsed.get('opposition_team'):
+                canonical = self._get_canonical_team_name(str(parsed['opposition_team']))
+                if canonical:
+                    parsed['opposition_team'] = canonical
+            
+            return parsed
+            
+        except (json.JSONDecodeError, Exception) as e:
+            # Fallback: Use alias-aware resolution without LLM
+            player1 = self._resolve_player_name(query)
+            player2 = None
+            team = self._resolve_team_name(query)
+            
+            # Try to extract second player from "vs" comparison
+            if ' vs ' in query.lower() or ' against ' in query.lower():
+                separator = ' vs ' if ' vs ' in query.lower() else ' against '
+                parts = query.lower().split(separator)
+                if len(parts) >= 2:
+                    player2 = self._resolve_player_name(parts[1])
             
             return {
-                "player1": extracted_player,
-                "player2": None,
+                "player1": player1,
+                "player2": player2,
                 "venue": None,
                 "seasons": None,
                 "bowler_type": None,
                 "match_phase": None,
                 "match_situation": None,
-                "opposition_team": None,
+                "opposition_team": team,
                 "batter_role": None,
                 "vs_conditions": None,
                 "form_filter": None,
-                "query_type": "player_stats" if extracted_player else "general",
-                "interpretation": f"Searching for {extracted_player}" if extracted_player else "Could not parse query clearly"
+                "query_type": "head_to_head" if (player1 and player2) else ("player_stats" if player1 else "general"),
+                "interpretation": f"Comparing {player1} vs {player2}" if (player1 and player2) else (f"Stats for {player1}" if player1 else "Cricket query")
             }
+    
+    def _get_canonical_player_name(self, player_input: str) -> Optional[str]:
+        """Get canonical player name using loaded aliases"""
+        if not player_input:
+            return None
+        
+        player_lower = player_input.lower().strip()
+        
+        # Direct match in aliases
+        if player_lower in self.player_aliases:
+            return self.player_aliases[player_lower]
+        
+        # Check if it's already a canonical name in dataset
+        for player in self.all_players:
+            if player and player.lower() == player_lower:
+                return player
+        
+        # Fuzzy match: partial word match
+        for player in self.all_players:
+            if player and (player.lower() in player_lower or player_lower in player.lower()):
+                return player
+        
+        return None
+    
+    def _get_canonical_team_name(self, team_input: str) -> Optional[str]:
+        """Get canonical team name using loaded aliases"""
+        if not team_input:
+            return None
+        
+        team_lower = team_input.lower().strip()
+        
+        # Direct alias match
+        if team_lower in self.team_aliases:
+            return self.team_aliases[team_lower]
+        
+        # Already canonical
+        for team in self.all_teams:
+            if team and team.lower() == team_lower:
+                return team
+        
+        # Fuzzy match
+        for team in self.all_teams:
+            if team and (team.lower() in team_lower or team_lower in team.lower()):
+                return team
+        
+        return None
     
     def get_response(self, query: str) -> str:
         """
