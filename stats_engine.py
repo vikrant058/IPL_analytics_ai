@@ -278,10 +278,6 @@ class StatsEngine:
         # Use provided total_matches or calculate from batting data
         matches = total_matches if total_matches is not None else len(player_deliveries['match_id'].unique())
         
-        # Count dot balls (balls faced with 0 runs)
-        dot_balls = len(player_deliveries[player_deliveries['batsman_runs'] == 0])
-        dot_ball_percentage = round((dot_balls / balls * 100), 2) if balls > 0 else 0
-        
         # Calculate scores per match
         match_scores = player_deliveries.groupby('match_id')['batsman_runs'].sum()
         highest_score = int(match_scores.max()) if len(match_scores) > 0 else 0
@@ -292,13 +288,25 @@ class StatsEngine:
         fours = len(player_deliveries[player_deliveries['batsman_runs'] == 4])
         sixes = len(player_deliveries[player_deliveries['batsman_runs'] == 6])
         
+        # FIX #1: Count dismissals (innings where player got out) for accurate batting average
+        dismissals = player_deliveries[player_deliveries['is_wicket'] == 1][['match_id', 'inning']].drop_duplicates().shape[0]
+        
+        # FIX #2 & #3: Valid deliveries exclude wides and no balls for strike rate and dot balls
+        valid_deliveries = player_deliveries[
+            (player_deliveries['extras_type'] != 'wides') &
+            (player_deliveries['extras_type'] != 'noballs')
+        ]
+        dot_balls = len(valid_deliveries[valid_deliveries['batsman_runs'] == 0])
+        valid_count = len(valid_deliveries)
+        dot_ball_percentage = round((dot_balls / valid_count * 100), 2) if valid_count > 0 else 0
+        
         return {
             'matches': matches,
             'innings': innings,
             'runs': int(runs),
             'balls': balls,
-            'average': round(runs / innings, 2) if innings > 0 else 0,
-            'strike_rate': round((runs / balls * 100), 2) if balls > 0 else 0,
+            'average': round(runs / dismissals, 2) if dismissals > 0 else 0,
+            'strike_rate': round((runs / valid_count * 100), 2) if valid_count > 0 else 0,
             'highest_score': highest_score,
             'centuries': centuries,
             'fifties': fifties,
@@ -334,7 +342,12 @@ class StatsEngine:
             return {}
         
         wickets = player_deliveries['is_wicket'].sum()
-        runs_conceded = player_deliveries['total_runs'].sum()
+        
+        # FIX #4: Bowler runs conceded = exclude leg byes and byes (cricket rule: only credited for runs off bat, wides, no balls)
+        runs_conceded = player_deliveries[
+            ~player_deliveries['extras_type'].isin(['legbyes', 'byes'])
+        ]['total_runs'].sum()
+        
         balls = len(player_deliveries)
         
         # Count unique innings where player bowled (only inning 1 and 2, exclude super overs)
@@ -344,22 +357,32 @@ class StatsEngine:
         # Use provided total_matches or calculate from bowling data
         matches = total_matches if total_matches is not None else len(player_deliveries['match_id'].unique())
         
-        # Count dot balls (balls with 0 runs conceded)
-        dot_balls = len(player_deliveries[player_deliveries['total_runs'] == 0])
-        dot_ball_percentage = round((dot_balls / balls * 100), 2) if balls > 0 else 0
+        # FIX #5: Dot balls - exclude wides and no balls (only valid deliveries with 0 runs)
+        valid_deliveries_bowling = player_deliveries[
+            (player_deliveries['extras_type'] != 'wides') &
+            (player_deliveries['extras_type'] != 'noballs')
+        ]
+        dot_balls = len(valid_deliveries_bowling[valid_deliveries_bowling['total_runs'] == 0])
+        valid_balls_count = len(valid_deliveries_bowling)
+        dot_ball_percentage = round((dot_balls / valid_balls_count * 100), 2) if valid_balls_count > 0 else 0
         
-        # Best figures (wickets/runs in a match)
-        match_stats = player_deliveries.groupby('match_id').agg({
-            'is_wicket': 'sum',
-            'total_runs': 'sum'
-        }).reset_index()
+        # FIX #6: Best figures - use correct runs (exclude leg byes and byes)
+        best_figures_data = []
+        for match_id in player_deliveries['match_id'].unique():
+            match_data = player_deliveries[player_deliveries['match_id'] == match_id]
+            wickets_in_match = match_data['is_wicket'].sum()
+            runs_in_match = match_data[
+                ~match_data['extras_type'].isin(['legbyes', 'byes'])
+            ]['total_runs'].sum()
+            best_figures_data.append({
+                'match_id': match_id,
+                'wickets': wickets_in_match,
+                'runs': runs_in_match
+            })
         
-        if len(match_stats) > 0:
-            # Find match with most wickets
-            best_match_idx = match_stats['is_wicket'].idxmax()
-            best_wickets = int(match_stats.loc[best_match_idx, 'is_wicket'])
-            best_runs = int(match_stats.loc[best_match_idx, 'total_runs'])
-            best_figures = f"{best_wickets}/{best_runs}"
+        if best_figures_data:
+            best_match = max(best_figures_data, key=lambda x: x['wickets'], default={'wickets': 0, 'runs': 0})
+            best_figures = f"{int(best_match['wickets'])}/{int(best_match['runs'])}"
         else:
             best_figures = "0/0"
         
