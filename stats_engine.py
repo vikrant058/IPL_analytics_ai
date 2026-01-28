@@ -594,8 +594,8 @@ class StatsEngine:
                 (self.deliveries_df['bowler'] == player2)
             ].copy()
             
-            # Apply filters if provided
-            if filters and h2h_deliveries.shape[0] > 0:
+            # Apply basic filters (seasons, venue) first
+            if filters:
                 if filters.get('seasons'):
                     h2h_deliveries = h2h_deliveries.merge(
                         self.matches_df[['id', 'year']], 
@@ -603,6 +603,17 @@ class StatsEngine:
                     )
                     h2h_deliveries = h2h_deliveries[h2h_deliveries['year'].isin(filters['seasons'])]
                     h2h_deliveries = h2h_deliveries.drop(columns=['id', 'year'])
+                
+                if filters.get('venue'):
+                    h2h_deliveries = h2h_deliveries.merge(
+                        self.matches_df[['id', 'venue']], 
+                        left_on='match_id', right_on='id', how='inner'
+                    )
+                    h2h_deliveries = h2h_deliveries[h2h_deliveries['venue'].isin(filters['venue'])]
+                    h2h_deliveries = h2h_deliveries.drop(columns=['id', 'venue'])
+                
+                # Apply cricket-specific filters (match_phase, match_situation, etc)
+                h2h_deliveries = self._apply_cricket_filters(h2h_deliveries, filters)
             
             if len(h2h_deliveries) == 0:
                 return {
