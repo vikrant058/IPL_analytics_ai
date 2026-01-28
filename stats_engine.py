@@ -490,6 +490,9 @@ class StatsEngine:
         """Calculate comprehensive bowling statistics"""
         player_deliveries = self.deliveries_df[self.deliveries_df['bowler'] == player].copy()
         
+        # CRITICAL: Exclude super overs (innings 3 and above) - Cricinfo only counts regular innings
+        player_deliveries = player_deliveries[player_deliveries['inning'].isin([1, 2])]
+        
         # Apply basic filters (season, venue) first
         if filters:
             if filters.get('seasons'):
@@ -524,7 +527,12 @@ class StatsEngine:
             ~player_deliveries['extras_type'].isin(['legbyes', 'byes'])
         ]['total_runs'].sum()
         
-        balls = len(player_deliveries)
+        # CRITICAL: Count only valid deliveries (exclude wides and no balls) - Cricinfo counts 6 balls per over
+        valid_deliveries_count = player_deliveries[
+            (player_deliveries['extras_type'] != 'wides') &
+            (player_deliveries['extras_type'] != 'noballs')
+        ]
+        balls = len(valid_deliveries_count)
         
         # Count unique innings where player bowled (only inning 1 and 2, exclude super overs)
         valid_innings = player_deliveries[player_deliveries['inning'].isin([1, 2])][['match_id', 'inning']].drop_duplicates()
