@@ -517,10 +517,13 @@ class StatsEngine:
         if len(player_deliveries) == 0:
             return {}
         
-        # Count wickets - is_wicket column already filters for valid dismissals in the source data
-        # (includes: caught, bowled, caught & bowled, stumped, hit wicket, LBW)
-        # (excludes: run out, retired, obstructing field, etc.)
-        wickets = player_deliveries['is_wicket'].sum()
+        # Count wickets - EXCLUDE run outs (not credited to bowler in cricket rules)
+        # Bowler gets credit for: caught, bowled, caught & bowled, stumped, hit wicket, LBW
+        # Does NOT get credit for: run out, retired, obstructing field, etc.
+        wickets = len(player_deliveries[
+            (player_deliveries['is_wicket'] == 1) & 
+            (player_deliveries['dismissal_kind'] != 'run out')
+        ])
         
         # FIX #4: Bowler runs conceded = exclude leg byes and byes (cricket rule: only credited for runs off bat, wides, no balls)
         runs_conceded = player_deliveries[
@@ -735,7 +738,7 @@ class StatsEngine:
                 'runs': int(runs),
                 'strike_rate': round(strike_rate, 2),
                 'dot_balls': dot_balls,
-                'summary': f'{player1} has faced {deliveries} balls from {player2}, scoring {int(runs)} runs at a strike rate of {strike_rate:.1f}%'
+                'summary': f'{player1} has faced {deliveries} balls from {player2}, scoring {int(runs)} runs at a strike rate of {strike_rate:.1f}'
             }
         except Exception as e:
             return {'error': True, 'message': str(e)}
