@@ -334,7 +334,7 @@ class StatsEngine:
             # TODO: Add batting order detection
             pass
         
-        # VS conditions: vs_pace, vs_spin, vs_off_spin, vs_leg_spin, vs_left_arm, vs_right_arm
+        # VS conditions: vs_pace, vs_spin, vs_off_spin, vs_leg_spin, vs_left_arm, vs_right_arm, vs_left_arm_spin, vs_right_arm_spin
         # Filter deliveries against specific bowling types
         if filters.get('vs_conditions'):
             vs_cond = filters['vs_conditions'].lower()
@@ -347,6 +347,16 @@ class StatsEngine:
             elif vs_cond == 'vs_spin':
                 spin_bowlers = self._bowler_types.get('spin_bowlers', [])
                 matching_bowlers.update(spin_bowlers)
+            elif vs_cond == 'vs_left_arm_spin':
+                # Left arm spinners only (left-armers who are spinners)
+                left_arm = set(self._bowler_types.get('left_arm_bowlers', []))
+                spin = set(self._bowler_types.get('spin_bowlers', []))
+                matching_bowlers.update(left_arm & spin)  # Intersection
+            elif vs_cond == 'vs_right_arm_spin':
+                # Right arm spinners only
+                right_arm = set(self._bowler_types.get('right_arm_bowlers', []))
+                spin = set(self._bowler_types.get('spin_bowlers', []))
+                matching_bowlers.update(right_arm & spin)  # Intersection
             elif vs_cond == 'vs_off_spin' or vs_cond == 'vs_offspinner' or vs_cond == 'vs_off_spinner':
                 off_spin_bowlers = self._bowler_types.get('off_spin_bowlers', [])
                 matching_bowlers.update(off_spin_bowlers)

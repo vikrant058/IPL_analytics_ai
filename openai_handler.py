@@ -119,10 +119,18 @@ class CricketChatbot:
                     data = json.load(f)
                     
                 # Build reverse mapping: alias -> canonical name
+                # The first element in the alias_list is the full team name
                 alias_map = {}
-                for canonical_name, alias_list in data.get("teams", {}).items():
-                    for alias in alias_list:
-                        alias_map[alias.lower()] = canonical_name
+                for key, alias_list in data.get("teams", {}).items():
+                    # First item in alias_list should be the full team name
+                    if alias_list and len(alias_list) > 0:
+                        full_name = alias_list[0]  # e.g., "Mumbai Indians"
+                        # Map all aliases to the full team name
+                        for alias in alias_list:
+                            alias_map[alias.lower()] = full_name
+                    else:
+                        # Fallback: use the key as the full name
+                        alias_map[key.lower()] = key
                 
                 return alias_map
         except Exception as e:
@@ -215,8 +223,13 @@ class CricketChatbot:
         elif any(word in query_lower for word in ['finisher', 'finishing']):
             filters['batter_role'] = 'finisher'
         
-        # VS conditions keywords
-        if any(word in query_lower for word in ['vs off spin', 'against off spin', 'vs off-spin', 'vs offspinner']):
+        # VS conditions keywords - CHECK MORE SPECIFIC PATTERNS FIRST
+        # Check for spin + arm combinations first (more specific)
+        if any(word in query_lower for word in ['left arm spin', 'left-arm spin', 'vs left arm spinner', 'against left arm spinner']):
+            filters['vs_conditions'] = 'vs_left_arm_spin'
+        elif any(word in query_lower for word in ['right arm spin', 'right-arm spin', 'vs right arm spinner', 'against right arm spinner']):
+            filters['vs_conditions'] = 'vs_right_arm_spin'
+        elif any(word in query_lower for word in ['vs off spin', 'against off spin', 'vs off-spin', 'vs offspinner']):
             filters['vs_conditions'] = 'vs_off_spin'
         elif any(word in query_lower for word in ['vs leg spin', 'against leg spin', 'vs leg-spin', 'vs legspinner']):
             filters['vs_conditions'] = 'vs_leg_spin'
