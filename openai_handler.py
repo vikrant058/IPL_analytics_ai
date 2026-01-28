@@ -166,6 +166,67 @@ class CricketChatbot:
         
         return None
     
+    def _extract_filter_keywords(self, query: str) -> Dict:
+        """Extract filter keywords from query text using pattern matching"""
+        query_lower = query.lower()
+        filters = {}
+        
+        # Match phase keywords
+        if any(word in query_lower for word in ['powerplay', 'power play', '0-6']):
+            filters['match_phase'] = 'powerplay'
+        elif any(word in query_lower for word in ['middle overs', 'middle']):
+            filters['match_phase'] = 'middle_overs'
+        elif any(word in query_lower for word in ['death', 'death overs', 'final overs']):
+            filters['match_phase'] = 'death_overs'
+        elif any(word in query_lower for word in ['opening', 'start']):
+            filters['match_phase'] = 'opening'
+        elif any(word in query_lower for word in ['closing', 'end']):
+            filters['match_phase'] = 'closing'
+        
+        # Match situation keywords
+        if any(word in query_lower for word in ['chasing', 'chase']):
+            filters['match_situation'] = 'chasing'
+        elif any(word in query_lower for word in ['defending', 'defend']):
+            filters['match_situation'] = 'defending'
+        elif any(word in query_lower for word in ['pressure chase', 'tight chase']):
+            filters['match_situation'] = 'pressure_chase'
+        elif any(word in query_lower for word in ['winning', 'winning position']):
+            filters['match_situation'] = 'winning_position'
+        elif any(word in query_lower for word in ['batting first', 'batting 1st']):
+            filters['match_situation'] = 'batting_first'
+        
+        # Bowler type keywords
+        if any(word in query_lower for word in ['pacer', 'pace', 'fast bowler', 'fast']):
+            filters['bowler_type'] = 'pace'
+        elif any(word in query_lower for word in ['spinner', 'spin', 'spin bowler']):
+            filters['bowler_type'] = 'spin'
+        elif any(word in query_lower for word in ['left arm', 'left-arm']):
+            filters['bowler_type'] = 'left_arm'
+        elif any(word in query_lower for word in ['right arm', 'right-arm']):
+            filters['bowler_type'] = 'right_arm'
+        
+        # Batter role keywords
+        if any(word in query_lower for word in ['opener', 'opening']):
+            filters['batter_role'] = 'opener'
+        elif any(word in query_lower for word in ['middle order', 'middle']):
+            filters['batter_role'] = 'middle_order'
+        elif any(word in query_lower for word in ['lower order', 'lower']):
+            filters['batter_role'] = 'lower_order'
+        elif any(word in query_lower for word in ['finisher', 'finishing']):
+            filters['batter_role'] = 'finisher'
+        
+        # VS conditions keywords
+        if any(word in query_lower for word in ['vs pace', 'against pace', 'vs fast']):
+            filters['vs_conditions'] = 'vs_pace'
+        elif any(word in query_lower for word in ['vs spin', 'against spin']):
+            filters['vs_conditions'] = 'vs_spin'
+        elif any(word in query_lower for word in ['vs left arm', 'against left arm']):
+            filters['vs_conditions'] = 'vs_left_arm'
+        elif any(word in query_lower for word in ['vs right arm', 'against right arm']):
+            filters['vs_conditions'] = 'vs_right_arm'
+        
+        return filters
+    
     def parse_query(self, query: str) -> Dict:
         """
         Parse natural language query using GPT to intelligently extract cricket-specific information.
@@ -187,9 +248,9 @@ USE THESE TEAM ALIASES:
 ... and {len(self.team_aliases)-6} more team aliases
 
 CRICKET FILTER OPTIONS:
-- match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs)
-- match_situation: 'batting_first', 'chasing', 'pressure_chase', 'comfortable_chase'
-- bowler_type: 'pace', 'spin', 'left_arm', 'right_arm', 'fast', 'off_spinner', 'leg_spinner'
+- match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs), 'opening', 'closing'
+- match_situation: 'batting_first', 'chasing', 'defending', 'pressure_chase', 'winning_position'
+- bowler_type: 'pace', 'spin', 'left_arm', 'right_arm'
 - batter_role: 'opener', 'middle_order', 'lower_order', 'finisher'
 - vs_conditions: 'vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm'
 
@@ -214,9 +275,11 @@ Return ONLY valid JSON (NO other text):
 
 EXAMPLES:
 - "virat vs bumrah" → player1: "V Kohli", player2: "JJ Bumrah", query_type: "head_to_head"
-- "rohit powerplay" → player1: "RG Sharma", match_phase: "powerplay", query_type: "player_stats"
-- "kohli chasing mi" → player1: "V Kohli", match_situation: "chasing", opposition_team: "Mumbai Indians"
-- "bumrah pace against csk" → player1: "JJ Bumrah", bowler_type: "pace", opposition_team: "Chennai Super Kings"
+- "rohit in powerplay" → player1: "RG Sharma", match_phase: "powerplay", query_type: "player_stats"
+- "kohli in death overs" → player1: "V Kohli", match_phase: "death_overs", query_type: "player_stats"
+- "kohli vs bumrah in powerplay" → player1: "V Kohli", player2: "JJ Bumrah", match_phase: "powerplay", query_type: "head_to_head"
+- "kohli chasing" → player1: "V Kohli", match_situation: "chasing", query_type: "player_stats"
+- "bumrah vs pace against csk" → player1: "JJ Bumrah", vs_conditions: "vs_pace", opposition_team: "Chennai Super Kings"
 - "sky vs spin 2024" → player1: "SA Yadav", vs_conditions: "vs_spin", seasons: [2024]"""
         
         try:
@@ -246,10 +309,22 @@ EXAMPLES:
                 if canonical:
                     parsed['opposition_team'] = canonical
             
+            # Normalize filter values to snake_case lowercase
+            if parsed.get('match_phase'):
+                parsed['match_phase'] = str(parsed['match_phase']).lower().replace(' ', '_').replace('-', '_')
+            if parsed.get('match_situation'):
+                parsed['match_situation'] = str(parsed['match_situation']).lower().replace(' ', '_').replace('-', '_')
+            if parsed.get('bowler_type'):
+                parsed['bowler_type'] = str(parsed['bowler_type']).lower().replace(' ', '_').replace('-', '_')
+            if parsed.get('batter_role'):
+                parsed['batter_role'] = str(parsed['batter_role']).lower().replace(' ', '_').replace('-', '_')
+            if parsed.get('vs_conditions'):
+                parsed['vs_conditions'] = str(parsed['vs_conditions']).lower().replace(' ', '_').replace('-', '_')
+            
             return parsed
             
         except (json.JSONDecodeError, Exception) as e:
-            # Fallback: Use alias-aware resolution without LLM
+            # Fallback: Extract keywords AND entities
             player1 = self._resolve_player_name(query)
             player2 = None
             team = self._resolve_team_name(query)
@@ -260,6 +335,9 @@ EXAMPLES:
                 parts = query.lower().split(separator)
                 if len(parts) >= 2:
                     player2 = self._resolve_player_name(parts[1])
+            
+            # Extract filter keywords using pattern matching
+            extracted_filters = self._extract_filter_keywords(query)
             
             # Determine query type
             determined_type = 'general'
@@ -275,12 +353,12 @@ EXAMPLES:
                 "player2": player2,
                 "venue": None,
                 "seasons": None,
-                "bowler_type": None,
-                "match_phase": None,
-                "match_situation": None,
+                "bowler_type": extracted_filters.get('bowler_type'),
+                "match_phase": extracted_filters.get('match_phase'),
+                "match_situation": extracted_filters.get('match_situation'),
                 "opposition_team": team,
-                "batter_role": None,
-                "vs_conditions": None,
+                "batter_role": extracted_filters.get('batter_role'),
+                "vs_conditions": extracted_filters.get('vs_conditions'),
                 "form_filter": None,
                 "query_type": determined_type,
                 "interpretation": f"Comparing {player1} vs {player2}" if (player1 and player2) else (f"Stats for {player1}" if player1 else "Cricket query")

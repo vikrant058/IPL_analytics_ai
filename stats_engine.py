@@ -243,11 +243,87 @@ class StatsEngine:
         
         return len(filtered_matches)
     
+    def _apply_cricket_filters(self, deliveries_df: pd.DataFrame, filters: Dict) -> pd.DataFrame:
+        """Apply cricket-specific filters like match_phase, bowler_type, match_situation, etc"""
+        if not filters:
+            return deliveries_df
+        
+        df = deliveries_df.copy()
+        
+        # Calculate ball_number if not already present (over*6 + ball)
+        if 'ball_number' not in df.columns:
+            df['ball_number'] = df['over'] * 6 + df['ball']
+        
+        # Match phase filter: powerplay (0-6), middle (6-16), death (16+)
+        if filters.get('match_phase'):
+            phase = filters['match_phase'].lower()
+            if phase == 'powerplay':
+                # Powerplay is overs 0-6 (balls 0-35)
+                df = df[df['over'] <= 5]
+            elif phase == 'middle_overs':
+                # Middle overs: overs 7-15 (balls 36-89)
+                df = df[(df['over'] >= 6) & (df['over'] <= 15)]
+            elif phase == 'death_overs':
+                # Death overs: overs 16+ (balls 90+)
+                df = df[df['over'] >= 16]
+            elif phase == 'opening':
+                # Opening phase: first 3 overs (balls 0-17)
+                df = df[df['over'] <= 2]
+            elif phase == 'closing':
+                # Closing phase: last 3 overs (overs 17-19)
+                df = df[df['over'] >= 17]
+        
+        # Match situation filter: chasing vs defending
+        if filters.get('match_situation'):
+            situation = filters['match_situation'].lower()
+            df = df.merge(self.matches_df[['id', 'team1']], left_on='match_id', right_on='id', how='left')
+            
+            if situation == 'chasing':
+                # Chasing: batting_team is team2 (batting second, inning == 2)
+                df = df[(df['batting_team'] != df['team1']) & (df['inning'] == 2)]
+            elif situation == 'defending':
+                # Defending: batting_team is team1 (batting first, inning == 1)
+                df = df[(df['batting_team'] == df['team1']) & (df['inning'] == 1)]
+            elif situation == 'batting_first':
+                # Batting first: inning == 1
+                df = df[df['inning'] == 1]
+            elif situation == 'pressure_chase':
+                # Pressure chase: chasing AND (rough estimate based on low runs/overs at start)
+                df = df[(df['batting_team'] != df['team1']) & (df['inning'] == 2)]
+            elif situation == 'winning_position':
+                # Winning position: batting team ahead (difficult without match state - skip for now)
+                pass
+            
+            df = df.drop(columns=['id', 'team1'], errors='ignore')
+        
+        # Bowler type filter: pace vs spin, left_arm vs right_arm
+        # NOTE: This requires bowler classification data which isn't in the current dataset
+        if filters.get('bowler_type'):
+            # TODO: Add bowler_type classification dataset
+            pass
+        
+        # Batter role filter: opener, middle_order, lower_order, finisher
+        # NOTE: This requires batting order data which requires deeper match analysis
+        if filters.get('batter_role'):
+            # TODO: Add batting order detection
+            pass
+        
+        # VS conditions: vs_pace, vs_spin, vs_left_arm, vs_right_arm
+        # NOTE: This requires bowler type classification
+        if filters.get('vs_conditions'):
+            # TODO: Add bowler classification dataset
+            pass
+        
+        # Drop temporary columns
+        df = df.drop(columns=['ball_number'], errors='ignore')
+        
+        return df
+    
     def _get_batting_stats(self, player: str, filters: Dict = None, total_matches: int = None) -> Dict:
         """Calculate comprehensive batting statistics"""
         player_deliveries = self.deliveries_df[self.deliveries_df['batter'] == player].copy()
         
-        # Apply filters manually without merging to avoid data duplication
+        # Apply basic filters (season, venue) first
         if filters:
             if filters.get('seasons'):
                 player_deliveries = player_deliveries.merge(
@@ -264,6 +340,9 @@ class StatsEngine:
                 )
                 player_deliveries = player_deliveries[player_deliveries['venue'].isin(filters['venue'])]
                 player_deliveries = player_deliveries.drop(columns=['id', 'venue'])
+        
+        # Apply cricket-specific filters (match_phase, match_situation, vs_conditions, etc)
+        player_deliveries = self._apply_cricket_filters(player_deliveries, filters)
         
         if len(player_deliveries) == 0:
             return {}
@@ -320,7 +399,7 @@ class StatsEngine:
         """Calculate comprehensive bowling statistics"""
         player_deliveries = self.deliveries_df[self.deliveries_df['bowler'] == player].copy()
         
-        # Apply filters manually without merging to avoid data duplication
+        # Apply basic filters (season, venue) first
         if filters:
             if filters.get('seasons'):
                 player_deliveries = player_deliveries.merge(
@@ -337,6 +416,9 @@ class StatsEngine:
                 )
                 player_deliveries = player_deliveries[player_deliveries['venue'].isin(filters['venue'])]
                 player_deliveries = player_deliveries.drop(columns=['id', 'venue'])
+        
+        # Apply cricket-specific filters (match_phase, match_situation, vs_conditions, etc)
+        player_deliveries = self._apply_cricket_filters(player_deliveries, filters)
         
         if len(player_deliveries) == 0:
             return {}
