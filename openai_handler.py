@@ -452,11 +452,11 @@ EXAMPLES:
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
                                                         match_phase=match_phase, match_situation=match_situation,
-                                                        bowler_type=bowler_type)
+                                                        bowler_type=bowler_type, opposition_team=opposition_team)
             elif query_type == 'player_stats' and player1:
                 return self._get_player_stats_response(player1, seasons, 
                                                        match_phase=match_phase, match_situation=match_situation,
-                                                       bowler_type=bowler_type,
+                                                       bowler_type=bowler_type, opposition_team=opposition_team,
                                                        batter_role=batter_role, vs_conditions=vs_conditions)
             elif query_type == 'team_comparison' and opposition_team:
                 return self._get_team_stats_response(opposition_team)
@@ -464,7 +464,7 @@ EXAMPLES:
                 # Default to player stats if we have a player
                 return self._get_player_stats_response(player1, seasons, 
                                                        match_phase=match_phase, match_situation=match_situation,
-                                                       bowler_type=bowler_type,
+                                                       bowler_type=bowler_type, opposition_team=opposition_team,
                                                        batter_role=batter_role, vs_conditions=vs_conditions)
             else:
                 return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'"
@@ -474,7 +474,8 @@ EXAMPLES:
     
     def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, 
                                     seasons: List[int] = None, match_phase: Optional[str] = None,
-                                    match_situation: Optional[str] = None, bowler_type: Optional[str] = None) -> str:
+                                    match_situation: Optional[str] = None, bowler_type: Optional[str] = None,
+                                    opposition_team: Optional[str] = None) -> str:
         """Get head-to-head comparison between two players with additional filters"""
         
         try:
@@ -495,6 +496,8 @@ EXAMPLES:
                 filters['match_situation'] = match_situation
             if bowler_type:
                 filters['bowler_type'] = bowler_type
+            if opposition_team:
+                filters['opposition_team'] = opposition_team
             
             # Get H2H stats from stats engine
             h2h_data = self.stats_engine.get_player_head_to_head(found_player1, found_player2, 
@@ -530,7 +533,7 @@ EXAMPLES:
     
     def _get_player_stats_response(self, player: str, seasons: List[int] = None, 
                                     match_phase: Optional[str] = None, match_situation: Optional[str] = None,
-                                    bowler_type: Optional[str] = None,
+                                    bowler_type: Optional[str] = None, opposition_team: Optional[str] = None,
                                     batter_role: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
         """Get player statistics with advanced filters like match phase, match situation, bowler type, etc."""
         
@@ -550,6 +553,8 @@ EXAMPLES:
                 filters['match_situation'] = match_situation
             if bowler_type:
                 filters['bowler_type'] = bowler_type
+            if opposition_team:
+                filters['opposition_team'] = opposition_team
             if batter_role:
                 filters['batter_role'] = batter_role
             if vs_conditions:
@@ -570,6 +575,8 @@ EXAMPLES:
                 response += f" - **{match_phase.replace('_', ' ').title()}**"
             if match_situation:
                 response += f" - **{match_situation.replace('_', ' ').title()}**"
+            if opposition_team:
+                response += f" - **vs {opposition_team}**"
             if vs_conditions:
                 response += f" - **{vs_conditions.replace('_', ' ').title()}**"
             response += "\n\n"

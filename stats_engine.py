@@ -254,6 +254,22 @@ class StatsEngine:
         if 'ball_number' not in df.columns:
             df['ball_number'] = df['over'] * 6 + df['ball']
         
+        # Opposition team filter: filter for matches where player played AGAINST opposition_team
+        if filters.get('opposition_team'):
+            opp_team = filters['opposition_team']
+            df = df.merge(self.matches_df[['id', 'team1', 'team2']], left_on='match_id', right_on='id', how='left')
+            
+            # For batting stats: opposition is the bowling_team
+            # For bowling stats: opposition is the batting_team
+            # We'll keep deliveries where: (batting_team played against opposition_team) OR (bowling_team played against opposition_team)
+            # This works for both batting and bowling analysis
+            
+            # Get matches where this team played (either team1 or team2)
+            team_matches = df[(df['team1'] == opp_team) | (df['team2'] == opp_team)]
+            df = df[df['match_id'].isin(team_matches['match_id'])]
+            
+            df = df.drop(columns=['id', 'team1', 'team2'], errors='ignore')
+        
         # Match phase filter: powerplay (0-6), middle (6-16), death (16+)
         if filters.get('match_phase'):
             phase = filters['match_phase'].lower()
