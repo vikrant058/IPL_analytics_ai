@@ -1,0 +1,30 @@
+{
+  "right_hand_batters": [
+    "V Kohli", "S Dhawan", "RG Sharma", "DA Warner", "SK Raina", "MS Dhoni",
+    "RV Uthappa", "AM Rahane", "KD Karthik", "KL Rahul", "G Gambhir",
+    "AT Rayudu", "F du Plessis", "MK Pandey", "SV Samson", "SR Watson",
+    "SS Iyer", "JC Buttler", "KA Pollard", "PA Patel", "Shubman Gill",
+    "Q de Kock", "RR Pant", "JH Kallis", "BB McCullum", "M Vijay",
+    "Yuvraj Singh", "DA Miller", "MA Agarwal", "SR Tendulkar", "N Rana",
+    "SPD Smith", "Ishan Kishan", "R Dravid", "SE Marsh", "GJ Maxwell",
+    "V Sehwag", "HH Pandya", "RD Gaikwad", "KS Williamson", "AJ Finch",
+    "JP Duminy", "RA Tripathi", "CH Gayle", "AB de Villiers", "RJ Peterson",
+    "S Katich", "JM Vince", "BJ Hodge", "JEC Franklin", "NJ Dexter",
+    "CJL Rogers", "MJ Clarke", "DT Christian", "RG More", "R Sathish",
+    "NS Poonia", "DL Madushanka", "A Sharma", "AB Agarkar", "SC Ganguly",
+    "LR Shukla", "VRV Singh", "WP Saha", "YK Pathan", "JR Hopes",
+    "IK Pathan", "B Lee", "S Sreesanth", "PP Chawla", "MS Gony",
+    "M Muralitharan", "L Balaji", "Sandeep Sharma", "B Kumar", "UT Yadav",
+    "JJ Bumrah", "AR Patel", "I Sharma", "P Kumar", "Mohammed Shami",
+    "TA Boult", "MM Sharma", "HV Patel", "Z Khan", "JD Unadkat",
+    "A Nehra", "PP Ojha", "K Rabada", "CH Morris", "A Nortje",
+    "Kuldeep Yadav", "AD Russell", "DL Chahar", "M Morkel", "RD Chahar",
+    "CV Varun", "AB Dinda"
+  ],
+  "left_hand_batters": [
+    "AB de Villiers", "CH Gayle", "SA Yadav", "IK Pathan", "L Balaji",
+    "R Ashwin", "SP Narine", "DJ Bravo", "SL Malinga", "Rashid Khan",
+    "KH Pandya", "Mohammed Siraj", "SN Thakur", "R Vinay Kumar", "S Sreesanth",
+    "JH Vince", "LR Shukla", "WA Mota", "JDP Oram", "R Bhatia"
+  ]
+}

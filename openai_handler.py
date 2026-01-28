@@ -660,14 +660,30 @@ EXAMPLES:
             
             if 'bowling' in stats and stats['bowling']:
                 bowl = stats['bowling']
-                response += f"🎳 **Bowling Stats**\n"
-                response += f"- Matches: {bowl.get('matches', 0)}\n"
-                response += f"- Innings: {bowl.get('innings', 0)}\n"
-                response += f"- Wickets: {bowl.get('wickets', 0)}\n"
-                response += f"- Average: {bowl.get('average', 0):.2f}\n"
-                response += f"- Economy: {bowl.get('economy', 0):.2f}\n"
-                response += f"- Best Figures: {bowl.get('best_figures', 'N/A')}\n"
-                response += f"- Maiden Overs: {bowl.get('maiden_overs', 0)}\n"
+                response += f"🎳 **Bowling Stats**\n\n"
+                response += "| Metric | Value |\n|--------|-------|\n"
+                response += f"| Matches | {bowl.get('matches', 0)} |\n"
+                response += f"| Innings | {bowl.get('innings', 0)} |\n"
+                response += f"| Balls | {bowl.get('balls', 0)} |\n"
+                response += f"| Wickets | {bowl.get('wickets', 0)} |\n"
+                response += f"| Runs Conceded | {bowl.get('runs_conceded', 0)} |\n"
+                response += f"| Average | {bowl.get('average', 0):.2f} |\n"
+                response += f"| Economy | {bowl.get('economy', 0):.2f} |\n"
+                response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n"
+                response += f"| Maiden Overs | {bowl.get('maiden_overs', 0)} |\n\n"
+                
+                # Get bowling breakdown by batter handedness
+                breakdown = self.stats_engine.get_bowling_handedness_breakdown(found_player, filters)
+                if breakdown and len(breakdown) > 0:
+                    response += "**BREAKDOWN BY BATTER HANDEDNESS**\n\n"
+                    response += "| Batter Type | Balls | Wickets | Runs | Economy |\n|---|---|---|---|---|\n"
+                    for hand_type, hand_stats in breakdown.items():
+                        hand_label = hand_type.replace('vs_', '').replace('_', ' ').title()
+                        balls = hand_stats.get('balls', 0)
+                        wickets = hand_stats.get('wickets', 0)
+                        runs = hand_stats.get('runs_conceded', 0)
+                        economy = hand_stats.get('economy', 0)
+                        response += f"| {hand_label} | {balls} | {wickets} | {runs} | {economy:.2f} |\n"
             
             return response
         

@@ -16,6 +16,7 @@ class StatsEngine:
         self._team_cache = None
         self._aliases = self._load_aliases()
         self._bowler_types = self._load_bowler_types()
+        self._batter_handedness = self._load_batter_handedness()
     
     def _load_aliases(self) -> Dict:
         """Load player and team aliases from JSON file"""
@@ -35,6 +36,15 @@ class StatsEngine:
                 return json.load(f)
         except FileNotFoundError:
             return {}
+    
+    def _load_batter_handedness(self) -> Dict:
+        """Load batter handedness (left/right) from JSON file"""
+        try:
+            hand_file = os.path.join(os.path.dirname(__file__), 'batter_handedness.json')
+            with open(hand_file, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {'right_hand_batters': [], 'left_hand_batters': []}
     
     def _get_all_players(self) -> List[str]:
         """Get cached list of all unique players"""
@@ -752,6 +762,68 @@ class StatsEngine:
                 breakdown[display_name] = stats
         
         return breakdown
+
+    def get_bowling_handedness_breakdown(self, player: str, filters: Dict = None) -> Dict:
+        """Get bowling stats breakdown by batter handedness (RHB vs LHB)"""
+        base_filters = filters.copy() if filters else {}
+        breakdown = {}
+        
+        right_hand_batters = set(self._batter_handedness.get('right_hand_batters', []))
+        left_hand_batters = set(self._batter_handedness.get('left_hand_batters', []))
+        
+        # Get bowler's deliveries
+        player_deliveries = self.deliveries_df[self.deliveries_df['bowler'] == player].copy()
+        
+        # Apply basic filters first
+        if base_filters:
+            if base_filters.get('seasons'):
+                player_deliveries = player_deliveries.merge(
+                    self.matches_df[['id', 'year']], 
+                    left_on='match_id', right_on='id', how='inner'
+                )
+                player_deliveries = player_deliveries[player_deliveries['year'].isin(base_filters['seasons'])]
+                player_deliveries = player_deliveries.drop(columns=['id', 'year'])
+        
+        # Calculate stats vs RHB
+        rhb_deliveries = player_deliveries[player_deliveries['batter'].isin(right_hand_batters)].copy()
+        if len(rhb_deliveries) > 0:
+            breakdown['vs_RHB'] = self._get_bowling_stats_from_deliveries(rhb_deliveries, player)
+        
+        # Calculate stats vs LHB
+        lhb_deliveries = player_deliveries[player_deliveries['batter'].isin(left_hand_batters)].copy()
+        if len(lhb_deliveries) > 0:
+            breakdown['vs_LHB'] = self._get_bowling_stats_from_deliveries(lhb_deliveries, player)
+        
+        return breakdown
+    
+    def _get_bowling_stats_from_deliveries(self, deliveries_df: pd.DataFrame, player: str) -> Dict:
+        """Calculate bowling stats from a pre-filtered deliveries dataframe"""
+        if len(deliveries_df) == 0:
+            return {}
+        
+        wickets = deliveries_df['is_wicket'].sum()
+        runs_conceded = deliveries_df[
+            ~deliveries_df['extras_type'].isin(['legbyes', 'byes'])
+        ]['total_runs'].sum()
+        balls = len(deliveries_df)
+        
+        # Valid deliveries for dot balls and economy
+        valid_deliveries = deliveries_df[
+            (deliveries_df['extras_type'] != 'wides') &
+            (deliveries_df['extras_type'] != 'noballs')
+        ]
+        dot_balls = len(valid_deliveries[valid_deliveries['total_runs'] == 0])
+        valid_count = len(valid_deliveries)
+        
+        return {
+            'wickets': int(wickets),
+            'runs_conceded': int(runs_conceded),
+            'balls': balls,
+            'overs': round(balls / 6, 1),
+            'economy': round((runs_conceded / (balls / 6)), 2) if balls > 0 else 0,
+            'average': round(runs_conceded / wickets, 2) if wickets > 0 else 0,
+            'strike_rate': round((wickets / balls * 100), 2) if balls > 0 else 0,
+        }
 
     def get_primary_skill(self, player: str) -> str:
         """Determine a player's primary skill (batter/bowler) based on participation
