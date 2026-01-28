@@ -216,13 +216,17 @@ class CricketChatbot:
             filters['batter_role'] = 'finisher'
         
         # VS conditions keywords
-        if any(word in query_lower for word in ['vs pace', 'against pace', 'vs fast']):
+        if any(word in query_lower for word in ['vs off spin', 'against off spin', 'vs off-spin', 'vs offspinner']):
+            filters['vs_conditions'] = 'vs_off_spin'
+        elif any(word in query_lower for word in ['vs leg spin', 'against leg spin', 'vs leg-spin', 'vs legspinner']):
+            filters['vs_conditions'] = 'vs_leg_spin'
+        elif any(word in query_lower for word in ['vs pace', 'against pace', 'vs fast']):
             filters['vs_conditions'] = 'vs_pace'
         elif any(word in query_lower for word in ['vs spin', 'against spin']):
             filters['vs_conditions'] = 'vs_spin'
-        elif any(word in query_lower for word in ['vs left arm', 'against left arm']):
+        elif any(word in query_lower for word in ['vs left arm', 'against left arm', 'vs left-arm']):
             filters['vs_conditions'] = 'vs_left_arm'
-        elif any(word in query_lower for word in ['vs right arm', 'against right arm']):
+        elif any(word in query_lower for word in ['vs right arm', 'against right arm', 'vs right-arm']):
             filters['vs_conditions'] = 'vs_right_arm'
         
         return filters
@@ -429,6 +433,10 @@ EXAMPLES:
         batter_role = parsed.get('batter_role')
         vs_conditions = parsed.get('vs_conditions')
         form_filter = parsed.get('form_filter')
+        
+        # Canonicalize opposition_team using team aliases
+        if opposition_team:
+            opposition_team = self._get_canonical_team_name(opposition_team)
         query_type = parsed.get('query_type')
         
         # Validation: Ensure query has cricket-relevant entity (player, team, or venue)
@@ -586,17 +594,31 @@ EXAMPLES:
             
             if 'batting' in stats and stats['batting']:
                 bat = stats['batting']
-                response += f"🏏 **Batting Stats**\n"
-                response += f"- Matches: {bat.get('matches', 0)}\n"
-                response += f"- Innings: {bat.get('innings', 0)}\n"
-                response += f"- Runs: {bat.get('runs', 0)}\n"
-                response += f"- Average: {bat.get('average', 0):.2f}\n"
-                response += f"- Strike Rate: {bat.get('strike_rate', 0):.2f}\n"
-                response += f"- Highest Score: {bat.get('highest_score', 0)}\n"
-                response += f"- Centuries: {bat.get('centuries', 0)}\n"
-                response += f"- Fifties: {bat.get('fifties', 0)}\n"
-                response += f"- Fours: {bat.get('fours', 0)}\n"
-                response += f"- Sixes: {bat.get('sixes', 0)}\n\n"
+                
+                # Use table format for vs_conditions filters
+                if vs_conditions:
+                    response += f"🏏 **Batting Stats - {vs_conditions.replace('_', ' ').title()}**\n\n"
+                    response += "| Metric | Value |\n|--------|-------|\n"
+                    response += f"| Matches | {bat.get('matches', 0)} |\n"
+                    response += f"| Runs | {bat.get('runs', 0)} |\n"
+                    response += f"| Average | {bat.get('average', 0):.2f} |\n"
+                    response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n"
+                    response += f"| Hundreds | {bat.get('centuries', 0)} |\n"
+                    response += f"| Fifties | {bat.get('fifties', 0)} |\n"
+                    response += f"| Fours | {bat.get('fours', 0)} |\n"
+                    response += f"| Sixes | {bat.get('sixes', 0)} |\n\n"
+                else:
+                    response += f"🏏 **Batting Stats**\n"
+                    response += f"- Matches: {bat.get('matches', 0)}\n"
+                    response += f"- Innings: {bat.get('innings', 0)}\n"
+                    response += f"- Runs: {bat.get('runs', 0)}\n"
+                    response += f"- Average: {bat.get('average', 0):.2f}\n"
+                    response += f"- Strike Rate: {bat.get('strike_rate', 0):.2f}\n"
+                    response += f"- Highest Score: {bat.get('highest_score', 0)}\n"
+                    response += f"- Centuries: {bat.get('centuries', 0)}\n"
+                    response += f"- Fifties: {bat.get('fifties', 0)}\n"
+                    response += f"- Fours: {bat.get('fours', 0)}\n"
+                    response += f"- Sixes: {bat.get('sixes', 0)}\n\n"
             
             if 'bowling' in stats and stats['bowling']:
                 bowl = stats['bowling']

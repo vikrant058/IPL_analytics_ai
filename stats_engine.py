@@ -334,7 +334,7 @@ class StatsEngine:
             # TODO: Add batting order detection
             pass
         
-        # VS conditions: vs_pace, vs_spin, vs_left_arm, vs_right_arm
+        # VS conditions: vs_pace, vs_spin, vs_off_spin, vs_leg_spin, vs_left_arm, vs_right_arm
         # Filter deliveries against specific bowling types
         if filters.get('vs_conditions'):
             vs_cond = filters['vs_conditions'].lower()
@@ -342,19 +342,21 @@ class StatsEngine:
             matching_bowlers = set()
             
             if vs_cond == 'vs_pace':
-                # Find pace bowlers from our classification
-                pace_bowlers = self._bowler_types.get('pace_bowlers', {}).keys()
+                pace_bowlers = self._bowler_types.get('pace_bowlers', [])
                 matching_bowlers.update(pace_bowlers)
             elif vs_cond == 'vs_spin':
-                # Find spin bowlers from our classification
-                spin_bowlers = self._bowler_types.get('spin_bowlers', {}).keys()
+                spin_bowlers = self._bowler_types.get('spin_bowlers', [])
                 matching_bowlers.update(spin_bowlers)
+            elif vs_cond == 'vs_off_spin' or vs_cond == 'vs_offspinner' or vs_cond == 'vs_off_spinner':
+                off_spin_bowlers = self._bowler_types.get('off_spin_bowlers', [])
+                matching_bowlers.update(off_spin_bowlers)
+            elif vs_cond == 'vs_leg_spin' or vs_cond == 'vs_legspinner' or vs_cond == 'vs_leg_spinner':
+                leg_spin_bowlers = self._bowler_types.get('leg_spin_bowlers', [])
+                matching_bowlers.update(leg_spin_bowlers)
             elif vs_cond == 'vs_left_arm':
-                # Find left arm bowlers
                 left_arm = self._bowler_types.get('left_arm_bowlers', [])
                 matching_bowlers.update(left_arm)
             elif vs_cond == 'vs_right_arm':
-                # Find right arm bowlers
                 right_arm = self._bowler_types.get('right_arm_bowlers', [])
                 matching_bowlers.update(right_arm)
             

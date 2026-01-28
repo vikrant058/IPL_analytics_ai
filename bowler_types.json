@@ -1,40 +1,31 @@
 {
-  "pace_bowlers": {
-    "P Kumar": "fast", "B Kumar": "fast", "R Ashwin": "off_spin", "Y Chahal": "leg_spin",
-    "JJ Bumrah": "fast", "T Thakur": "fast", "Mohammed Shami": "fast", "K Rabada": "fast",
-    "M Siraj": "fast", "U Yadav": "fast", "R Khan": "fast", "A Mithun": "fast",
-    "R Hazlewood": "fast", "N Coulter-Nile": "fast", "P Cummins": "fast", "J Archer": "fast",
-    "T Curran": "fast", "S Broad": "fast", "B Stokes": "fast", "DP Conway": "fast",
-    "M Boult": "fast", "T Boult": "fast", "C Morris": "fast", "D Wiese": "fast",
-    "M Marsh": "fast", "A Zampa": "leg_spin", "A Nortje": "fast", "I Sodhi": "leg_spin",
-    "R Shepherd": "fast", "M Morkel": "fast", "S Thakur": "fast", "B Stokes": "fast",
-    "L Ferguson": "fast", "I Sodhi": "leg_spin", "B Kumar": "pace", "B Cutting": "fast",
-    "S Yadav": "left_arm_fast", "Y Singh": "left_arm_fast", "JP Behrendorff": "left_arm_fast",
-    "TK Curran": "right_arm_fast", "AD Cummins": "right_arm_fast", "M Marsh": "right_arm_fast",
-    "T Thakur": "right_arm_fast", "M Siraj": "right_arm_fast", "Md Siraj": "right_arm_fast",
-    "Umesh Yadav": "right_arm_fast", "Ishant Sharma": "right_arm_fast", "Ahmed": "right_arm_fast",
-    "K Rabada": "right_arm_fast", "R Hazlewood": "right_arm_fast", "B Stokes": "right_arm_fast",
-    "D Wiese": "right_arm_fast", "Boult": "left_arm_fast", "J Archer": "right_arm_fast",
-    "Nortje": "right_arm_fast", "Coulter-Nile": "right_arm_fast", "Hazlewood": "right_arm_fast",
-    "Richardson": "right_arm_fast", "Cummins": "right_arm_fast", "Morris": "right_arm_fast",
-    "Marsh": "right_arm_fast", "Curran": "right_arm_fast", "Shepherd": "right_arm_fast",
-    "Nagarkoti": "right_arm_fast", "Garg": "right_arm_fast", "Yadav": "right_arm_fast"
-  },
-  "spin_bowlers": {
-    "R Ashwin": "off_spin", "Y Chahal": "leg_spin", "K Pandya": "leg_spin", "P Negi": "left_arm_spin",
-    "S Yadav": "left_arm_spin", "A Mishra": "leg_spin", "J Malinga": "off_spin",
-    "A Zampa": "leg_spin", "Rashid Khan": "leg_spin", "A Agar": "left_arm_spin",
-    "MP Milind": "leg_spin", "A Jayakumar": "off_spin", "B Laughlin": "off_spin",
-    "Harpreet": "left_arm_spin", "Saurabh": "leg_spin", "Garg": "left_arm_spin",
-    "R Bishnoi": "leg_spin", "K Gowtham": "leg_spin", "K Nagarkoti": "leg_spin",
-    "Y Jaiswal": "left_arm_spin", "T Natarajan": "leg_spin", "A Patel": "left_arm_spin",
-    "K Khurana": "leg_spin", "U Malik": "leg_spin", "A Ashish": "leg_spin",
-    "S Lamichhane": "leg_spin", "M Khan": "leg_spin", "A Manohar": "leg_spin",
-    "Ashish": "leg_spin", "Singh": "leg_spin", "Kumar": "off_spin", "Patel": "left_arm_spin",
-    "Mishra": "leg_spin", "Chahal": "leg_spin", "Rashid": "leg_spin", "Ashwin": "off_spin",
-    "Malinga": "off_spin", "Zampa": "leg_spin", "Yadav": "left_arm_spin", "Bishnoi": "leg_spin",
-    "Gowtham": "leg_spin", "Lamichhane": "leg_spin", "Khan": "leg_spin"
-  },
-  "left_arm_bowlers": ["S Yadav", "A Mishra", "P Negi", "A Agar", "P Chawla", "Y Singh", "JP Behrendorff", "M Boult"],
-  "right_arm_bowlers": ["R Ashwin", "Y Chahal", "JJ Bumrah", "T Thakur", "Mohammed Shami", "K Rabada", "M Siraj", "U Yadav"]
+  "pace_bowlers": [
+    "JJ Bumrah", "T Thakur", "Mohammed Shami", "K Rabada", "M Siraj", "U Yadav",
+    "R Khan", "A Mithun", "R Hazlewood", "N Coulter-Nile", "P Cummins", "J Archer",
+    "T Curran", "S Broad", "B Stokes", "M Boult", "C Morris", "D Wiese", "M Marsh",
+    "A Nortje", "R Shepherd", "M Morkel", "L Ferguson", "B Cutting", "P Kumar",
+    "Ishant Sharma", "Ahmed", "Nagarkoti", "Garg", "Md Siraj"
+  ],
+  "spin_bowlers": [
+    "R Ashwin", "Y Chahal", "K Pandya", "P Negi", "S Yadav", "A Mishra", "J Malinga",
+    "A Zampa", "Rashid Khan", "A Agar", "R Bishnoi", "K Gowtham", "I Sodhi",
+    "S Lamichhane", "M Khan", "U Malik", "A Patel", "A Jayakumar", "B Laughlin"
+  ],
+  "off_spin_bowlers": [
+    "R Ashwin", "A Mishra", "A Jayakumar", "J Malinga", "B Laughlin", "A Virojas", "P Negi"
+  ],
+  "leg_spin_bowlers": [
+    "Y Chahal", "K Pandya", "A Zampa", "Rashid Khan", "R Bishnoi", "K Gowtham", "I Sodhi",
+    "S Lamichhane", "M Khan", "U Malik", "A Manohar", "A Ashish"
+  ],
+  "left_arm_bowlers": [
+    "S Yadav", "P Negi", "A Agar", "A Patel", "Y Singh", "JP Behrendorff", "M Boult", "B Cutting"
+  ],
+  "right_arm_bowlers": [
+    "JJ Bumrah", "R Ashwin", "Y Chahal", "K Pandya", "T Thakur", "Mohammed Shami", "K Rabada",
+    "M Siraj", "U Yadav", "R Khan", "A Mithun", "R Hazlewood", "N Coulter-Nile", "P Cummins",
+    "J Archer", "T Curran", "S Broad", "B Stokes", "A Zampa", "Rashid Khan", "R Bishnoi",
+    "K Gowtham", "I Sodhi", "S Lamichhane", "A Nortje", "R Shepherd", "M Morkel", "L Ferguson",
+    "D Wiese", "M Marsh", "C Morris"
+  ]
 }
