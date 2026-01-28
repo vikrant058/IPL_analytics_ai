@@ -514,7 +514,13 @@ class StatsEngine:
         if len(player_deliveries) == 0:
             return {}
         
-        wickets = player_deliveries['is_wicket'].sum()
+        # Only count wickets for valid dismissal types:
+        # Bowler gets credit for: Caught, Bowled, Caught & Bowled, Stumped, Hit Wicket
+        # (NOT for Run Out, LBW, Retired, Obstructing the field, etc.)
+        valid_dismissals = player_deliveries['dismissal_kind'].isin([
+            'caught', 'bowled', 'caught and bowled', 'stumped', 'hit wicket'
+        ])
+        wickets = valid_dismissals.sum()
         
         # FIX #4: Bowler runs conceded = exclude leg byes and byes (cricket rule: only credited for runs off bat, wides, no balls)
         runs_conceded = player_deliveries[
@@ -539,11 +545,15 @@ class StatsEngine:
         valid_balls_count = len(valid_deliveries_bowling)
         dot_ball_percentage = round((dot_balls / valid_balls_count * 100), 2) if valid_balls_count > 0 else 0
         
-        # FIX #6: Best figures - use correct runs (exclude leg byes and byes)
+        # FIX #6: Best figures - use correct runs (exclude leg byes and byes) and valid dismissals only
         best_figures_data = []
         for match_id in player_deliveries['match_id'].unique():
             match_data = player_deliveries[player_deliveries['match_id'] == match_id]
-            wickets_in_match = match_data['is_wicket'].sum()
+            # Only count valid dismissals for this match
+            valid_dismissals_match = match_data['dismissal_kind'].isin([
+                'caught', 'bowled', 'caught and bowled', 'stumped', 'hit wicket'
+            ])
+            wickets_in_match = valid_dismissals_match.sum()
             runs_in_match = match_data[
                 ~match_data['extras_type'].isin(['legbyes', 'byes'])
             ]['total_runs'].sum()
@@ -559,9 +569,11 @@ class StatsEngine:
         else:
             best_figures = "0/0"
         
-        # Count 4-wicket hauls
-        match_wickets = player_deliveries.groupby('match_id')['is_wicket'].sum()
-        four_wickets = len(match_wickets[match_wickets >= 4])
+        # Count 4-wicket hauls (only valid dismissals)
+        valid_dismissals_by_match = player_deliveries[player_deliveries['dismissal_kind'].isin([
+            'caught', 'bowled', 'caught and bowled', 'stumped', 'hit wicket'
+        ])].groupby('match_id').size()
+        four_wickets = len(valid_dismissals_by_match[valid_dismissals_by_match >= 4])
         
         # Count maiden overs (6 balls with 0 runs)
         over_runs = player_deliveries.groupby(['match_id', 'inning', 'over'])['total_runs'].sum()
@@ -801,7 +813,14 @@ class StatsEngine:
         if len(deliveries_df) == 0:
             return {}
         
-        wickets = deliveries_df['is_wicket'].sum()
+        # Only count wickets for valid dismissal types
+        # Bowler gets credit for: Caught, Bowled, Caught & Bowled, Stumped, Hit Wicket
+        # (NOT for Run Out, LBW, Retired, Obstructing the field, etc.)
+        valid_dismissals = deliveries_df['dismissal_kind'].isin([
+            'caught', 'bowled', 'caught and bowled', 'stumped', 'hit wicket'
+        ])
+        wickets = valid_dismissals.sum()
+        
         runs_conceded = deliveries_df[
             ~deliveries_df['extras_type'].isin(['legbyes', 'byes'])
         ]['total_runs'].sum()
