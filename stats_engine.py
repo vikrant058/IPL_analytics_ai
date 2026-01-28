@@ -557,7 +557,8 @@ class StatsEngine:
             })
         
         if best_figures_data:
-            best_match = max(best_figures_data, key=lambda x: x['wickets'], default={'wickets': 0, 'runs': 0})
+            # Find best figures: max wickets, then min runs (e.g., 5/10 is better than 5/29)
+            best_match = max(best_figures_data, key=lambda x: (x['wickets'], -x['runs']), default={'wickets': 0, 'runs': 0})
             best_figures = f"{int(best_match['wickets'])}/{int(best_match['runs'])}"
         else:
             best_figures = "0/0"
