@@ -530,23 +530,58 @@ EXAMPLES:
             if h2h_data.get('error'):
                 return f"Could not find head-to-head data between {found_player1} and {found_player2}. They may not have faced each other."
             
-            # Format response
-            response = f"**Head-to-Head: {found_player1} vs {found_player2}**"
-            if seasons:
-                response += f" **({', '.join(str(s) for s in seasons)})**"
-            if match_phase:
-                response += f" - **{match_phase.replace('_', ' ').title()}**"
-            if match_situation:
-                response += f" - **{match_situation.replace('_', ' ').title()}**"
-            response += "\n\n"
+            # Generate intelligent insights
+            insights = []
             
-            response += f"📊 **Deliveries**: {h2h_data['deliveries']}\n"
-            response += f"🏃 **Runs**: {h2h_data['runs']}\n"
-            response += f"⚡ **Strike Rate**: {h2h_data['strike_rate']:.2f}\n"
-            response += f"🎯 **Dot Balls**: {h2h_data.get('dot_balls', 'N/A')}\n"
+            # Deliveries and runs analysis
+            deliveries = h2h_data['deliveries']
+            runs = h2h_data['runs']
+            strike_rate = h2h_data['strike_rate']
+            dot_balls = h2h_data.get('dot_balls', 0)
+            
+            if deliveries > 0:
+                # Strike rate insights
+                if strike_rate > 150:
+                    insights.append(f"🔥 **Aggressive Approach**: {found_player1} has been very aggressive vs {found_player2} with SR of {strike_rate:.1f}")
+                elif strike_rate < 100:
+                    insights.append(f"🛡️ **Cautious**: {found_player1} plays cautiously vs {found_player2} (SR: {strike_rate:.1f})")
+                
+                # Dot ball analysis
+                dot_percentage = (dot_balls / deliveries) * 100 if deliveries > 0 else 0
+                if dot_percentage > 40:
+                    insights.append(f"📊 **High Dot Ball Rate**: {dot_percentage:.1f}% dot balls faced - facing difficulty")
+                elif dot_percentage < 20:
+                    insights.append(f"⚡ **Scoring Intent**: Only {dot_percentage:.1f}% dot balls - {found_player1} is finding the gaps")
+                
+                # Wicket/Dismissal insights (from runs data - proxy for control)
+                if runs == 0 and deliveries > 3:
+                    insights.append(f"😱 **Dominant Bowler**: {found_player2} has been exceptional - 0 runs in {deliveries} deliveries!")
+                elif runs < deliveries:
+                    insights.append(f"💪 **Bowler's Strength**: {found_player2} restricts {found_player1} effectively")
+            
+            # Format main response
+            response = f"**Head-to-Head: {found_player1} vs {found_player2}**\n"
+            if seasons:
+                response += f"📅 **Seasons**: {', '.join(str(s) for s in seasons)}\n"
+            if match_phase:
+                response += f"🎯 **Phase**: {match_phase.replace('_', ' ').title()}\n"
+            if match_situation:
+                response += f"⚙️ **Situation**: {match_situation.replace('_', ' ').title()}\n"
+            response += "\n"
+            
+            response += f"📊 **Deliveries**: {deliveries}\n"
+            response += f"🏃 **Runs**: {runs}\n"
+            response += f"⚡ **Strike Rate**: {strike_rate:.2f}\n"
+            response += f"🎯 **Dot Balls**: {dot_balls} ({dot_percentage:.1f}%)\n"
             
             if venue:
-                response += f"\n📍 **Venue**: {venue}\n"
+                response += f"📍 **Venue**: {venue}\n"
+            
+            # Add insights section
+            if insights:
+                response += f"\n**Key Insights:**\n"
+                for insight in insights:
+                    response += f"• {insight}\n"
             
             response += f"\n{h2h_data.get('summary', '')}"
             

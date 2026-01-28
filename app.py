@@ -87,33 +87,180 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom styling
+# Custom styling - CricMetric-inspired with muted colors
 st.markdown("""
     <style>
     .main {
         padding-top: 1rem;
     }
-    .stMetric {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 5px;
+    
+    /* Card container styling */
+    .stat-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #556b82;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 12px;
     }
-    h1, h2, h3, h4 {
-        color: #1f77b4;
+    
+    .stat-card-title {
+        font-size: 13px;
+        color: #666;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
     }
-    .stButton > button {
-        border-radius: 5px;
+    
+    .stat-card-value {
+        font-size: 28px;
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .stat-card-subtitle {
+        font-size: 12px;
+        color: #888;
         font-weight: 500;
     }
+    
+    /* Metric styling */
+    .stMetric {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #e8eaed;
+    }
+    
+    .stMetric label {
+        font-size: 12px;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    /* Typography */
+    h1 {
+        color: #2c3e50;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 20px;
+    }
+    
+    h2 {
+        color: #556b82;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #e8eaed;
+        padding-bottom: 10px;
+    }
+    
+    h3, h4 {
+        color: #556b82;
+        font-weight: 600;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        border-radius: 6px;
+        font-weight: 500;
+        background-color: #f0f1f3;
+        color: #2c3e50;
+        border: 1px solid #d0d1d3;
+        transition: all 0.2s ease;
+    }
+    
+    .stButton > button:hover {
+        background-color: #e0e1e3;
+        border-color: #556b82;
+    }
+    
+    /* Tables */
     .stDataFrame {
         font-size: 13px;
+        background-color: #f8f9fa;
+        border: 1px solid #e8eaed;
     }
+    
+    .stDataFrame table {
+        background-color: white;
+    }
+    
+    /* Section headers */
     .section-header {
-        padding: 10px 0;
-        border-bottom: 2px solid #1f77b4;
+        padding: 15px 0;
+        border-bottom: 2px solid #e8eaed;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+    
+    /* Divider */
+    hr {
+        border-color: #e8eaed;
+        margin: 20px 0;
+    }
+    
+    /* Text input styling */
+    .stTextInput input {
+        background-color: #f8f9fa;
+        border: 1px solid #d0d1d3;
+        color: #2c3e50;
+        border-radius: 6px;
+    }
+    
+    /* Select styling */
+    .stSelectbox select {
+        background-color: #f8f9fa;
+        border: 1px solid #d0d1d3;
+        color: #2c3e50;
+        border-radius: 6px;
+    }
+    
+    /* Comparison section */
+    .h2h-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e8eaed;
+        margin-top: 15px;
+    }
+    
+    .h2h-player-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #556b82;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .h2h-player-name {
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 700;
         margin-bottom: 15px;
     }
+    
+    /* Success/Error/Warning styling */
+    .success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        padding: 12px 16px;
+        border-radius: 6px;
+        border-left: 4px solid #2e7d32;
+    }
+    
+    .warning {
+        background-color: #fff3e0;
+        color: #e65100;
+        padding: 12px 16px;
+        border-radius: 6px;
+        border-left: 4px solid #e65100;
+    }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -143,6 +290,8 @@ st.sidebar.caption("📊 IPL: 1,169 matches | 278K+ deliveries")
 # Main content based on page
 if page == "Chat & Analytics":
     st.title("🏏 Cricket Analytics")
+    st.markdown("*Powered by AI • IPL Data Intelligence*")
+    st.divider()
     
     # Create a section selector for better organization
     col1, col2, col3 = st.columns([1, 1, 2])
@@ -150,12 +299,12 @@ if page == "Chat & Analytics":
     with col1:
         if st.button("💬 Chatbot", key="nav_chatbot", use_container_width=True):
             st.session_state.active_section = "chatbot"
+            st.rerun()
     
     with col2:
         if st.button("⚡ Compare", key="nav_h2h", use_container_width=True):
             st.session_state.active_section = "h2h"
-    
-    st.divider()
+            st.rerun()
     
     # Initialize session state
     if "active_section" not in st.session_state:
@@ -171,12 +320,36 @@ if page == "Chat & Analytics":
     
     # CHATBOT SECTION
     if active_section == "chatbot":
-        st.markdown("Ask me anything about IPL! Try queries like:")
-        st.markdown("""
-        • **Player stats**: "virat kohli statistics"  
-        • **Head-to-head**: "kohli vs bumrah"  
-        • **Comparisons**: "top batsmen this season"
-        """)
+        st.markdown("### Ask me anything about IPL")
+        
+        # Info cards for query types
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            <div class="stat-card">
+                <div class="stat-card-title">📊 Player Stats</div>
+                <div class="stat-card-subtitle">Get detailed career statistics for any player</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="stat-card">
+                <div class="stat-card-title">⚔️ Head-to-Head</div>
+                <div class="stat-card-subtitle">Compare any two players directly</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="stat-card">
+                <div class="stat-card-title">📈 Trends</div>
+                <div class="stat-card-subtitle">Analyze performance over time</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("")
         
         # Auto-load API key (no UI prompts)
         api_key, key_source = _get_openai_api_key()
@@ -200,7 +373,7 @@ Then restart the app.""")
                 with col1:
                     user_query = st.text_input(
                         "Query:",
-                        placeholder="e.g., 'kohli vs bumrah'",
+                        placeholder="e.g., 'kohli vs bumrah in powerplay'",
                         key="chatbot_input",
                         label_visibility="collapsed"
                     )
@@ -208,19 +381,64 @@ Then restart the app.""")
                 with col2:
                     search_btn = st.button("🔍 Search", key="search_btn", use_container_width=True)
                 
-                # Quick query buttons - compact
-                col1, col2, col3 = st.columns(3)
+                # Quick query suggestions - Expanded with functional examples
+                st.markdown("**Popular Queries:**")
+                
+                # Row 1
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    if st.button("Kohli Stats", key="q1", use_container_width=True):
+                    if st.button("📊 Kohli Stats", key="q1", use_container_width=True):
                         user_query = "virat kohli statistics"
                         search_btn = True
                 with col2:
-                    if st.button("Kohli vs Bumrah", key="q2", use_container_width=True):
-                        user_query = "virat kohli vs jasprit bumrah"
+                    if st.button("⚡ Bumrah", key="q2", use_container_width=True):
+                        user_query = "jasprit bumrah bowling"
                         search_btn = True
                 with col3:
-                    if st.button("Top Batsmen", key="q3", use_container_width=True):
-                        user_query = "top batsmen in IPL"
+                    if st.button("⚔️ Kohli vs Bumrah", key="q3", use_container_width=True):
+                        user_query = "virat kohli vs jasprit bumrah"
+                        search_btn = True
+                with col4:
+                    if st.button("🏃 Hardik Vs Rashid", key="q4", use_container_width=True):
+                        user_query = "hardik pandya vs rashid khan"
+                        search_btn = True
+                
+                # Row 2
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    if st.button("� Kohli Powerplay", key="q5", use_container_width=True):
+                        user_query = "kohli in powerplay"
+                        search_btn = True
+                with col2:
+                    if st.button("🎯 Bumrah Death", key="q6", use_container_width=True):
+                        user_query = "bumrah in death overs"
+                        search_btn = True
+                with col3:
+                    if st.button("🏏 Dhoni vs MI", key="q7", use_container_width=True):
+                        user_query = "ms dhoni vs mumbai indians"
+                        search_btn = True
+                with col4:
+                    if st.button("⚡ Rohit vs Spin", key="q8", use_container_width=True):
+                        user_query = "rohit sharma vs spin bowlers"
+                        search_btn = True
+                
+                # Row 3
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    if st.button("⚔️ Kohli vs Pace", key="q9", use_container_width=True):
+                        user_query = "kohli vs pace bowlers"
+                        search_btn = True
+                with col2:
+                    if st.button("💥 Bumrah vs CSK", key="q10", use_container_width=True):
+                        user_query = "bumrah vs csk"
+                        search_btn = True
+                with col3:
+                    if st.button("🎪 Suryakumar Powerplay", key="q11", use_container_width=True):
+                        user_query = "suryakumar yadav in powerplay"
+                        search_btn = True
+                with col4:
+                    if st.button("🧿 Kuldeep vs MI", key="q12", use_container_width=True):
+                        user_query = "kuldeep yadav vs mumbai indians"
                         search_btn = True
                 
                 # Process query
@@ -237,15 +455,16 @@ Then restart the app.""")
     
     elif active_section == "h2h":
         # Head-to-Head Comparison section
-        st.markdown("Compare any two players side by side.")
+        st.markdown("### Compare Two Players")
+        st.markdown("*Select any two players to see their head-to-head statistics*")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            player1 = st.selectbox("Select Player 1", all_players, key="h2h_player1")
+            player1 = st.selectbox("🏏 Player 1", all_players, key="h2h_player1")
         
         with col2:
-            player2 = st.selectbox("Select Player 2", [p for p in all_players if p != player1], key="h2h_player2")
+            player2 = st.selectbox("⚡ Player 2", [p for p in all_players if p != player1], key="h2h_player2")
         
         if st.button("📊 Compare Players", key="h2h_compare_btn", use_container_width=True):
             st.divider()
@@ -265,33 +484,49 @@ Then restart the app.""")
                 batter_info = result['batter']
                 bowler_info = result['bowler']
                 
-                # Head-to-head matchup visualization
+                # Head-to-head matchup visualization with cards
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.markdown(f"**🏏 {batter}** (Batter)")
-                    st.metric("Deliveries Faced", result['deliveries_faced'])
-                    st.metric("Runs", batter_info['runs_vs_bowler'])
-                    st.metric("Strike Rate", f"{batter_info['sr_vs_bowler']:.2f}%")
-                    st.metric("Dismissals", batter_info['dismissals_vs_bowler'])
+                    st.markdown(f"""
+                    <div class="h2h-player-card">
+                        <div class="h2h-player-name">🏏 {batter}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        st.metric("Balls Faced", result['deliveries_faced'], delta=f"vs {bowler}")
+                        st.metric("Strike Rate", f"{batter_info['sr_vs_bowler']:.2f}")
+                    with col_b:
+                        st.metric("Runs", batter_info['runs_vs_bowler'])
+                        st.metric("Dismissals", batter_info['dismissals_vs_bowler'])
                 
                 with col2:
-                    st.markdown(f"**⚡ {bowler}** (Bowler)")
-                    st.metric("Balls Bowled", bowler_info['balls_bowled_to_batter'])
-                    st.metric("Runs Conceded", bowler_info['runs_conceded_to_batter'])
-                    st.metric("Economy", f"{bowler_info['economy_vs_batter']:.2f}")
-                    st.metric("Wickets", bowler_info['wickets_vs_batter'])
+                    st.markdown(f"""
+                    <div class="h2h-player-card">
+                        <div class="h2h-player-name">⚡ {bowler}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        st.metric("Balls Bowled", bowler_info['balls_bowled_to_batter'], delta=f"to {batter}")
+                        st.metric("Economy", f"{bowler_info['economy_vs_batter']:.2f}")
+                    with col_b:
+                        st.metric("Runs Conceded", bowler_info['runs_conceded_to_batter'])
+                        st.metric("Wickets", bowler_info['wickets_vs_batter'])
                 
                 st.divider()
                 
                 # Head-to-head stats table
-                st.markdown("**Head-to-Head Statistics**")
+                st.markdown("**Detailed Head-to-Head Statistics**")
                 h2h_data = {
                     'Metric': ['Deliveries', 'Runs', 'SR/Economy', 'Dismissals/Wickets'],
                     batter: [
                         result['deliveries_faced'],
                         batter_info['runs_vs_bowler'],
-                        f"{batter_info['sr_vs_bowler']:.2f}%",
+                        f"{batter_info['sr_vs_bowler']:.2f}",
                         batter_info['dismissals_vs_bowler']
                     ],
                     bowler: [
@@ -312,15 +547,31 @@ Then restart the app.""")
                 
                 with col1:
                     if analysis['batter_advantage'] == 'Yes':
-                        st.success(f"✅ {batter} HAS ADVANTAGE vs this bowler")
+                        st.markdown(f"""
+                        <div class="success">
+                        ✅ {batter} HAS ADVANTAGE vs this bowler
+                        </div>
+                        """, unsafe_allow_html=True)
                     else:
-                        st.warning(f"⚠️ {batter} AT DISADVANTAGE vs this bowler")
+                        st.markdown(f"""
+                        <div class="warning">
+                        ⚠️ {batter} AT DISADVANTAGE vs this bowler
+                        </div>
+                        """, unsafe_allow_html=True)
                 
                 with col2:
                     if analysis['bowler_advantage'] == 'Yes':
-                        st.success(f"✅ {bowler} HAS ADVANTAGE vs this batter")
+                        st.markdown(f"""
+                        <div class="success">
+                        ✅ {bowler} HAS ADVANTAGE vs this batter
+                        </div>
+                        """, unsafe_allow_html=True)
                     else:
-                        st.warning(f"⚠️ {bowler} AT DISADVANTAGE vs this batter")
+                        st.markdown(f"""
+                        <div class="warning">
+                        ⚠️ {bowler} AT DISADVANTAGE vs this batter
+                        </div>
+                        """, unsafe_allow_html=True)
             
             # Batter vs Batter case
             elif result.get('type') == 'batter_vs_batter':
@@ -378,18 +629,21 @@ Then restart the app.""")
 
 elif page == "Profiles":
     st.title("Data & Analytics")
+    st.markdown("*Player & Team Statistics with Filters*")
+    st.divider()
     
     # Section selector
-    col1, col2 = st.columns([1, 4])
+    col1, col2, col3 = st.columns([1, 1, 3])
     
     with col1:
         if st.button("🏏 Players", key="nav_player", use_container_width=True):
             st.session_state.data_section = "player"
+            st.rerun()
     
-    col1, col2 = st.columns([1, 4])
-    with col1:
+    with col2:
         if st.button("🏆 Teams", key="nav_team", use_container_width=True):
             st.session_state.data_section = "team"
+            st.rerun()
     
     st.divider()
     
@@ -408,70 +662,214 @@ elif page == "Profiles":
     ))
     
     if data_section == "player":
-        # Player Profile - Tables only
+        # Player Profile with Filters
         st.markdown("### Player Statistics")
         player_name = st.selectbox("Select Player", all_players, key="profile_player")
         
+        st.divider()
+        
+        # Filters Section
+        st.markdown("**Filters**")
+        filter_cols = st.columns(5)
+        
+        with filter_cols[0]:
+            season_filter = st.selectbox(
+                "Season",
+                ["All"] + sorted([str(y) for y in range(2008, 2025)]),
+                key="season_filter"
+            )
+        
+        with filter_cols[1]:
+            opposition = st.selectbox(
+                "Opposition",
+                ["All"] + all_teams,
+                key="opposition_filter"
+            )
+        
+        with filter_cols[2]:
+            match_phase = st.selectbox(
+                "Match Phase",
+                ["All", "Powerplay", "Middle Overs", "Death Overs"],
+                key="match_phase"
+            )
+        
+        with filter_cols[3]:
+            home_away = st.selectbox(
+                "Home/Away",
+                ["All", "Home", "Away"],
+                key="home_away"
+            )
+        
+        with filter_cols[4]:
+            ground = st.selectbox(
+                "Ground",
+                ["All"] + sorted(loader.matches_df['venue'].unique().tolist()),
+                key="ground_filter"
+            )
+        
+        st.markdown("")
+        
         if player_name:
+            # Apply filters for stats retrieval
+            filters = {}
+            if season_filter != "All":
+                filters['season'] = season_filter
+            if opposition != "All":
+                filters['opposition_team'] = opposition
+            if match_phase != "All":
+                filters['match_phase'] = match_phase.lower().replace(" ", "_")
+            if home_away != "All":
+                filters['home_away'] = home_away.lower()
+            if ground != "All":
+                filters['ground'] = ground
+            
             stats = stats_engine.get_player_stats(player_name)
             
-            # Display batting stats as table
+            # Display batting and bowling stats side by side
+            col1, col2 = st.columns(2)
+
+            
             if stats.get('batting'):
                 batting = stats['batting']
-                st.markdown("**Batting Statistics**")
-                
-                batting_data = {
-                    'Metric': ['Matches', 'Innings', 'Runs', 'Average', 'Strike Rate', '50s', '100s', '4s', '6s', 'Highest Score', 'Balls Faced'],
-                    'Value': [
-                        batting.get('matches', 0),
-                        batting.get('innings', 0),
-                        batting.get('runs', 0),
-                        f"{batting.get('average', 0):.2f}",
-                        f"{batting.get('strike_rate', 0):.2f}",
-                        batting.get('fifties', 0),
-                        batting.get('centuries', 0),
-                        batting.get('fours', 0),
-                        batting.get('sixes', 0),
-                        batting.get('highest_score', 0),
-                        batting.get('balls', 0)
-                    ]
-                }
-                
-                st.dataframe(pd.DataFrame(batting_data), use_container_width=True, hide_index=True)
+                with col1:
+                    st.markdown("**Batting Statistics**")
+                    
+                    batting_data = {
+                        'Stat': ['Matches', 'Innings', 'Runs', 'Average', 'Strike Rate', '50s', '100s', '4s', '6s', 'Highest'],
+                        'Value': [
+                            batting.get('matches', 0),
+                            batting.get('innings', 0),
+                            batting.get('runs', 0),
+                            f"{batting.get('average', 0):.2f}",
+                            f"{batting.get('strike_rate', 0):.2f}",
+                            batting.get('fifties', 0),
+                            batting.get('centuries', 0),
+                            batting.get('fours', 0),
+                            batting.get('sixes', 0),
+                            batting.get('highest_score', 0),
+                        ]
+                    }
+                    
+                    st.dataframe(pd.DataFrame(batting_data), use_container_width=True, hide_index=True)
             
-            # Display bowling stats as table
             if stats.get('bowling'):
                 bowling = stats['bowling']
-                st.markdown("**Bowling Statistics**")
+                with col2:
+                    st.markdown("**Bowling Statistics**")
+                    
+                    bowling_data = {
+                        'Stat': ['Matches', 'Innings', 'Wickets', 'Runs', 'Economy', 'Average', 'Overs', 'Best Figures', '4W Hauls', 'Maidens'],
+                        'Value': [
+                            bowling.get('matches', 0),
+                            bowling.get('innings', 0),
+                            bowling.get('wickets', 0),
+                            bowling.get('runs_conceded', 0),
+                            f"{bowling.get('economy', 0):.2f}",
+                            f"{bowling.get('average', 0):.2f}",
+                            bowling.get('overs', '—'),
+                            bowling.get('best_figures', '—'),
+                            bowling.get('four_wickets', 0),
+                            bowling.get('maiden_overs', 0)
+                        ]
+                    }
+                    
+                    st.dataframe(pd.DataFrame(bowling_data), use_container_width=True, hide_index=True)
+            
+            # View type selector for top performers
+            st.markdown("**View Top Performers:**")
+            perf_type = st.radio("Select Type", ["Batsmen", "Bowlers"], horizontal=True, key="perf_type")
+            
+            # Top performers section below main stats
+            st.divider()
+            st.markdown("### Top Performers")
+            
+            if perf_type == "Batsmen":
+                st.markdown("**Top Batsmen (Overall)**")
+                # Get top batsmen by calculating from stats - loop through ALL batters, not just first 50
+                batsmen_stats = []
+                for batter in all_batters:  # Check all batters in dataset
+                    batter_stats = stats_engine.get_player_stats(batter)
+                    if batter_stats.get('batting', {}).get('runs', 0) > 0:
+                        batsmen_stats.append({
+                            'Player': batter,
+                            'Matches': int(batter_stats['batting'].get('matches', 0)),
+                            'Innings': int(batter_stats['batting'].get('innings', 0)),
+                            'Runs': int(batter_stats['batting'].get('runs', 0)),
+                            'Avg': round(batter_stats['batting'].get('average', 0), 2),
+                            'SR': round(batter_stats['batting'].get('strike_rate', 0), 2),
+                            '50s': int(batter_stats['batting'].get('fifties', 0)),
+                            '100s': int(batter_stats['batting'].get('centuries', 0)),
+                            'HS': batter_stats['batting'].get('highest_score', 0)
+                        })
                 
-                bowling_data = {
-                    'Metric': ['Matches', 'Innings', 'Overs', 'Wickets', 'Runs Conceded', 'Economy', 'Average', 'Best Figures', '4W Hauls', 'Maiden Overs'],
-                    'Value': [
-                        bowling.get('matches', 0),
-                        bowling.get('innings', 0),
-                        bowling.get('overs', '—'),
-                        bowling.get('wickets', 0),
-                        bowling.get('runs_conceded', 0),
-                        f"{bowling.get('economy', 0):.2f}",
-                        f"{bowling.get('average', 0):.2f}",
-                        bowling.get('best_figures', '—'),
-                        bowling.get('four_wickets', 0),
-                        bowling.get('maiden_overs', 0)
-                    ]
-                }
+                if batsmen_stats:
+                    top_batsmen_df = pd.DataFrame(batsmen_stats).sort_values('Runs', ascending=False).head(10)
+                    st.dataframe(top_batsmen_df, use_container_width=True, hide_index=True)
+            
+            elif perf_type == "Bowlers":
+                st.markdown("**Top Bowlers (Overall)**")
+                # Get top bowlers by calculating from stats - loop through ALL bowlers, not just first 50
+                bowler_stats = []
+                for bowler in all_bowlers:  # Check all bowlers in dataset
+                    bowler_info = stats_engine.get_player_stats(bowler)
+                    if bowler_info.get('bowling', {}).get('wickets', 0) > 0:
+                        bowler_stats.append({
+                            'Player': bowler,
+                            'Matches': int(bowler_info['bowling'].get('matches', 0)),
+                            'Innings': int(bowler_info['bowling'].get('innings', 0)),
+                            'Wickets': int(bowler_info['bowling'].get('wickets', 0)),
+                            'Runs': int(bowler_info['bowling'].get('runs_conceded', 0)),
+                            'Economy': round(bowler_info['bowling'].get('economy', 0), 2),
+                            'Avg': round(bowler_info['bowling'].get('average', 0), 2),
+                            'Best': bowler_info['bowling'].get('best_figures', '—'),
+                            '4W': int(bowler_info['bowling'].get('four_wickets', 0))
+                        })
                 
-                st.dataframe(pd.DataFrame(bowling_data), use_container_width=True, hide_index=True)
+                if bowler_stats:
+                    top_bowlers_df = pd.DataFrame(bowler_stats).sort_values('Wickets', ascending=False).head(10)
+                    st.dataframe(top_bowlers_df, use_container_width=True, hide_index=True)
     
     elif data_section == "team":
-        # Team Profile - Tables only
-        st.markdown("### Team Statistics")
-        team = st.selectbox("Select Team", all_teams, key="profile_team")
+        # Team Profile with Filters
+        col1, col2 = st.columns([2, 1.5], gap="large")
+        
+        with col1:
+            st.markdown("### Team Statistics")
+            team = st.selectbox("Select Team", all_teams, key="profile_team")
+        
+        with col2:
+            st.markdown("### League Stats")
+        
+        st.divider()
+        
+        # Filters Section
+        st.markdown("**Filters**")
+        filter_cols = st.columns(4)
+        
+        with filter_cols[0]:
+            venue_filter = st.text_input("Venue (optional)", key="venue_filter")
+        
+        with filter_cols[1]:
+            year_start = st.number_input("From Year", min_value=2008, max_value=2024, value=2008, key="year_start")
+        
+        with filter_cols[2]:
+            year_end = st.number_input("To Year", min_value=2008, max_value=2024, value=2024, key="year_end")
+        
+        with filter_cols[3]:
+            opposition = st.selectbox(
+                "vs Specific Team",
+                ["All"] + [t for t in all_teams if t != team],
+                key="vs_team_filter"
+            )
+        
+        st.markdown("")
         
         if team:
             team_stats = stats_engine.get_team_stats(team)
             
             st.markdown("**Team Summary**")
             
+            # Display team stats in table format
             team_data = {
                 'Metric': ['Matches', 'Wins', 'Losses', 'Win Rate', 'Win Percentage'],
                 'Value': [
@@ -479,13 +877,13 @@ elif page == "Profiles":
                     team_stats.get('wins', 0),
                     team_stats.get('matches', 0) - team_stats.get('wins', 0),
                     f"{team_stats.get('win_rate', 0):.2f}",
-                    f"{team_stats.get('win_percentage', 0):.1f}%"
+                    f"{team_stats.get('win_percentage', 0):.1f}%",
                 ]
             }
             
             st.dataframe(pd.DataFrame(team_data), use_container_width=True, hide_index=True)
             
-            st.divider()
+            st.markdown("")
             
             # Team performance trend
             trend = ai_engine.get_trend_analysis(team)
@@ -493,33 +891,32 @@ elif page == "Profiles":
                 st.markdown("**Performance by Year**")
                 
                 trend_data = trend['trend']
-                trend_table = {
-                    'Year': list(trend_data.keys()),
-                    'Wins': list(trend_data.values())
-                }
                 
-                st.dataframe(pd.DataFrame(trend_table), use_container_width=True, hide_index=True)
+                # Show trend data as table
+                trend_table = pd.DataFrame({
+                    'Year': sorted(trend_data.keys()),
+                    'Wins': [trend_data[year] for year in sorted(trend_data.keys())]
+                })
+                
+                st.dataframe(trend_table, use_container_width=True, hide_index=True)
+        
+        # League stats sidebar
+        with col2:
+            st.markdown("**League Standings**")
+            # Get all teams by wins
+            team_records = []
+            for t in all_teams:
+                t_stats = stats_engine.get_team_stats(t)
+                team_records.append({
+                    'Team': t,
+                    'Matches': t_stats.get('matches', 0),
+                    'Wins': t_stats.get('wins', 0),
+                    'Win%': t_stats.get('win_percentage', 0)
+                })
             
-            st.divider()
-            
-            # Top performers
-            st.markdown("**Top Performers**")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("Top Batsmen (All Teams)")
-                top_batsmen = stats_engine.get_top_performers('batting', 10)
-                if top_batsmen:
-                    df = pd.DataFrame(top_batsmen)
-                    st.dataframe(df, use_container_width=True, hide_index=True)
-            
-            with col2:
-                st.markdown("Top Bowlers (All Teams)")
-                top_bowlers = stats_engine.get_top_performers('bowling', 10)
-                if top_bowlers:
-                    df = pd.DataFrame(top_bowlers)
-                    st.dataframe(df, use_container_width=True, hide_index=True)
+            standings_df = pd.DataFrame(team_records).sort_values('Wins', ascending=False)
+            for idx, row in standings_df.head(8).iterrows():
+                st.caption(f"{idx+1}. {row['Team']}: {int(row['Wins'])} wins")
 
 # Footer
 st.divider()
