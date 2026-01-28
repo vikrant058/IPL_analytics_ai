@@ -452,7 +452,8 @@ EXAMPLES:
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
                                                         match_phase=match_phase, match_situation=match_situation,
-                                                        bowler_type=bowler_type, opposition_team=opposition_team)
+                                                        bowler_type=bowler_type, opposition_team=opposition_team,
+                                                        vs_conditions=vs_conditions)
             elif query_type == 'player_stats' and player1:
                 return self._get_player_stats_response(player1, seasons, 
                                                        match_phase=match_phase, match_situation=match_situation,
@@ -475,7 +476,7 @@ EXAMPLES:
     def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, 
                                     seasons: List[int] = None, match_phase: Optional[str] = None,
                                     match_situation: Optional[str] = None, bowler_type: Optional[str] = None,
-                                    opposition_team: Optional[str] = None) -> str:
+                                    opposition_team: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
         """Get head-to-head comparison between two players with additional filters"""
         
         try:
@@ -498,6 +499,8 @@ EXAMPLES:
                 filters['bowler_type'] = bowler_type
             if opposition_team:
                 filters['opposition_team'] = opposition_team
+            if vs_conditions:
+                filters['vs_conditions'] = vs_conditions
             
             # Get H2H stats from stats engine
             h2h_data = self.stats_engine.get_player_head_to_head(found_player1, found_player2, 

@@ -15,6 +15,7 @@ class StatsEngine:
         self._player_cache = None
         self._team_cache = None
         self._aliases = self._load_aliases()
+        self._bowler_types = self._load_bowler_types()
     
     def _load_aliases(self) -> Dict:
         """Load player and team aliases from JSON file"""
@@ -23,6 +24,15 @@ class StatsEngine:
             with open(alias_file, 'r') as f:
                 data = json.load(f)
                 return data.get('aliases', {})
+        except FileNotFoundError:
+            return {}
+    
+    def _load_bowler_types(self) -> Dict:
+        """Load bowler type classifications from JSON file"""
+        try:
+            bowler_file = os.path.join(os.path.dirname(__file__), 'bowler_types.json')
+            with open(bowler_file, 'r') as f:
+                return json.load(f)
         except FileNotFoundError:
             return {}
     
@@ -325,10 +335,33 @@ class StatsEngine:
             pass
         
         # VS conditions: vs_pace, vs_spin, vs_left_arm, vs_right_arm
-        # NOTE: This requires bowler type classification
+        # Filter deliveries against specific bowling types
         if filters.get('vs_conditions'):
-            # TODO: Add bowler classification dataset
-            pass
+            vs_cond = filters['vs_conditions'].lower()
+            # Get list of bowlers matching the condition type
+            matching_bowlers = set()
+            
+            if vs_cond == 'vs_pace':
+                # Find pace bowlers from our classification
+                pace_bowlers = self._bowler_types.get('pace_bowlers', {}).keys()
+                matching_bowlers.update(pace_bowlers)
+            elif vs_cond == 'vs_spin':
+                # Find spin bowlers from our classification
+                spin_bowlers = self._bowler_types.get('spin_bowlers', {}).keys()
+                matching_bowlers.update(spin_bowlers)
+            elif vs_cond == 'vs_left_arm':
+                # Find left arm bowlers
+                left_arm = self._bowler_types.get('left_arm_bowlers', [])
+                matching_bowlers.update(left_arm)
+            elif vs_cond == 'vs_right_arm':
+                # Find right arm bowlers
+                right_arm = self._bowler_types.get('right_arm_bowlers', [])
+                matching_bowlers.update(right_arm)
+            
+            # Filter deliveries to only those bowled by matching bowlers
+            if matching_bowlers:
+                df = df[df['bowler'].isin(matching_bowlers)].copy()
+        
         
         # Drop temporary columns
         df = df.drop(columns=['ball_number'], errors='ignore')
