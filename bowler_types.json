@@ -27,5 +27,26 @@
     "J Archer", "T Curran", "S Broad", "B Stokes", "A Zampa", "Rashid Khan", "R Bishnoi",
     "K Gowtham", "I Sodhi", "S Lamichhane", "A Nortje", "R Shepherd", "M Morkel", "L Ferguson",
     "D Wiese", "M Marsh", "C Morris"
+  ],
+  "right_arm_pace": [
+    "JJ Bumrah", "T Thakur", "Mohammed Shami", "K Rabada", "M Siraj", "U Yadav",
+    "R Khan", "A Mithun", "R Hazlewood", "N Coulter-Nile", "P Cummins", "J Archer",
+    "T Curran", "S Broad", "B Stokes", "A Nortje", "R Shepherd", "M Morkel", "L Ferguson",
+    "D Wiese", "M Marsh", "C Morris", "P Kumar", "Ishant Sharma"
+  ],
+  "left_arm_pace": [
+    "M Boult", "B Cutting", "JP Behrendorff"
+  ],
+  "right_arm_off_spin": [
+    "R Ashwin", "A Mishra", "A Jayakumar", "J Malinga", "B Laughlin"
+  ],
+  "left_arm_off_spin": [
+    "P Negi", "A Virojas"
+  ],
+  "right_arm_leg_spin": [
+    "Y Chahal", "K Pandya", "A Zampa", "Rashid Khan", "R Bishnoi", "K Gowtham", "I Sodhi"
+  ],
+  "left_arm_leg_spin": [
+    "S Lamichhane", "M Khan", "U Malik"
   ]
 }

@@ -609,10 +609,35 @@ EXAMPLES:
                 bat = stats['batting']
                 
                 # Use table format for vs_conditions filters
-                if vs_conditions:
+                if vs_conditions and vs_conditions in ['vs_spin', 'vs_pace']:
+                    response += f"🏏 **Batting Stats - {vs_conditions.replace('_', ' ').title()}**\n\n"
+                    # Overall stats
+                    response += "**TOTAL**\n"
+                    response += "| Metric | Value |\n|--------|-------|\n"
+                    response += f"| Matches | {bat.get('matches', 0)} |\n"
+                    response += f"| Balls | {bat.get('balls', 0)} |\n"
+                    response += f"| Runs | {bat.get('runs', 0)} |\n"
+                    response += f"| Average | {bat.get('average', 0):.2f} |\n"
+                    response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n\n"
+                    
+                    # Get breakdown by sub-types
+                    breakdown = self.stats_engine.get_bowling_subtype_breakdown(found_player, vs_conditions, filters)
+                    if breakdown:
+                        response += "**BREAKDOWN BY BOWLING TYPE**\n\n"
+                        response += "| Bowling Type | Balls | Runs | Avg | SR |\n|---|---|---|---|---|\n"
+                        for sub_type, sub_stats in breakdown.items():
+                            type_label = sub_type.replace('vs_', '').replace('_', ' ').title()
+                            balls = sub_stats.get('balls', 0)
+                            runs = sub_stats.get('runs', 0)
+                            avg = sub_stats.get('average', 0)
+                            sr = sub_stats.get('strike_rate', 0)
+                            response += f"| {type_label} | {balls} | {runs} | {avg:.2f} | {sr:.1f} |\n"
+                    response += "\n"
+                elif vs_conditions:
                     response += f"🏏 **Batting Stats - {vs_conditions.replace('_', ' ').title()}**\n\n"
                     response += "| Metric | Value |\n|--------|-------|\n"
                     response += f"| Matches | {bat.get('matches', 0)} |\n"
+                    response += f"| Balls | {bat.get('balls', 0)} |\n"
                     response += f"| Runs | {bat.get('runs', 0)} |\n"
                     response += f"| Average | {bat.get('average', 0):.2f} |\n"
                     response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n"

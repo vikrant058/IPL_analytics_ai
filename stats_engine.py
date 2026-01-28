@@ -335,6 +335,7 @@ class StatsEngine:
             pass
         
         # VS conditions: vs_pace, vs_spin, vs_off_spin, vs_leg_spin, vs_left_arm, vs_right_arm, vs_left_arm_spin, vs_right_arm_spin
+        # And sub-types: right_arm_pace, left_arm_pace, right_arm_off_spin, left_arm_off_spin, right_arm_leg_spin, left_arm_leg_spin
         # Filter deliveries against specific bowling types
         if filters.get('vs_conditions'):
             vs_cond = filters['vs_conditions'].lower()
@@ -369,6 +370,25 @@ class StatsEngine:
             elif vs_cond == 'vs_right_arm':
                 right_arm = self._bowler_types.get('right_arm_bowlers', [])
                 matching_bowlers.update(right_arm)
+            # Sub-types for breakdown
+            elif vs_cond == 'right_arm_pace':
+                bowlers = self._bowler_types.get('right_arm_pace', [])
+                matching_bowlers.update(bowlers)
+            elif vs_cond == 'left_arm_pace':
+                bowlers = self._bowler_types.get('left_arm_pace', [])
+                matching_bowlers.update(bowlers)
+            elif vs_cond == 'right_arm_off_spin':
+                bowlers = self._bowler_types.get('right_arm_off_spin', [])
+                matching_bowlers.update(bowlers)
+            elif vs_cond == 'left_arm_off_spin':
+                bowlers = self._bowler_types.get('left_arm_off_spin', [])
+                matching_bowlers.update(bowlers)
+            elif vs_cond == 'right_arm_leg_spin':
+                bowlers = self._bowler_types.get('right_arm_leg_spin', [])
+                matching_bowlers.update(bowlers)
+            elif vs_cond == 'left_arm_leg_spin':
+                bowlers = self._bowler_types.get('left_arm_leg_spin', [])
+                matching_bowlers.update(bowlers)
             
             # Filter deliveries to only those bowled by matching bowlers
             if matching_bowlers:
@@ -698,6 +718,41 @@ class StatsEngine:
         except Exception as e:
             return {'error': True, 'message': str(e)}
     
+    def get_bowling_subtype_breakdown(self, player: str, vs_condition: str, filters: Dict = None) -> Dict:
+        """Get batting stats breakdown by bowling sub-types
+        
+        For vs_spin, returns: vs_right_arm_off_spin, vs_left_arm_off_spin, vs_right_arm_leg_spin, vs_left_arm_leg_spin
+        For vs_pace, returns: vs_right_arm_pace, vs_left_arm_pace
+        """
+        base_filters = filters.copy() if filters else {}
+        breakdown = {}
+        
+        # Determine which sub-types to calculate
+        if vs_condition == 'vs_spin':
+            sub_types = [
+                ('vs_right_arm_off_spin', 'right_arm_off_spin'),
+                ('vs_left_arm_off_spin', 'left_arm_off_spin'),
+                ('vs_right_arm_leg_spin', 'right_arm_leg_spin'),
+                ('vs_left_arm_leg_spin', 'left_arm_leg_spin'),
+            ]
+        elif vs_condition == 'vs_pace':
+            sub_types = [
+                ('vs_right_arm_pace', 'right_arm_pace'),
+                ('vs_left_arm_pace', 'left_arm_pace'),
+            ]
+        else:
+            return breakdown
+        
+        # Calculate stats for each sub-type
+        for display_name, bowler_type_key in sub_types:
+            sub_filters = base_filters.copy()
+            sub_filters['vs_conditions'] = bowler_type_key
+            stats = self._get_batting_stats(player, sub_filters)
+            if stats and stats.get('balls', 0) > 0:  # Only include if there are balls faced
+                breakdown[display_name] = stats
+        
+        return breakdown
+
     def get_primary_skill(self, player: str) -> str:
         """Determine a player's primary skill (batter/bowler) based on participation
         
