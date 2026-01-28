@@ -133,12 +133,15 @@ st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
     "Choose Section",
-    ["💬 Chat & Analytics", "📊 Player & Team Data"],
+    ["Chat & Analytics", "Profiles"],
     label_visibility="collapsed"
 )
 
+st.sidebar.markdown("---")
+st.sidebar.caption("📊 IPL: 1,169 matches | 278K+ deliveries")
+
 # Main content based on page
-if page == "💬 Chat & Analytics":
+if page == "Chat & Analytics":
     st.title("🏏 Cricket Analytics")
     
     # Create a section selector for better organization
@@ -373,7 +376,7 @@ Then restart the app.""")
                 
                 st.dataframe(pd.DataFrame(comparison_data), use_container_width=True, hide_index=True)
 
-elif page == "� Player & Team Data":
+elif page == "Profiles":
     st.title("Data & Analytics")
     
     # Section selector
