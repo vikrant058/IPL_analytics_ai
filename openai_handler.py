@@ -664,26 +664,39 @@ EXAMPLES:
                     insights.append(f"💪 **Bowler's Strength**: {found_player2} restricts {found_player1} effectively")
             
             # Format main response
-            response = f"**Head-to-Head: {found_player1} vs {found_player2}**\n"
-            if seasons:
-                response += f"📅 **Seasons**: {', '.join(str(s) for s in seasons)}\n"
-            if match_phase:
-                response += f"🎯 **Phase**: {match_phase.replace('_', ' ').title()}\n"
-            if match_situation:
-                response += f"⚙️ **Situation**: {match_situation.replace('_', ' ').title()}\n"
-            response += "\n"
+            response = f"**Head-to-Head: {found_player1} vs {found_player2}**\n\n"
             
-            response += f"📊 **Deliveries**: {deliveries}\n"
-            response += f"🏃 **Runs**: {runs}\n"
-            response += f"⚡ **Strike Rate**: {strike_rate:.2f}\n"
-            response += f"🎯 **Dot Balls**: {dot_balls} ({dot_percentage:.1f}%)\n"
+            # Filter context
+            filters_context = []
+            if seasons:
+                filters_context.append(f"📅 {', '.join(str(s) for s in seasons)}")
+            if match_phase:
+                filters_context.append(f"🎯 {match_phase.replace('_', ' ').title()}")
+            if match_situation:
+                filters_context.append(f"⚙️ {match_situation.replace('_', ' ').title()}")
+            if ground:
+                filters_context.append(f"📍 {ground}")
+            if handedness:
+                filters_context.append(f"👤 {handedness.replace('_', ' ').title()}")
+            
+            if filters_context:
+                response += f"**Filters**: {' • '.join(filters_context)}\n\n"
+            
+            # H2H Stats Table
+            response += "| Metric | Value |\n|--------|-------|\n"
+            response += f"| Deliveries | {deliveries} |\n"
+            response += f"| Runs | {runs} |\n"
+            response += f"| Strike Rate | {strike_rate:.2f} |\n"
+            response += f"| Dot Balls | {dot_balls} ({dot_percentage:.1f}%) |\n"
             
             if venue:
-                response += f"📍 **Venue**: {venue}\n"
+                response += f"| Venue | {venue} |\n"
+            
+            response += "\n"
             
             # Add insights section
             if insights:
-                response += f"\n**Key Insights:**\n"
+                response += f"**Key Insights:**\n"
                 for insight in insights:
                     response += f"• {insight}\n"
             
@@ -795,17 +808,19 @@ EXAMPLES:
                     response += f"| Fours | {bat.get('fours', 0)} |\n"
                     response += f"| Sixes | {bat.get('sixes', 0)} |\n\n"
                 else:
-                    response += f"🏏 **Batting Stats**\n"
-                    response += f"- Matches: {bat.get('matches', 0)}\n"
-                    response += f"- Innings: {bat.get('innings', 0)}\n"
-                    response += f"- Runs: {bat.get('runs', 0)}\n"
-                    response += f"- Average: {bat.get('average', 0):.2f}\n"
-                    response += f"- Strike Rate: {bat.get('strike_rate', 0):.2f}\n"
-                    response += f"- Highest Score: {bat.get('highest_score', 0)}\n"
-                    response += f"- Centuries: {bat.get('centuries', 0)}\n"
-                    response += f"- Fifties: {bat.get('fifties', 0)}\n"
-                    response += f"- Fours: {bat.get('fours', 0)}\n"
-                    response += f"- Sixes: {bat.get('sixes', 0)}\n\n"
+                    response += f"🏏 **Batting Stats**\n\n"
+                    response += "| Metric | Value |\n|--------|-------|\n"
+                    response += f"| Matches | {bat.get('matches', 0)} |\n"
+                    response += f"| Innings | {bat.get('innings', 0)} |\n"
+                    response += f"| Balls | {bat.get('balls', 0)} |\n"
+                    response += f"| Runs | {bat.get('runs', 0)} |\n"
+                    response += f"| Average | {bat.get('average', 0):.2f} |\n"
+                    response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n"
+                    response += f"| Highest Score | {bat.get('highest_score', 0)} |\n"
+                    response += f"| Centuries | {bat.get('centuries', 0)} |\n"
+                    response += f"| Fifties | {bat.get('fifties', 0)} |\n"
+                    response += f"| Fours | {bat.get('fours', 0)} |\n"
+                    response += f"| Sixes | {bat.get('sixes', 0)} |\n\n"
             
             if 'bowling' in stats and stats['bowling']:
                 bowl = stats['bowling']
