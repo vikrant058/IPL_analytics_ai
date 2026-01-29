@@ -447,7 +447,47 @@ Then restart the app.""")
                     with st.spinner("🔍 Analyzing..."):
                         response = chatbot.get_response(user_query)
                     
-                    st.markdown(response)
+                    # Split response into sections for side-by-side display
+                    if "🏏 **Batting Stats**" in response and "🎳 **Bowling Stats**" in response:
+                        # Extract batting and bowling sections
+                        batting_start = response.find("🏏 **Batting Stats**")
+                        bowling_start = response.find("🎳 **Bowling Stats**")
+                        breakdown_start = response.find("**BREAKDOWN")
+                        
+                        # Get header (before batting stats)
+                        header = response[:batting_start].strip()
+                        
+                        # Get batting section
+                        if bowling_start > batting_start:
+                            batting_section = response[batting_start:bowling_start].strip()
+                        else:
+                            batting_section = response[batting_start:breakdown_start if breakdown_start > 0 else len(response)].strip()
+                        
+                        # Get bowling section
+                        if breakdown_start > bowling_start:
+                            bowling_section = response[bowling_start:breakdown_start].strip()
+                            breakdown_section = response[breakdown_start:].strip()
+                        else:
+                            bowling_section = response[bowling_start:].strip()
+                            breakdown_section = ""
+                        
+                        # Display header
+                        if header:
+                            st.markdown(header)
+                        
+                        # Display batting and bowling side by side
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown(batting_section)
+                        with col2:
+                            st.markdown(bowling_section)
+                        
+                        # Display breakdown if exists
+                        if breakdown_section:
+                            st.markdown(breakdown_section)
+                    else:
+                        # Single stat type or no stats, display normally
+                        st.markdown(response)
                 
             except Exception as e:
                 st.error(f"❌ Error initializing chatbot: {str(e)[:100]}")
