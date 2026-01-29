@@ -404,6 +404,48 @@ class StatsEngine:
             if matching_bowlers:
                 df = df[df['bowler'].isin(matching_bowlers)].copy()
         
+        # ===== NEW FILTERS =====
+        
+        # Ground/Venue filter
+        if filters.get('ground'):
+            ground = filters['ground']
+            df = df.merge(self.matches_df[['id', 'venue']], left_on='match_id', right_on='id', how='left')
+            df = df[df['venue'] == ground]
+            df = df.drop(columns=['id', 'venue'], errors='ignore')
+        
+        # Inning filter (1 = batting first, 2 = batting second/chasing)
+        if filters.get('innings_order'):
+            inning = filters['innings_order']
+            df = df[df['inning'] == inning]
+        
+        # Handedness filter (filter deliveries facing/bowled by left/right handers)
+        if filters.get('handedness'):
+            handedness = filters['handedness']
+            if handedness == 'left_handed':
+                # Filter for deliveries against left-handed batters
+                left_handers = self._batter_handedness.get('left_hand_batters', [])
+                df = df[df['batter'].isin(left_handers)]
+            elif handedness == 'right_handed':
+                # Filter for deliveries against right-handed batters
+                right_handers = self._batter_handedness.get('right_hand_batters', [])
+                df = df[df['batter'].isin(right_handers)]
+        
+        # Match type filter (home/away)
+        if filters.get('match_type'):
+            match_type = filters['match_type']
+            df = df.merge(self.matches_df[['id', 'team1', 'team2']], left_on='match_id', right_on='id', how='left')
+            
+            # Determine if this is home or away for the relevant team
+            # For batting stats: check if batting_team is home (team1)
+            # For bowling stats: check if bowling_team is home (team1)
+            if match_type == 'home':
+                # Filter for matches where team1 is batting/bowling
+                df = df[((df['batting_team'] == df['team1']) | (df['bowling_team'] == df['team1']))]
+            elif match_type == 'away':
+                # Filter for matches where team2 is batting/bowling
+                df = df[((df['batting_team'] == df['team2']) | (df['bowling_team'] == df['team2']))]
+            
+            df = df.drop(columns=['id', 'team1', 'team2'], errors='ignore')
         
         # Drop temporary columns
         df = df.drop(columns=['ball_number'], errors='ignore')

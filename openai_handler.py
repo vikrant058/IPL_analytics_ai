@@ -175,71 +175,142 @@ class CricketChatbot:
         return None
     
     def _extract_filter_keywords(self, query: str) -> Dict:
-        """Extract filter keywords from query text using pattern matching"""
+        """
+        Extract ALL filter keywords from query text using comprehensive pattern matching.
+        Supports: match_phase, match_situation, bowler_type, batter_role, vs_conditions,
+                  ground, handedness, year/season, inning, and home/away filters.
+        """
         query_lower = query.lower()
         filters = {}
         
-        # Match phase keywords
-        if any(word in query_lower for word in ['powerplay', 'power play', '0-6']):
+        # ===== MATCH PHASE FILTERS =====
+        if any(word in query_lower for word in ['powerplay', 'power play', '0-6', 'first 6']):
             filters['match_phase'] = 'powerplay'
-        elif any(word in query_lower for word in ['middle overs', 'middle']):
+        elif any(word in query_lower for word in ['middle overs', 'middle overs', 'middle phase']):
             filters['match_phase'] = 'middle_overs'
-        elif any(word in query_lower for word in ['death', 'death overs', 'final overs']):
+        elif any(word in query_lower for word in ['death', 'death overs', 'final overs', 'last overs']):
             filters['match_phase'] = 'death_overs'
-        elif any(word in query_lower for word in ['opening', 'start']):
+        elif any(word in query_lower for word in ['opening', 'first 3 overs', 'start']):
             filters['match_phase'] = 'opening'
-        elif any(word in query_lower for word in ['closing', 'end']):
+        elif any(word in query_lower for word in ['closing', 'last 3 overs', 'final phase']):
             filters['match_phase'] = 'closing'
         
-        # Match situation keywords
-        if any(word in query_lower for word in ['chasing', 'chase']):
+        # ===== MATCH SITUATION FILTERS =====
+        if any(word in query_lower for word in ['chasing', 'chase', 'while chasing']):
             filters['match_situation'] = 'chasing'
-        elif any(word in query_lower for word in ['defending', 'defend']):
+        elif any(word in query_lower for word in ['defending', 'defend', 'defended']):
             filters['match_situation'] = 'defending'
         elif any(word in query_lower for word in ['pressure chase', 'tight chase']):
             filters['match_situation'] = 'pressure_chase'
         elif any(word in query_lower for word in ['winning', 'winning position']):
             filters['match_situation'] = 'winning_position'
-        elif any(word in query_lower for word in ['batting first', 'batting 1st']):
+        elif any(word in query_lower for word in ['batting first', 'batting 1st', 'bat first']):
             filters['match_situation'] = 'batting_first'
         
-        # Bowler type keywords
-        if any(word in query_lower for word in ['pacer', 'pace', 'fast bowler', 'fast']):
+        # ===== BOWLING TYPE FILTERS =====
+        if any(word in query_lower for word in ['pacer', 'pace', 'fast bowler', 'fast', 'pace bowler', 'pacers']):
             filters['bowler_type'] = 'pace'
-        elif any(word in query_lower for word in ['spinner', 'spin', 'spin bowler']):
+        elif any(word in query_lower for word in ['spinner', 'spin', 'spin bowler', 'spinners']):
             filters['bowler_type'] = 'spin'
-        elif any(word in query_lower for word in ['left arm', 'left-arm']):
+        elif any(word in query_lower for word in ['left arm', 'left-arm', 'left arm fast', 'left arm bowler']):
             filters['bowler_type'] = 'left_arm'
-        elif any(word in query_lower for word in ['right arm', 'right-arm']):
+        elif any(word in query_lower for word in ['right arm', 'right-arm', 'right arm fast', 'right arm bowler']):
             filters['bowler_type'] = 'right_arm'
         
-        # Batter role keywords
-        if any(word in query_lower for word in ['opener', 'opening']):
+        # ===== BATTER ROLE FILTERS =====
+        if any(word in query_lower for word in ['opener', 'opening batter', 'open the batting']):
             filters['batter_role'] = 'opener'
-        elif any(word in query_lower for word in ['middle order', 'middle']):
+        elif any(word in query_lower for word in ['middle order', 'middle-order', 'middle batsman']):
             filters['batter_role'] = 'middle_order'
-        elif any(word in query_lower for word in ['lower order', 'lower']):
+        elif any(word in query_lower for word in ['lower order', 'lower-order', 'tail-ender']):
             filters['batter_role'] = 'lower_order'
-        elif any(word in query_lower for word in ['finisher', 'finishing']):
+        elif any(word in query_lower for word in ['finisher', 'finishing', 'death batter']):
             filters['batter_role'] = 'finisher'
         
-        # VS conditions keywords - CHECK MORE SPECIFIC PATTERNS FIRST
-        # Check for spin + arm combinations first (more specific)
-        if any(word in query_lower for word in ['left arm spin', 'left-arm spin', 'vs left arm spinner', 'against left arm spinner']):
+        # ===== HANDEDNESS FILTERS =====
+        if any(word in query_lower for word in ['left-hand', 'left handed', 'left hander', 'lhb', 'vs left hand']):
+            filters['handedness'] = 'left_handed'
+        elif any(word in query_lower for word in ['right-hand', 'right handed', 'right hander', 'rhb', 'vs right hand']):
+            filters['handedness'] = 'right_handed'
+        
+        # ===== INNING FILTERS =====
+        if any(word in query_lower for word in ['inning 1', 'first inning', 'first innings', 'inning one']):
+            filters['inning'] = 1
+        elif any(word in query_lower for word in ['inning 2', 'second inning', 'second innings', 'inning two']):
+            filters['inning'] = 2
+        
+        # ===== YEAR/SEASON FILTERS =====
+        # Extract 4-digit years (2008-2025 for IPL)
+        import re
+        years = re.findall(r'\b(20\d{2})\b', query)
+        if years:
+            filters['seasons'] = [int(y) for y in years if 2008 <= int(y) <= 2025]
+        
+        # ===== GROUND/VENUE FILTERS =====
+        # Check for ground names - first try exact matches with known venues
+        venues_to_check = [
+            ('wankhede', 'Wankhede Stadium'),
+            ('chinnaswamy', 'M Chinnaswamy Stadium'),
+            ('arun jaitley', 'Arun Jaitley Stadium'),
+            ('feroz shah kotla', 'Arun Jaitley Stadium'),
+            ('eden gardens', 'Eden Gardens'),
+            ('chidambaram', 'MA Chidambaram Stadium'),
+            ('rajiv gandhi', 'Rajiv Gandhi International Stadium'),
+            ('narendra modi', 'Narendra Modi Stadium'),
+            ('sardar patel', 'Narendra Modi Stadium'),
+            ('motera', 'Narendra Modi Stadium'),
+            ('sawai mansingh', 'Sawai Mansingh Stadium'),
+            ('dy patil', 'Dr DY Patil Sports Academy'),
+            ('bindra', 'Punjab Cricket Association IS Bindra Stadium'),
+            ('mohali', 'Punjab Cricket Association IS Bindra Stadium'),
+            ('reddy', 'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium'),
+            ('visakhapatnam', 'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium'),
+            ('arun nagar', 'Arun Nagar Stadium'),
+            ('maharashtra cricket', 'Maharashtra Cricket Association Stadium'),
+            ('pune', 'Maharashtra Cricket Association Stadium'),
+            ('bharat ratna', 'Bharat Ratna Rajiv Gandhi Intl'),
+            ('chepauk', 'MA Chidambaram Stadium'),
+            ('uppal', 'Rajiv Gandhi International Stadium'),
+            ('hyderabad', 'Rajiv Gandhi International Stadium'),
+            ('ahmedabad', 'Narendra Modi Stadium'),
+            ('jaipur', 'Sawai Mansingh Stadium'),
+            ('mumbai', 'Wankhede Stadium'),
+            ('bangalore', 'M Chinnaswamy Stadium'),
+            ('bengaluru', 'M Chinnaswamy Stadium'),
+            ('delhi', 'Arun Jaitley Stadium'),
+            ('kolkata', 'Eden Gardens'),
+            ('chennai', 'MA Chidambaram Stadium'),
+        ]
+        
+        for venue_keyword, canonical_venue in venues_to_check:
+            if venue_keyword in query_lower:
+                filters['ground'] = canonical_venue
+                break
+        
+        # ===== HOME/AWAY FILTERS =====
+        if any(word in query_lower for word in ['home', 'at home', 'home ground']):
+            filters['match_type'] = 'home'
+        elif any(word in query_lower for word in ['away', 'away game', 'away match']):
+            filters['match_type'] = 'away'
+        
+        # ===== VS CONDITIONS KEYWORDS - More specific patterns first =====
+        # Spin + arm combinations (most specific)
+        if any(word in query_lower for word in ['left arm spin', 'left-arm spin', 'vs left arm spinner']):
             filters['vs_conditions'] = 'vs_left_arm_spin'
-        elif any(word in query_lower for word in ['right arm spin', 'right-arm spin', 'vs right arm spinner', 'against right arm spinner']):
+        elif any(word in query_lower for word in ['right arm spin', 'right-arm spin', 'vs right arm spinner']):
             filters['vs_conditions'] = 'vs_right_arm_spin'
-        elif any(word in query_lower for word in ['vs off spin', 'against off spin', 'vs off-spin', 'vs offspinner']):
+        elif any(word in query_lower for word in ['vs off spin', 'against off spin', 'vs offspinner']):
             filters['vs_conditions'] = 'vs_off_spin'
-        elif any(word in query_lower for word in ['vs leg spin', 'against leg spin', 'vs leg-spin', 'vs legspinner']):
+        elif any(word in query_lower for word in ['vs leg spin', 'against leg spin', 'vs legspinner']):
             filters['vs_conditions'] = 'vs_leg_spin'
+        # General vs conditions
         elif any(word in query_lower for word in ['vs pace', 'against pace', 'vs fast']):
             filters['vs_conditions'] = 'vs_pace'
         elif any(word in query_lower for word in ['vs spin', 'against spin']):
             filters['vs_conditions'] = 'vs_spin'
-        elif any(word in query_lower for word in ['vs left arm', 'against left arm', 'vs left-arm']):
+        elif any(word in query_lower for word in ['vs left arm', 'against left arm']):
             filters['vs_conditions'] = 'vs_left_arm'
-        elif any(word in query_lower for word in ['vs right arm', 'against right arm', 'vs right-arm']):
+        elif any(word in query_lower for word in ['vs right arm', 'against right arm']):
             filters['vs_conditions'] = 'vs_right_arm'
         
         return filters
@@ -265,11 +336,16 @@ USE THESE TEAM ALIASES:
 ... and {len(self.team_aliases)-6} more team aliases
 
 CRICKET FILTER OPTIONS:
-- match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs), 'opening', 'closing'
+- match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs), 'opening' (0-3 overs), 'closing' (17-20 overs)
 - match_situation: 'batting_first', 'chasing', 'defending', 'pressure_chase', 'winning_position'
 - bowler_type: 'pace', 'spin', 'left_arm', 'right_arm'
 - batter_role: 'opener', 'middle_order', 'lower_order', 'finisher'
-- vs_conditions: 'vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm'
+- vs_conditions: 'vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm', 'vs_off_spin', 'vs_leg_spin'
+- ground: IPL stadium names (e.g., 'Wankhede Stadium', 'Eden Gardens', 'M Chinnaswamy Stadium')
+- handedness: 'left_handed', 'right_handed'
+- seasons: List of years [2008-2025]
+- inning: 1 or 2 (1 = batting first, 2 = batting second/chasing)
+- match_type: 'home', 'away'
 
 USER QUERY: "{query}"
 
@@ -277,27 +353,33 @@ Return ONLY valid JSON (NO other text):
 {{
     "player1": "Full player name (use aliases if needed) or null",
     "player2": "Second player (for comparisons) or null",
-    "venue": "Venue name or null",
-    "seasons": [List of years mentioned or null],
+    "venue": "Venue/Ground name or null",
+    "seasons": [List of years mentioned (2008-2025) or null],
     "bowler_type": "Bowler type or null",
     "match_phase": "Match phase or null",
     "match_situation": "Match situation or null",
     "opposition_team": "Full team name or null",
     "batter_role": "Batter role or null",
     "vs_conditions": "Condition or null",
+    "ground": "Ground/Venue name or null",
+    "handedness": "left_handed or right_handed or null",
+    "inning": 1 or 2 or null,
+    "match_type": "home or away or null",
     "form_filter": "Form or null",
     "query_type": "head_to_head|player_stats|team_comparison|general",
     "interpretation": "What the user is asking"
 }}
 
 EXAMPLES:
+- "virat in powerplay" → player1: "V Kohli", match_phase: "powerplay", query_type: "player_stats"
 - "virat vs bumrah" → player1: "V Kohli", player2: "JJ Bumrah", query_type: "head_to_head"
-- "rohit in powerplay" → player1: "RG Sharma", match_phase: "powerplay", query_type: "player_stats"
-- "kohli in death overs" → player1: "V Kohli", match_phase: "death_overs", query_type: "player_stats"
-- "kohli vs bumrah in powerplay" → player1: "V Kohli", player2: "JJ Bumrah", match_phase: "powerplay", query_type: "head_to_head"
-- "kohli chasing" → player1: "V Kohli", match_situation: "chasing", query_type: "player_stats"
-- "bumrah vs pace against csk" → player1: "JJ Bumrah", vs_conditions: "vs_pace", opposition_team: "Chennai Super Kings"
-- "sky vs spin 2024" → player1: "SA Yadav", vs_conditions: "vs_spin", seasons: [2024]"""
+- "kohli vs bumrah in chinnaswamy" → player1: "V Kohli", player2: "JJ Bumrah", ground: "M Chinnaswamy Stadium", query_type: "head_to_head"
+- "kohli chasing in death overs 2024" → player1: "V Kohli", match_situation: "chasing", match_phase: "death_overs", seasons: [2024], query_type: "player_stats"
+- "bumrah vs left hander" → player1: "JJ Bumrah", handedness: "left_handed", query_type: "player_stats"
+- "sky in powerplay chasing" → player1: "SA Yadav", match_phase: "powerplay", match_situation: "chasing", query_type: "player_stats"
+- "bumrah at home in 2024" → player1: "JJ Bumrah", match_type: "home", seasons: [2024], query_type: "player_stats"
+- "sharma vs pace bowlers" → player1: "RG Sharma", vs_conditions: "vs_pace", query_type: "player_stats"
+- "bumrah vs right hander" → player1: "JJ Bumrah", handedness: "right_handed", query_type: "player_stats\""""
         
         try:
             response = self.client.chat.completions.create(
@@ -369,13 +451,17 @@ EXAMPLES:
                 "player1": player1,
                 "player2": player2,
                 "venue": None,
-                "seasons": None,
+                "seasons": extracted_filters.get('seasons'),
                 "bowler_type": extracted_filters.get('bowler_type'),
                 "match_phase": extracted_filters.get('match_phase'),
                 "match_situation": extracted_filters.get('match_situation'),
                 "opposition_team": team,
                 "batter_role": extracted_filters.get('batter_role'),
                 "vs_conditions": extracted_filters.get('vs_conditions'),
+                "ground": extracted_filters.get('ground'),
+                "handedness": extracted_filters.get('handedness'),
+                "inning": extracted_filters.get('inning'),
+                "match_type": extracted_filters.get('match_type'),
                 "form_filter": None,
                 "query_type": determined_type,
                 "interpretation": f"Comparing {player1} vs {player2}" if (player1 and player2) else (f"Stats for {player1}" if player1 else "Cricket query")
@@ -431,6 +517,7 @@ EXAMPLES:
         """
         Main method: Takes user query and returns analytics response
         Validates that query contains cricket-relevant parameters before processing.
+        Handles comprehensive filter extraction: phases, situations, grounds, years, handedness, etc.
         """
         
         # Parse the query
@@ -445,6 +532,10 @@ EXAMPLES:
         opposition_team = parsed.get('opposition_team')
         batter_role = parsed.get('batter_role')
         vs_conditions = parsed.get('vs_conditions')
+        ground = parsed.get('ground')
+        handedness = parsed.get('handedness')
+        inning = parsed.get('inning')
+        match_type = parsed.get('match_type')
         form_filter = parsed.get('form_filter')
         
         # Canonicalize opposition_team using team aliases
@@ -457,7 +548,7 @@ EXAMPLES:
         has_cricket_entity = player1 or player2 or venue or opposition_team
         
         if not has_cricket_entity:
-            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'\n- 'bumrah in pressure situations'\n- 'kohli against left-arm fast bowlers'"
+            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli chasing in 2025 at home'\n- 'bumrah vs left handers in death overs'\n- 'sky in chinnaswamy 2024'\n- 'sharma's powerplay stats'"
         
         try:
             # Determine query type if not set correctly
@@ -469,17 +560,20 @@ EXAMPLES:
                 elif opposition_team:
                     query_type = 'team_comparison'
             
-            # Route to appropriate handler
+            # Route to appropriate handler with all filters
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
                                                         match_phase=match_phase, match_situation=match_situation,
                                                         bowler_type=bowler_type, opposition_team=opposition_team,
-                                                        vs_conditions=vs_conditions)
+                                                        vs_conditions=vs_conditions, ground=ground,
+                                                        handedness=handedness, inning=inning, match_type=match_type)
             elif query_type == 'player_stats' and player1:
                 return self._get_player_stats_response(player1, seasons, 
                                                        match_phase=match_phase, match_situation=match_situation,
                                                        bowler_type=bowler_type, opposition_team=opposition_team,
-                                                       batter_role=batter_role, vs_conditions=vs_conditions)
+                                                       batter_role=batter_role, vs_conditions=vs_conditions,
+                                                       ground=ground, handedness=handedness, inning=inning, 
+                                                       match_type=match_type)
             elif query_type == 'team_comparison' and opposition_team:
                 return self._get_team_stats_response(opposition_team)
             elif player1:
@@ -497,8 +591,10 @@ EXAMPLES:
     def _get_head_to_head_response(self, player1: str, player2: str, venue: Optional[str] = None, 
                                     seasons: List[int] = None, match_phase: Optional[str] = None,
                                     match_situation: Optional[str] = None, bowler_type: Optional[str] = None,
-                                    opposition_team: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
-        """Get head-to-head comparison between two players with additional filters"""
+                                    opposition_team: Optional[str] = None, vs_conditions: Optional[str] = None,
+                                    ground: Optional[str] = None, handedness: Optional[str] = None,
+                                    inning: Optional[int] = None, match_type: Optional[str] = None) -> str:
+        """Get head-to-head comparison between two players with comprehensive filters"""
         
         try:
             # Find actual player names using fuzzy matching
@@ -522,6 +618,14 @@ EXAMPLES:
                 filters['opposition_team'] = opposition_team
             if vs_conditions:
                 filters['vs_conditions'] = vs_conditions
+            if ground:
+                filters['ground'] = ground
+            if handedness:
+                filters['handedness'] = handedness
+            if inning:
+                filters['innings_order'] = inning  # stats_engine uses 'innings_order'
+            if match_type:
+                filters['match_type'] = match_type
             
             # Get H2H stats from stats engine
             h2h_data = self.stats_engine.get_player_head_to_head(found_player1, found_player2, 
@@ -593,8 +697,10 @@ EXAMPLES:
     def _get_player_stats_response(self, player: str, seasons: List[int] = None, 
                                     match_phase: Optional[str] = None, match_situation: Optional[str] = None,
                                     bowler_type: Optional[str] = None, opposition_team: Optional[str] = None,
-                                    batter_role: Optional[str] = None, vs_conditions: Optional[str] = None) -> str:
-        """Get player statistics with advanced filters like match phase, match situation, bowler type, etc."""
+                                    batter_role: Optional[str] = None, vs_conditions: Optional[str] = None,
+                                    ground: Optional[str] = None, handedness: Optional[str] = None,
+                                    inning: Optional[int] = None, match_type: Optional[str] = None) -> str:
+        """Get player statistics with comprehensive filters: phases, situations, grounds, years, handedness, etc."""
         
         try:
             # Find player with fuzzy matching
@@ -618,6 +724,14 @@ EXAMPLES:
                 filters['batter_role'] = batter_role
             if vs_conditions:
                 filters['vs_conditions'] = vs_conditions
+            if ground:
+                filters['ground'] = ground
+            if handedness:
+                filters['handedness'] = handedness
+            if inning:
+                filters['innings_order'] = inning  # stats_engine uses 'innings_order'
+            if match_type:
+                filters['match_type'] = match_type
             
             # Get stats with optional filters
             stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
