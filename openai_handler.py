@@ -336,7 +336,48 @@ class CricketChatbot:
         """
         Parse natural language query using GPT to intelligently extract cricket-specific information.
         Leverages loaded player/team aliases for smart entity resolution.
+        
+        Optimization: Try simple pattern matching FIRST before calling GPT.
         """
+        
+        # OPTIMIZATION: Try simple pattern matching first for common queries
+        # This avoids expensive GPT calls for queries like "player last N matches"
+        query_lower = query.lower()
+        
+        # Check if this is a "player last N matches/innings" query
+        import re
+        time_period_match = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
+        if time_period_match:
+            # This is likely a trends query
+            player1 = self._resolve_player_name(query)
+            if player1:
+                # We found a player and time period - extract it without GPT
+                number = time_period_match.group(1)
+                period_type = time_period_match.group(2)
+                return {
+                    "player1": player1,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": None,
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": None,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": f"last {number} {period_type}",
+                    "record_type": None,
+                    "comparison_type": None,
+                    "ranking_metric": None,
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "trends",
+                    "interpretation": f"Trends for {player1} in last {number} {period_type}"
+                }
         
         # Build context about available aliases for the prompt
         player_alias_samples = {k: v for k, v in list(self.player_aliases.items())[:8]}
