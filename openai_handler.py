@@ -293,6 +293,23 @@ class CricketChatbot:
         elif any(word in query_lower for word in ['away', 'away game', 'away match']):
             filters['match_type'] = 'away'
         
+        # ===== TIME PERIOD FILTERS =====
+        # Extract "last N matches", "last N innings", "last season", "recent"
+        import re
+        if 'recent' in query_lower or 'current' in query_lower or 'now' in query_lower:
+            filters['time_period'] = 'recent'
+        elif 'last season' in query_lower:
+            filters['time_period'] = 'last season'
+        elif 'all time' in query_lower or 'career' in query_lower:
+            filters['time_period'] = 'all time'
+        else:
+            # Look for "last N matches/innings" pattern
+            match_pattern = re.search(r'last\s+(\d+)\s+(matches|innings|games|inning)', query_lower)
+            if match_pattern:
+                number = match_pattern.group(1)
+                period_type = match_pattern.group(2)
+                filters['time_period'] = f"last {number} {period_type}"
+        
         # ===== VS CONDITIONS KEYWORDS - More specific patterns first =====
         # Spin + arm combinations (most specific)
         if any(word in query_lower for word in ['left arm spin', 'left-arm spin', 'vs left arm spinner']):
@@ -466,6 +483,10 @@ EXAMPLES:
             elif team:
                 determined_type = 'team_comparison'
             
+            # Determine query_type based on extracted filters
+            if extracted_filters.get('time_period') and player1:
+                determined_type = 'trends'
+            
             return {
                 "player1": player1,
                 "player2": player2,
@@ -481,6 +502,11 @@ EXAMPLES:
                 "handedness": extracted_filters.get('handedness'),
                 "inning": extracted_filters.get('inning'),
                 "match_type": extracted_filters.get('match_type'),
+                "time_period": extracted_filters.get('time_period'),
+                "record_type": None,
+                "comparison_type": None,
+                "ranking_metric": None,
+                "player_list": None,
                 "form_filter": None,
                 "query_type": determined_type,
                 "interpretation": f"Comparing {player1} vs {player2}" if (player1 and player2) else (f"Stats for {player1}" if player1 else "Cricket query")

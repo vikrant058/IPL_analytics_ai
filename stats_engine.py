@@ -281,9 +281,9 @@ class StatsEngine:
             dismissed = False
             if len(bat_deliv) > 0:
                 for _, deliv in bat_deliv.iterrows():
-                    bat_runs += deliv['batter_runs']
+                    bat_runs += deliv['batsman_runs']
                     bat_balls += 1
-                    if deliv['wicket'] == 1:
+                    if deliv['is_wicket'] == 1:
                         dismissed = True
             
             # Calculate bowling figures if bowled
@@ -294,7 +294,7 @@ class StatsEngine:
                 for _, deliv in bowl_deliv.iterrows():
                     bowl_balls += 1
                     bowl_runs += deliv['total_runs']
-                    if deliv['wicket'] == 1:
+                    if deliv['is_wicket'] == 1:
                         bowl_wickets += 1
             
             # Determine opposition team (either team1 or team2)
