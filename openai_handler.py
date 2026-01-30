@@ -979,8 +979,12 @@ EXAMPLES:
             # Get data - for both "innings" and "matches", show batting breakdown for batters
             innings_data = self.stats_engine.get_last_n_innings(found_player, n_period)
             
-            # If no batting innings (bowler), fall back to match-by-match bowling data
-            if not innings_data:
+            # Check if player has meaningful batting (not just rare tail-ender appearances)
+            # Filter out innings where player only faced 0-2 balls (rare tail-ender bats)
+            meaningful_innings = [i for i in innings_data if i['balls'] >= 3]
+            
+            # If player has few meaningful batting innings (likely a bowler), show bowling instead
+            if len(meaningful_innings) < 2:
                 matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
                 if not matches_data:
                     return f"No recent data available for {found_player}."
@@ -1011,13 +1015,13 @@ EXAMPLES:
                 
                 return response
             
-            # Show batting breakdown for batters
-            response = f"📈 **{found_player} - Last {len(innings_data)} Batting Innings**\n\n"
+            # Show batting breakdown for batters (use meaningful innings)
+            response = f"📈 **{found_player} - Last {len(meaningful_innings)} Batting Innings**\n\n"
             response += "🏏 **Batting Performance**\n\n"
             response += "| Inning | Opposition | Runs | Balls | SR |\n"
             response += "|--------|------------|------|-------|----|\n"
             
-            for i, inning in enumerate(innings_data, 1):
+            for i, inning in enumerate(meaningful_innings, 1):
                 sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
                 # Show asterisk on score ONLY if not out (dismissed = False)
                 runs_display = f"{inning['runs']}*" if inning['balls'] > 0 and not inning['dismissed'] else str(inning['runs'])
@@ -1026,10 +1030,10 @@ EXAMPLES:
             response += "\n"
             
             # Calculate averages
-            total_runs = sum(m['runs'] for m in innings_data)
-            total_balls = sum(m['balls'] for m in innings_data)
+            total_runs = sum(m['runs'] for m in meaningful_innings)
+            total_balls = sum(m['balls'] for m in meaningful_innings)
             avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
-            innings_count = len([m for m in innings_data if m['balls'] > 0])
+            innings_count = len([m for m in meaningful_innings if m['balls'] > 0])
             
             if innings_count > 0:
                 response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
