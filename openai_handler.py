@@ -1002,8 +1002,9 @@ EXAMPLES:
             meaningful_innings = [i for i in innings_data if i['balls'] >= 3]
             print(f"DEBUG: {found_player} - meaningful_innings (3+ balls): {len(meaningful_innings)}", file=sys.stderr)
             
-            # If player has few meaningful batting innings (likely a bowler), show bowling instead
-            if len(meaningful_innings) < 2:
+            # If player has NO meaningful batting innings AND also no bowling data, they're purely a tail-ender
+            # Only treat as bowler if they have 0 meaningful innings
+            if len(meaningful_innings) == 0:
                 matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
                 if not matches_data:
                     return f"No recent data available for {found_player}."
