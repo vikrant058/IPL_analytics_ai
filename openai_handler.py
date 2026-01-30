@@ -617,7 +617,7 @@ EXAMPLES:
                                                  seasons=seasons)
             
             elif query_type == 'records':
-                return self._get_records_response(player1=player1, record_type=record_type, 
+                return self._get_records_response(player=player1, record_type=record_type, 
                                                   seasons=seasons, match_phase=match_phase)
             
             elif query_type == 'rankings':
@@ -628,7 +628,7 @@ EXAMPLES:
                 return self._get_ground_insights_response(player1, ground)
             
             elif query_type == 'form_guide':
-                return self._get_form_guide_response(player1=player1, time_period=time_period)
+                return self._get_form_guide_response(player=player1, time_period=time_period)
             
             elif query_type == 'comparative_analysis' and (player1 or player_list):
                 return self._get_comparative_analysis_response(player1=player1, player2=player2,
