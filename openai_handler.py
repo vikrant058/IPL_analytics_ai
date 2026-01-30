@@ -986,13 +986,14 @@ EXAMPLES:
                 if matches_data:
                     response = f"📈 **{found_player} - Last {len(matches_data)} Batting Innings**\n\n"
                     response += "🏏 **Batting Performance**\n\n"
-                    response += "| Inning | Opposition | Runs | Balls | SR | Result |\n"
-                    response += "|--------|------------|------|-------|----|---------|\n"
+                    response += "| Inning | Opposition | Runs | Balls | SR |\n"
+                    response += "|--------|------------|------|-------|----|\n"
                     
                     for i, inning in enumerate(matches_data, 1):
                         sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
-                        result = f"{'💯' if inning['runs'] > 50 else '🔥' if inning['runs'] > 30 else '⚪' if inning['runs'] > 10 else '❌'} {'Out' if inning['dismissed'] else 'NotOut'}"
-                        response += f"| {i} | {inning['opposition'][:12]} | {inning['runs']} | {inning['balls']} | {sr:.1f} | {result} |\n"
+                        # Show asterisk on score if not out
+                        runs_display = f"{inning['runs']}*" if not inning['dismissed'] else str(inning['runs'])
+                        response += f"| {i} | {inning['opposition'][:12]} | {runs_display} | {inning['balls']} | {sr:.1f} |\n"
                     
                     response += "\n"
                     
@@ -1047,7 +1048,7 @@ EXAMPLES:
                         overs = bowl['balls'] / 6
                         economy = (bowl['runs'] / overs) if overs > 0 else 0
                         status = f"{'🔥' if bowl['wickets'] > 1 else '✅' if bowl['wickets'] == 1 else '⚪'}"
-                        response += f"| {match['season']} | {match['opposition'][:15]} | {bowl['wickets']}/- | {bowl['runs']} | {bowl['balls']} | {economy:.2f} | {status} |\n"
+                        response += f"| {match['season']} | {match['opposition'][:15]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} | {status} |\n"
                 
                 response += "\n"
             
