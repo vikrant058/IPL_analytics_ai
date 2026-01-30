@@ -413,6 +413,8 @@ EXAMPLES:
 - "top 10 run scorers in 2024" → seasons: [2024], ranking_metric: "runs", query_type: "rankings"
 - "kohli at wankhede" → player1: "V Kohli", ground: "Wankhede Stadium", query_type: "ground_insights"
 - "bumrah's trend in last 5 matches" → player1: "JJ Bumrah", time_period: "last 5 matches", query_type: "trends"
+- "kohli last 5 innings" → player1: "V Kohli", time_period: "last 5 innings", query_type: "trends"
+- "bumrah last 10 matches" → player1: "JJ Bumrah", time_period: "last 10 matches", query_type: "trends"
 - "kohli vs sharma in powerplay" → player1: "V Kohli", player2: "RG Sharma", match_phase: "powerplay", query_type: "comparative_analysis"
 - "who should bat for CSK in powerplay" → opposition_team: "CSK", match_phase: "powerplay", query_type: "predictions"
 """
