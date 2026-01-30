@@ -925,48 +925,77 @@ EXAMPLES:
                             match_phase: Optional[str] = None, 
                             match_situation: Optional[str] = None,
                             seasons: Optional[List[int]] = None) -> str:
-        """Get performance trend analysis for a player"""
+        """Get performance trend analysis for a player - last 5 matches breakdown"""
         try:
             found_player = self.stats_engine.find_player(player)
             if not found_player:
                 return f"Player '{player}' not found."
             
-            # Default time period to recent
-            period_label = time_period or "recent"
+            # Parse time period to get N matches
+            n_matches = 5  # Default
+            if time_period:
+                if "last" in time_period.lower() and "match" in time_period.lower():
+                    import re
+                    match = re.search(r'(\d+)', time_period)
+                    if match:
+                        n_matches = int(match.group(1))
             
-            # Get stats for the time period
-            filters = {}
-            if match_phase:
-                filters['match_phase'] = match_phase
-            if match_situation:
-                filters['match_situation'] = match_situation
-            if seasons:
-                filters['seasons'] = seasons
+            # Get last N matches data
+            matches_data = self.stats_engine.get_last_n_matches(found_player, n_matches)
             
-            stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
+            if not matches_data:
+                return f"No recent match data available for {found_player}."
             
-            if not stats or 'error' in stats:
-                return f"No trend data available for {found_player}."
+            response = f"📈 **{found_player} - Last {len(matches_data)} Matches Performance**\n\n"
             
-            response = f"📈 **{found_player} - Performance Trend ({period_label})**\n\n"
+            # Check if player is batter or bowler based on available data
+            has_batting = any(m['batting']['balls'] > 0 for m in matches_data)
+            has_bowling = any(m['bowling']['balls'] > 0 for m in matches_data)
             
-            if 'batting' in stats and stats['batting']:
-                bat = stats['batting']
-                response += "🏏 **Batting Trend**\n\n"
-                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
-                response += f"| Recent Form | Last 5 avg ~{bat.get('average', 0):.0f} runs | {'📈 Strong' if bat.get('average', 0) > 30 else '📉 Below Avg' if bat.get('average', 0) < 20 else '⚪ Average'} |\n"
-                response += f"| Strike Rate | {bat.get('strike_rate', 0):.1f} | {'🔥 Aggressive' if bat.get('strike_rate', 0) > 135 else '⚪ Normal'} |\n"
-                response += f"| Consistency | {bat.get('matches', 0)} matches | {'✅ Consistent' if bat.get('matches', 0) > 5 else '⏳ Limited'} |\n\n"
+            if has_batting:
+                response += "🏏 **Batting Performance (Last 5 Innings)**\n\n"
+                response += "| Match | Opposition | Runs | Balls | SR | Status |\n"
+                response += "|-------|------------|------|-------|----|---------|\n"
+                
+                for match in matches_data:
+                    bat = match['batting']
+                    if bat['balls'] > 0:
+                        sr = (bat['runs'] / bat['balls'] * 100) if bat['balls'] > 0 else 0
+                        status = f"{'💯' if bat['runs'] > 50 else '🔥' if bat['runs'] > 30 else '⚪' if bat['runs'] > 10 else '❌'}"
+                        status += f" {'Out' if bat['dismissed'] else 'Notout'}"
+                        response += f"| {match['season']} | {match['opposition'][:15]} | {bat['runs']} | {bat['balls']} | {sr:.1f} | {status} |\n"
+                
+                response += "\n"
             
-            if 'bowling' in stats and stats['bowling']:
-                bowl = stats['bowling']
-                response += "🎳 **Bowling Trend**\n\n"
-                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
-                response += f"| Recent Form | {bowl.get('wickets', 0)} wickets | {'🔥 Active' if bowl.get('wickets', 0) > 5 else '⏸️ Limited'} |\n"
-                response += f"| Economy | {bowl.get('economy', 0):.2f} | {'✅ Tight' if bowl.get('economy', 0) < 7.5 else '⚠️ Expensive'} |\n"
-                response += f"| Consistency | {bowl.get('matches', 0)} matches | {'✅ Regular' if bowl.get('matches', 0) > 5 else '⏳ Rare'} |\n\n"
+            if has_bowling:
+                response += "🎳 **Bowling Performance (Last 5 Matches)**\n\n"
+                response += "| Match | Opposition | Wickets | Runs | Balls | Economy | Status |\n"
+                response += "|-------|------------|---------|------|-------|---------|--------|\n"
+                
+                for match in matches_data:
+                    bowl = match['bowling']
+                    if bowl['balls'] > 0:
+                        overs = bowl['balls'] / 6
+                        economy = (bowl['runs'] / overs) if overs > 0 else 0
+                        status = f"{'🔥' if bowl['wickets'] > 1 else '✅' if bowl['wickets'] == 1 else '⚪'}"
+                        response += f"| {match['season']} | {match['opposition'][:15]} | {bowl['wickets']}/- | {bowl['runs']} | {bowl['balls']} | {economy:.2f} | {status} |\n"
+                
+                response += "\n"
             
-            response += f"**Interpretation**: {found_player} is showing a **{'Strong' if stats.get('batting', {}).get('average', 0) > 30 else 'Moderate' if stats.get('batting', {}).get('average', 0) > 20 else 'Fluctuating'}** trend recently."
+            # Calculate averages
+            if has_batting:
+                total_runs = sum(m['batting']['runs'] for m in matches_data)
+                total_balls = sum(m['batting']['balls'] for m in matches_data)
+                avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
+                response += f"**Recent Batting Average**: {total_runs / len([m for m in matches_data if m['batting']['balls'] > 0]):.1f} runs | **Strike Rate**: {avg_sr:.1f}\n\n"
+            
+            if has_bowling:
+                total_wickets = sum(m['bowling']['wickets'] for m in matches_data)
+                total_runs_conceded = sum(m['bowling']['runs'] for m in matches_data)
+                total_balls_bowled = sum(m['bowling']['balls'] for m in matches_data)
+                avg_economy = (total_runs_conceded / (total_balls_bowled / 6)) if total_balls_bowled > 0 else 0
+                response += f"**Recent Bowling**: {total_wickets} wickets in 5 matches | **Economy**: {avg_economy:.2f}\n\n"
+            
             return response
         
         except Exception as e:
@@ -1096,7 +1125,7 @@ EXAMPLES:
             return f"Error analyzing ground insights: {str(e)}"
     
     def _get_form_guide_response(self, player: Optional[str] = None, time_period: Optional[str] = None) -> str:
-        """Get current form analysis for a player"""
+        """Get current form analysis for a player - last 5 matches breakdown"""
         try:
             if not player:
                 return "Please specify a player for form analysis."
@@ -1105,38 +1134,79 @@ EXAMPLES:
             if not found_player:
                 return f"Player '{player}' not found."
             
-            # Get recent stats (last 5-10 matches by default)
-            stats = self.stats_engine.get_player_stats(found_player, None)
+            # Get last 5 matches data
+            matches_data = self.stats_engine.get_last_n_matches(found_player, 5)
             
-            if not stats or 'error' in stats:
-                return f"No form data available for {found_player}."
+            if not matches_data:
+                return f"No recent match data available for {found_player}."
             
-            response = f"📊 **{found_player} - Form Guide**\n\n"
+            # Check if player is batter or bowler
+            has_batting = any(m['batting']['balls'] > 0 for m in matches_data)
+            has_bowling = any(m['bowling']['balls'] > 0 for m in matches_data)
             
-            # Determine form status
-            bat_avg = stats.get('batting', {}).get('average', 0)
-            bowl_econ = stats.get('bowling', {}).get('economy', 999)
+            # Calculate form status
+            form_status = "⚪ NO RECENT DATA"
+            if has_batting:
+                bat_runs = sum(m['batting']['runs'] for m in matches_data if m['batting']['balls'] > 0)
+                bat_matches = len([m for m in matches_data if m['batting']['balls'] > 0])
+                bat_avg = bat_runs / bat_matches if bat_matches > 0 else 0
+                
+                if bat_avg > 35:
+                    form_status = "✅ **EXCELLENT FORM** 🔥"
+                elif bat_avg > 28:
+                    form_status = "✅ **GOOD FORM** ✅"
+                elif bat_avg > 20:
+                    form_status = "⚪ **AVERAGE FORM** ⚪"
+                elif bat_avg > 10:
+                    form_status = "⚠️ **POOR FORM** ⚠️"
+                else:
+                    form_status = "📉 **OUT OF FORM** ❌"
+            elif has_bowling:
+                bowl_wickets = sum(m['bowling']['wickets'] for m in matches_data if m['bowling']['balls'] > 0)
+                bowl_matches = len([m for m in matches_data if m['bowling']['balls'] > 0])
+                
+                if bowl_wickets >= 5:
+                    form_status = "✅ **EXCELLENT FORM** 🔥"
+                elif bowl_wickets >= 3:
+                    form_status = "✅ **GOOD FORM** ✅"
+                elif bowl_wickets > 0:
+                    form_status = "⚪ **AVERAGE FORM** ⚪"
+                else:
+                    form_status = "⚠️ **POOR FORM** ⚠️"
             
-            if bat_avg > 35:
-                form_status = "✅ **IN EXCELLENT FORM** - Top performer"
-            elif bat_avg > 28:
-                form_status = "✅ **IN GOOD FORM** - Consistent performer"
-            elif bat_avg > 20:
-                form_status = "⚪ **AVERAGE FORM** - Expected performance"
-            elif bat_avg > 10:
-                form_status = "⚠️ **POOR FORM** - Below expectations"
-            else:
-                form_status = "📉 **OUT OF FORM** - Struggling"
-            
+            response = f"📊 **{found_player} - Form Guide (Last 5 Matches)**\n\n"
             response += f"{form_status}\n\n"
             
-            if 'batting' in stats and stats['batting']:
-                bat = stats['batting']
-                response += "🏏 **Recent Batting**\n\n"
-                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
-                response += f"| Recent Average | {bat.get('average', 0):.1f} | {'🔥' if bat.get('average', 0) > 35 else '✅' if bat.get('average', 0) > 25 else '⚪' if bat.get('average', 0) > 15 else '⚠️'} |\n"
-                response += f"| Strike Rate | {bat.get('strike_rate', 0):.1f} | {'🔥' if bat.get('strike_rate', 0) > 135 else '✅' if bat.get('strike_rate', 0) > 120 else '⚪'} |\n"
-                response += f"| Highest Score | {bat.get('highest_score', 0)} | {'💯' if bat.get('highest_score', 0) > 80 else '✅' if bat.get('highest_score', 0) > 50 else '⚪'} |\n\n"
+            # Batting breakdown
+            if has_batting:
+                response += "🏏 **Batting in Last 5 Innings**\n\n"
+                response += "| Inning | Opposition | Runs | Balls | SR | Result |\n"
+                response += "|--------|------------|------|-------|----|---------|\n"
+                
+                for i, match in enumerate(matches_data, 1):
+                    bat = match['batting']
+                    if bat['balls'] > 0:
+                        sr = (bat['runs'] / bat['balls'] * 100) if bat['balls'] > 0 else 0
+                        result = f"{'💯' if bat['runs'] > 50 else '🔥' if bat['runs'] > 30 else '⚪' if bat['runs'] > 10 else '❌'} {'Out' if bat['dismissed'] else 'Not Out'}"
+                        response += f"| {i} | {match['opposition'][:12]} | {bat['runs']} | {bat['balls']} | {sr:.1f} | {result} |\n"
+                
+                response += "\n"
+            
+            # Bowling breakdown
+            if has_bowling:
+                response += "🎳 **Bowling in Last 5 Matches**\n\n"
+                response += "| Match | Opposition | Wickets | Runs | Economy | Status |\n"
+                response += "|-------|------------|---------|------|---------|--------|\n"
+                
+                for i, match in enumerate(matches_data, 1):
+                    bowl = match['bowling']
+                    if bowl['balls'] > 0:
+                        overs = bowl['balls'] / 6
+                        economy = (bowl['runs'] / overs) if overs > 0 else 0
+                        status = f"{'🔥' if bowl['wickets'] > 1 else '✅' if bowl['wickets'] == 1 else '⚪'}"
+                        response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {economy:.2f} | {status} |\n"
+                
+                response += "\n"
             
             return response
         

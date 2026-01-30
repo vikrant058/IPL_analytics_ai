@@ -188,6 +188,78 @@ class StatsEngine:
             'bowling': bowling_stats
         }
     
+    def get_last_n_matches(self, player: str, n: int = 5) -> List[Dict]:
+        """Get match-by-match data for player's last N appearances"""
+        found_player = self.find_player(player)
+        if not found_player:
+            return []
+        
+        # Get all matches where player appeared (batting or bowling)
+        batter_matches = self.deliveries_df[self.deliveries_df['batter'] == found_player][['match_id']].drop_duplicates()
+        bowler_matches = self.deliveries_df[self.deliveries_df['bowler'] == found_player][['match_id']].drop_duplicates()
+        
+        # Union of all matches
+        all_matches = set(batter_matches['match_id'].unique()) | set(bowler_matches['match_id'].unique())
+        
+        # Get match details sorted by date (descending - most recent first)
+        match_ids = sorted(list(all_matches), key=lambda x: -x)[:n]
+        
+        results = []
+        for match_id in match_ids:
+            match_info = self.matches_df[self.matches_df['id'] == match_id].iloc[0] if not self.matches_df[self.matches_df['id'] == match_id].empty else None
+            if match_info is None:
+                continue
+            
+            # Get batting data for this match
+            bat_deliv = self.deliveries_df[(self.deliveries_df['match_id'] == match_id) & 
+                                          (self.deliveries_df['batter'] == found_player)]
+            
+            # Get bowling data for this match
+            bowl_deliv = self.deliveries_df[(self.deliveries_df['match_id'] == match_id) & 
+                                           (self.deliveries_df['bowler'] == found_player)]
+            
+            # Calculate batting score if batted
+            bat_runs = 0
+            bat_balls = 0
+            dismissed = False
+            if len(bat_deliv) > 0:
+                for _, deliv in bat_deliv.iterrows():
+                    bat_runs += deliv['batter_runs']
+                    bat_balls += 1
+                    if deliv['wicket'] == 1:
+                        dismissed = True
+            
+            # Calculate bowling figures if bowled
+            bowl_balls = 0
+            bowl_runs = 0
+            bowl_wickets = 0
+            if len(bowl_deliv) > 0:
+                for _, deliv in bowl_deliv.iterrows():
+                    bowl_balls += 1
+                    bowl_runs += deliv['total_runs']
+                    if deliv['wicket'] == 1:
+                        bowl_wickets += 1
+            
+            results.append({
+                'match_id': match_id,
+                'date': match_info['date'] if 'date' in match_info else 'N/A',
+                'season': match_info['season'] if 'season' in match_info else 'N/A',
+                'batting_team': match_info['batting_team'] if 'batting_team' in match_info else 'N/A',
+                'opposition': match_info['bowling_team'] if 'bowling_team' in match_info else 'N/A',
+                'batting': {
+                    'runs': bat_runs,
+                    'balls': bat_balls,
+                    'dismissed': dismissed
+                },
+                'bowling': {
+                    'wickets': bowl_wickets,
+                    'runs': bowl_runs,
+                    'balls': bowl_balls
+                }
+            })
+        
+        return results
+    
     def _apply_filters(self, deliveries_df: pd.DataFrame, filters: Dict) -> pd.DataFrame:
         """Apply filters to deliveries dataframe"""
         if not filters:
