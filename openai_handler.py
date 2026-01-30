@@ -961,112 +961,48 @@ EXAMPLES:
             
             # Parse time period to get N matches/innings
             n_period = 5  # Default
-            use_innings = False
+            use_innings = True  # Default to innings for batters
             
             if time_period:
                 time_lower = time_period.lower()
                 import re
                 
-                # Check if asking for innings or matches
-                if "inning" in time_lower:
-                    use_innings = True
-                    match = re.search(r'(\d+)', time_lower)
-                    if match:
-                        n_period = int(match.group(1))
-                elif "match" in time_lower or "last" in time_lower:
-                    use_innings = False
-                    match = re.search(r'(\d+)', time_lower)
-                    if match:
-                        n_period = int(match.group(1))
-            
-            # Get data based on type (innings or matches)
-            if use_innings:
-                # For batters: get last N batting innings
-                matches_data = self.stats_engine.get_last_n_innings(found_player, n_period)
-                if matches_data:
-                    response = f"📈 **{found_player} - Last {len(matches_data)} Batting Innings**\n\n"
-                    response += "🏏 **Batting Performance**\n\n"
-                    response += "| Inning | Opposition | Runs | Balls | SR |\n"
-                    response += "|--------|------------|------|-------|----|\n"
-                    
-                    for i, inning in enumerate(matches_data, 1):
-                        sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
-                        # Show asterisk on score if not out
-                        runs_display = f"{inning['runs']}*" if not inning['dismissed'] else str(inning['runs'])
-                        response += f"| {i} | {inning['opposition'][:12]} | {runs_display} | {inning['balls']} | {sr:.1f} |\n"
-                    
-                    response += "\n"
-                    
-                    # Calculate averages
-                    total_runs = sum(m['runs'] for m in matches_data)
-                    total_balls = sum(m['balls'] for m in matches_data)
-                    avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
-                    innings_count = len([m for m in matches_data if m['balls'] > 0])
-                    
-                    if innings_count > 0:
-                        response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
-                    
-                    return response
-                else:
-                    return f"No recent inning data available for {found_player}."
-            else:
-                # For matches: get last N matches (covers both batters and bowlers)
-                matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
-            
-            if not matches_data:
-                return f"No recent match data available for {found_player}."
-            
-            response = f"📈 **{found_player} - Last {len(matches_data)} Matches Performance**\n\n"
-            
-            # Check if player is batter or bowler based on available data
-            has_batting = any(m['batting']['balls'] > 0 for m in matches_data)
-            has_bowling = any(m['bowling']['balls'] > 0 for m in matches_data)
-            
-            if has_batting:
-                response += "🏏 **Batting Performance (Last 5 Innings)**\n\n"
-                response += "| Match | Opposition | Runs | Balls | SR | Status |\n"
-                response += "|-------|------------|------|-------|----|---------|\n"
+                # Extract the number from "last N"
+                match = re.search(r'(\d+)', time_lower)
+                if match:
+                    n_period = int(match.group(1))
                 
-                for match in matches_data:
-                    bat = match['batting']
-                    if bat['balls'] > 0:
-                        sr = (bat['runs'] / bat['balls'] * 100) if bat['balls'] > 0 else 0
-                        status = f"{'💯' if bat['runs'] > 50 else '🔥' if bat['runs'] > 30 else '⚪' if bat['runs'] > 10 else '❌'}"
-                        status += f" {'Out' if bat['dismissed'] else 'Notout'}"
-                        response += f"| {match['season']} | {match['opposition'][:15]} | {bat['runs']} | {bat['balls']} | {sr:.1f} | {status} |\n"
+                # For batters: both "innings" and "matches" should show batting breakdown
+                # use_innings stays True by default
+                # Only use matches data structure for bowlers or when explicitly needed
+            
+            # Get data - for both "innings" and "matches", show batting breakdown for batters
+            matches_data = self.stats_engine.get_last_n_innings(found_player, n_period)
+            if matches_data:
+                response = f"📈 **{found_player} - Last {len(matches_data)} Batting Innings**\n\n"
+                response += "🏏 **Batting Performance**\n\n"
+                response += "| Inning | Opposition | Runs | Balls | SR |\n"
+                response += "|--------|------------|------|-------|----|\n"
+                
+                for i, inning in enumerate(matches_data, 1):
+                    sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
+                    # Show asterisk on score if not out
+                    runs_display = f"{inning['runs']}*" if not inning['dismissed'] else str(inning['runs'])
+                    response += f"| {i} | {inning['opposition'][:12]} | {runs_display} | {inning['balls']} | {sr:.1f} |\n"
                 
                 response += "\n"
-            
-            if has_bowling:
-                response += "🎳 **Bowling Performance (Last 5 Matches)**\n\n"
-                response += "| Match | Opposition | Wickets | Runs | Balls | Economy | Status |\n"
-                response += "|-------|------------|---------|------|-------|---------|--------|\n"
                 
-                for match in matches_data:
-                    bowl = match['bowling']
-                    if bowl['balls'] > 0:
-                        overs = bowl['balls'] / 6
-                        economy = (bowl['runs'] / overs) if overs > 0 else 0
-                        status = f"{'🔥' if bowl['wickets'] > 1 else '✅' if bowl['wickets'] == 1 else '⚪'}"
-                        response += f"| {match['season']} | {match['opposition'][:15]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} | {status} |\n"
-                
-                response += "\n"
-            
-            # Calculate averages
-            if has_batting:
-                total_runs = sum(m['batting']['runs'] for m in matches_data)
-                total_balls = sum(m['batting']['balls'] for m in matches_data)
+                # Calculate averages
+                total_runs = sum(m['runs'] for m in matches_data)
+                total_balls = sum(m['balls'] for m in matches_data)
                 avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
-                response += f"**Recent Batting Average**: {total_runs / len([m for m in matches_data if m['batting']['balls'] > 0]):.1f} runs | **Strike Rate**: {avg_sr:.1f}\n\n"
-            
-            if has_bowling:
-                total_wickets = sum(m['bowling']['wickets'] for m in matches_data)
-                total_runs_conceded = sum(m['bowling']['runs'] for m in matches_data)
-                total_balls_bowled = sum(m['bowling']['balls'] for m in matches_data)
-                avg_economy = (total_runs_conceded / (total_balls_bowled / 6)) if total_balls_bowled > 0 else 0
-                response += f"**Recent Bowling**: {total_wickets} wickets in 5 matches | **Economy**: {avg_economy:.2f}\n\n"
-            
-            return response
+                innings_count = len([m for m in matches_data if m['balls'] > 0])
+                
+                if innings_count > 0:
+                    response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
+                
+                return response
+
         
         except Exception as e:
             return f"Error analyzing trends: {str(e)}"
