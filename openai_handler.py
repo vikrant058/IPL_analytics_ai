@@ -303,8 +303,8 @@ class CricketChatbot:
         elif 'all time' in query_lower or 'career' in query_lower:
             filters['time_period'] = 'all time'
         else:
-            # Look for "last N matches/innings" pattern - flexible to typos
-            match_pattern = re.search(r'last\s+(\d+)\s+(match|matche|innings|games|inning)\w*', query_lower)
+            # Look for "last N matches/innings" pattern - supports: matches, match, innings, inning, games
+            match_pattern = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
             if match_pattern:
                 number = match_pattern.group(1)
                 period_type = match_pattern.group(2)
@@ -948,11 +948,44 @@ EXAMPLES:
         except Exception as e:
             return f"Error getting player stats: {str(e)}"
     
+    def _get_player_primary_skill(self, player: str) -> str:
+        """Determine if player is primarily a batter, bowler, or all-rounder"""
+        try:
+            overall_stats = self.stats_engine.get_player_stats(player)
+            if not overall_stats:
+                return 'unknown'
+            
+            batting_matches = overall_stats.get('batting', {}).get('matches', 0)
+            bowling_matches = overall_stats.get('bowling', {}).get('matches', 0)
+            
+            # If only bats
+            if batting_matches > 0 and bowling_matches == 0:
+                return 'batter'
+            # If only bowls
+            elif bowling_matches > 0 and batting_matches == 0:
+                return 'bowler'
+            # If both with significant usage
+            elif batting_matches > 0 and bowling_matches > 0:
+                # Check which one is more frequently used
+                batting_balls = overall_stats.get('batting', {}).get('balls', 0)
+                bowling_balls = overall_stats.get('bowling', {}).get('balls', 0)
+                
+                if bowling_balls > batting_balls:
+                    return 'bowler'  # Primary skill is bowling
+                elif batting_balls > bowling_balls:
+                    return 'batter'  # Primary skill is batting
+                else:
+                    return 'all-rounder'  # Equal usage
+            else:
+                return 'unknown'
+        except:
+            return 'unknown'
+    
     def _get_trends_response(self, player: str, time_period: Optional[str] = None, 
                             match_phase: Optional[str] = None, 
                             match_situation: Optional[str] = None,
                             seasons: Optional[List[int]] = None) -> str:
-        """Get performance trend analysis for a player - last 5 matches/innings breakdown"""
+        """Get performance trend analysis for a player - shows appropriate stats based on primary skill"""
         try:
             found_player = self.stats_engine.find_player(player)
             if not found_player:
@@ -960,7 +993,6 @@ EXAMPLES:
             
             # Parse time period to get N matches/innings
             n_period = 5  # Default
-            use_innings = True  # Default to innings for batters
             
             if time_period:
                 time_lower = time_period.lower()
@@ -970,22 +1002,33 @@ EXAMPLES:
                 match = re.search(r'(\d+)', time_lower)
                 if match:
                     n_period = int(match.group(1))
-                
-                # For batters: both "innings" and "matches" should show batting breakdown
-                # use_innings stays True by default
-                # Only use matches data structure for bowlers or when explicitly needed
             
-            # Get data - for both "innings" and "matches", show batting breakdown for batters
-            innings_data = self.stats_engine.get_last_n_innings(found_player, n_period)
-            import sys
-            print(f"DEBUG: {found_player} - get_last_n_innings returned {len(innings_data)} innings", file=sys.stderr)
+            # Determine player's primary skill
+            primary_skill = self._get_player_primary_skill(found_player)
             
-            # If no innings data at all, check if it's a data issue or player issue
+            # For bowlers or all-rounders: get last N matches (show bowling first)
+            # For batters: get last N innings (show batting)
+            if primary_skill == 'bowler':
+                return self._get_bowler_trends(found_player, n_period, match_phase, match_situation)
+            elif primary_skill == 'all-rounder':
+                return self._get_all_rounder_trends(found_player, n_period, match_phase, match_situation)
+            else:  # batter or unknown - default to batting
+                return self._get_batter_trends(found_player, n_period, match_phase, match_situation)
+        
+        except Exception as e:
+            return f"Error analyzing trends: {str(e)}"
+    
+    def _get_batter_trends(self, player: str, n_period: int, match_phase: Optional[str] = None, 
+                           match_situation: Optional[str] = None) -> str:
+        """Show batting performance trends for batters"""
+        try:
+            # Get last N innings data
+            innings_data = self.stats_engine.get_last_n_innings(player, n_period)
+            
             if not innings_data:
-                # Try to fall back to overall stats if player exists but no recent innings
-                overall_stats = self.stats_engine.get_player_stats(found_player)
+                overall_stats = self.stats_engine.get_player_stats(player)
                 if overall_stats and 'batting' in overall_stats and overall_stats['batting']:
-                    response = f"📈 **{found_player} - Career Stats (No Recent Innings Data)**\n\n"
+                    response = f"📈 **{player} - Career Batting Stats (No Recent Innings Data)**\n\n"
                     response += "🏏 **Batting Statistics**\n\n"
                     bat = overall_stats['batting']
                     response += "| Metric | Value |\n|--------|-------|\n"
@@ -994,55 +1037,16 @@ EXAMPLES:
                     response += f"| Average | {bat.get('average', 0):.2f} |\n"
                     response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n\n"
                     return response
-                return f"No data available for {found_player}."
+                return f"No data available for {player}."
             
-            # Check if player has meaningful batting (not just rare tail-ender appearances)
-            # Filter out innings where player only faced 0-2 balls (rare tail-ender bats)
+            # Filter meaningful innings (3+ balls)
             meaningful_innings = [i for i in innings_data if i['balls'] >= 3]
-            print(f"DEBUG: {found_player} - meaningful_innings (3+ balls): {len(meaningful_innings)}", file=sys.stderr)
             
-            # If player has NO meaningful batting innings AND also no bowling data, they're purely a tail-ender
-            # Only treat as bowler if they have 0 meaningful innings
-            if len(meaningful_innings) == 0:
-                matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
-                if not matches_data:
-                    return f"No recent data available for {found_player}."
-                
-                # Show bowling breakdown for bowlers
-                response = f"📈 **{found_player} - Last {len(matches_data)} Matches Performance**\n\n"
-                response += "🎳 **Bowling Performance**\n\n"
-                response += "| Match # | Opposition | Wickets | Runs | Balls | Economy |\n"
-                response += "|---------|------------|---------|------|-------|----------|\n"
-                
-                # Track if player actually bowled in any match
-                bowled_count = 0
-                for i, match in enumerate(matches_data, 1):
-                    bowl = match['bowling']
-                    # Show match even if no bowling, but calculate economy only if bowled
-                    if bowl['balls'] > 0:
-                        overs = bowl['balls'] / 6
-                        economy = (bowl['runs'] / overs) if overs > 0 else 0
-                        response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} |\n"
-                        bowled_count += 1
-                    else:
-                        # Show match but indicate didn't bowl
-                        response += f"| {i} | {match['opposition'][:12]} | - | - | - | - |\n"
-                
-                response += "\n"
-                
-                # Calculate averages for bowler
-                total_wickets = sum(m['bowling']['wickets'] for m in matches_data if m['bowling']['balls'] > 0)
-                total_runs_conceded = sum(m['bowling']['runs'] for m in matches_data if m['bowling']['balls'] > 0)
-                total_balls_bowled = sum(m['bowling']['balls'] for m in matches_data if m['bowling']['balls'] > 0)
-                
-                if total_balls_bowled > 0:
-                    avg_economy = (total_runs_conceded / (total_balls_bowled / 6))
-                    response += f"**Recent Stats**: {total_wickets} wickets | Economy {avg_economy:.2f}\n\n"
-                
-                return response
+            if not meaningful_innings:
+                return f"No recent batting data for {player}."
             
-            # Show batting breakdown for batters (use meaningful innings)
-            response = f"📈 **{found_player} - Last {len(meaningful_innings)} Batting Innings**\n\n"
+            # Show batting breakdown
+            response = f"📈 **{player} - Last {len(meaningful_innings)} Batting Innings**\n\n"
             response += "🏏 **Batting Performance**\n\n"
             response += "| Inning | Opposition | Runs | Balls | SR |\n"
             response += "|--------|------------|------|-------|----|\n"
@@ -1065,10 +1069,115 @@ EXAMPLES:
                 response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
             
             return response
-
-        
         except Exception as e:
-            return f"Error analyzing trends: {str(e)}"
+            return f"Error analyzing batter trends: {str(e)}"
+    
+    def _get_bowler_trends(self, player: str, n_period: int, match_phase: Optional[str] = None, 
+                          match_situation: Optional[str] = None) -> str:
+        """Show bowling performance trends for bowlers"""
+        try:
+            # Get last N matches data
+            matches_data = self.stats_engine.get_last_n_matches(player, n_period)
+            
+            if not matches_data:
+                return f"No recent data available for {player}."
+            
+            # Show bowling breakdown first
+            response = f"📈 **{player} - Last {len(matches_data)} Matches Bowling Performance**\n\n"
+            response += "🎳 **Bowling Stats**\n\n"
+            response += "| Match # | Opposition | Wickets | Runs | Balls | Economy |\n"
+            response += "|---------|------------|---------|------|-------|----------|\n"
+            
+            bowled_count = 0
+            for i, match in enumerate(matches_data, 1):
+                bowl = match['bowling']
+                if bowl['balls'] > 0:
+                    overs = bowl['balls'] / 6
+                    economy = (bowl['runs'] / overs) if overs > 0 else 0
+                    response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} |\n"
+                    bowled_count += 1
+                else:
+                    response += f"| {i} | {match['opposition'][:12]} | - | - | - | Did not bowl |\n"
+            
+            response += "\n"
+            
+            # Calculate bowling averages
+            total_wickets = sum(m['bowling']['wickets'] for m in matches_data if m['bowling']['balls'] > 0)
+            total_runs_conceded = sum(m['bowling']['runs'] for m in matches_data if m['bowling']['balls'] > 0)
+            total_balls_bowled = sum(m['bowling']['balls'] for m in matches_data if m['bowling']['balls'] > 0)
+            
+            if total_balls_bowled > 0:
+                avg_economy = (total_runs_conceded / (total_balls_bowled / 6))
+                response += f"**Recent Bowling Stats**: {total_wickets} wickets | Economy {avg_economy:.2f}\n\n"
+            
+            # Also show batting stats if the bowler has meaningful batting
+            batting_data = [m for m in matches_data if m.get('batting', {}).get('balls', 0) >= 3]
+            if batting_data:
+                response += "---\n\n"
+                response += f"🏏 **Also Contributed with Bat**\n\n"
+                response += "| Match # | Opposition | Runs | Balls | SR |\n"
+                response += "|---------|------------|------|-------|----|\n"
+                
+                for i, match in enumerate(batting_data, 1):
+                    bat = match['batting']
+                    if bat['balls'] > 0:
+                        sr = (bat['runs'] / bat['balls'] * 100) if bat['balls'] > 0 else 0
+                        response += f"| {i} | {match['opposition'][:12]} | {bat['runs']} | {bat['balls']} | {sr:.1f} |\n"
+            
+            return response
+        except Exception as e:
+            return f"Error analyzing bowler trends: {str(e)}"
+    
+    def _get_all_rounder_trends(self, player: str, n_period: int, match_phase: Optional[str] = None, 
+                               match_situation: Optional[str] = None) -> str:
+        """Show both batting and bowling trends for all-rounders"""
+        try:
+            matches_data = self.stats_engine.get_last_n_matches(player, n_period)
+            
+            if not matches_data:
+                return f"No recent data available for {player}."
+            
+            response = f"📈 **{player} - Last {len(matches_data)} Matches Performance (All-Rounder)**\n\n"
+            
+            # Batting section
+            batting_data = [m for m in matches_data if m.get('batting', {}).get('balls', 0) >= 3]
+            if batting_data:
+                response += "🏏 **Batting Performance**\n\n"
+                response += "| Match # | Opposition | Runs | Balls | SR |\n"
+                response += "|---------|------------|------|-------|----|\n"
+                
+                for i, match in enumerate(batting_data, 1):
+                    bat = match['batting']
+                    sr = (bat['runs'] / bat['balls'] * 100) if bat['balls'] > 0 else 0
+                    response += f"| {i} | {match['opposition'][:12]} | {bat['runs']} | {bat['balls']} | {sr:.1f} |\n"
+                
+                response += "\n"
+            
+            # Bowling section
+            bowling_data = [m for m in matches_data if m.get('bowling', {}).get('balls', 0) > 0]
+            if bowling_data:
+                response += "🎳 **Bowling Performance**\n\n"
+                response += "| Match # | Opposition | Wickets | Runs | Economy |\n"
+                response += "|---------|------------|---------|------|----------|\n"
+                
+                for i, match in enumerate(bowling_data, 1):
+                    bowl = match['bowling']
+                    overs = bowl['balls'] / 6
+                    economy = (bowl['runs'] / overs) if overs > 0 else 0
+                    response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {economy:.2f} |\n"
+                
+                response += "\n"
+            
+            # Overall summary
+            if batting_data or bowling_data:
+                bat_runs = sum(m['batting']['runs'] for m in matches_data if m['batting']['balls'] >= 3)
+                ball_wickets = sum(m['bowling']['wickets'] for m in matches_data if m['bowling']['balls'] > 0)
+                response += f"**Recent Impact**: {bat_runs} runs | {ball_wickets} wickets\n\n"
+            
+            return response
+        except Exception as e:
+            return f"Error analyzing all-rounder trends: {str(e)}"
+    
     
     def _get_records_response(self, player: Optional[str] = None, record_type: Optional[str] = None,
                              seasons: Optional[List[int]] = None,
