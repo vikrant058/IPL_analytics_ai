@@ -303,8 +303,8 @@ class CricketChatbot:
         elif 'all time' in query_lower or 'career' in query_lower:
             filters['time_period'] = 'all time'
         else:
-            # Look for "last N matches/innings" pattern
-            match_pattern = re.search(r'last\s+(\d+)\s+(matches|innings|games|inning)', query_lower)
+            # Look for "last N matches/innings" pattern - flexible to typos
+            match_pattern = re.search(r'last\s+(\d+)\s+(match|matche|innings|games|inning)\w*', query_lower)
             if match_pattern:
                 number = match_pattern.group(1)
                 period_type = match_pattern.group(2)
@@ -604,20 +604,19 @@ EXAMPLES:
             return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers'\n- 'bumrah at wankhede'\n- 'who should bat for CSK'"
         
         try:
-            # Determine query type if not set correctly
+            # Determine query type if not set correctly or set to 'general'
+            # IMPORTANT: Check time_period FIRST - it's highly specific
             if not query_type or query_type == 'general':
-                if player1 and player2:
+                if time_period and player1:
+                    query_type = 'trends'
+                elif player1 and player2:
                     query_type = 'head_to_head'
                 elif ranking_metric or (seasons and not player1):
                     query_type = 'rankings'
                 elif record_type:
                     query_type = 'records'
-                elif time_period and player1:
-                    query_type = 'trends'
                 elif ground and player1:
                     query_type = 'ground_insights'
-                elif player1 and player2:
-                    query_type = 'comparative_analysis'
                 elif player1:
                     query_type = 'player_stats'
                 elif opposition_team:
