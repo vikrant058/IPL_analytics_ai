@@ -215,9 +215,9 @@ class StatsEngine:
             dismissed = False
             
             for _, deliv in deliv_group.iterrows():
-                bat_runs += deliv['batter_runs']
+                bat_runs += deliv['batsman_runs']
                 bat_balls += 1
-                if deliv['wicket'] == 1:
+                if deliv['is_wicket'] == 1:
                     dismissed = True
             
             # Determine batting team for this inning
