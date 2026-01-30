@@ -977,31 +977,64 @@ EXAMPLES:
                 # Only use matches data structure for bowlers or when explicitly needed
             
             # Get data - for both "innings" and "matches", show batting breakdown for batters
-            matches_data = self.stats_engine.get_last_n_innings(found_player, n_period)
-            if matches_data:
-                response = f"📈 **{found_player} - Last {len(matches_data)} Batting Innings**\n\n"
-                response += "🏏 **Batting Performance**\n\n"
-                response += "| Inning | Opposition | Runs | Balls | SR |\n"
-                response += "|--------|------------|------|-------|----|\n"
+            innings_data = self.stats_engine.get_last_n_innings(found_player, n_period)
+            
+            # If no batting innings (bowler), fall back to match-by-match bowling data
+            if not innings_data:
+                matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
+                if not matches_data:
+                    return f"No recent data available for {found_player}."
                 
-                for i, inning in enumerate(matches_data, 1):
-                    sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
-                    # Show asterisk on score if not out
-                    runs_display = f"{inning['runs']}*" if not inning['dismissed'] else str(inning['runs'])
-                    response += f"| {i} | {inning['opposition'][:12]} | {runs_display} | {inning['balls']} | {sr:.1f} |\n"
+                # Show bowling breakdown for bowlers
+                response = f"📈 **{found_player} - Last {len(matches_data)} Matches Performance**\n\n"
+                response += "🎳 **Bowling Performance**\n\n"
+                response += "| Match # | Opposition | Wickets | Runs | Balls | Economy |\n"
+                response += "|---------|------------|---------|------|-------|----------|\n"
+                
+                for i, match in enumerate(matches_data, 1):
+                    bowl = match['bowling']
+                    if bowl['balls'] > 0:
+                        overs = bowl['balls'] / 6
+                        economy = (bowl['runs'] / overs) if overs > 0 else 0
+                        response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} |\n"
                 
                 response += "\n"
                 
-                # Calculate averages
-                total_runs = sum(m['runs'] for m in matches_data)
-                total_balls = sum(m['balls'] for m in matches_data)
-                avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
-                innings_count = len([m for m in matches_data if m['balls'] > 0])
+                # Calculate averages for bowler
+                total_wickets = sum(m['bowling']['wickets'] for m in matches_data if m['bowling']['balls'] > 0)
+                total_runs_conceded = sum(m['bowling']['runs'] for m in matches_data if m['bowling']['balls'] > 0)
+                total_balls_bowled = sum(m['bowling']['balls'] for m in matches_data if m['bowling']['balls'] > 0)
                 
-                if innings_count > 0:
-                    response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
+                if total_balls_bowled > 0:
+                    avg_economy = (total_runs_conceded / (total_balls_bowled / 6))
+                    response += f"**Recent Stats**: {total_wickets} wickets | Economy {avg_economy:.2f}\n\n"
                 
                 return response
+            
+            # Show batting breakdown for batters
+            response = f"📈 **{found_player} - Last {len(innings_data)} Batting Innings**\n\n"
+            response += "🏏 **Batting Performance**\n\n"
+            response += "| Inning | Opposition | Runs | Balls | SR |\n"
+            response += "|--------|------------|------|-------|----|\n"
+            
+            for i, inning in enumerate(innings_data, 1):
+                sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
+                # Show asterisk on score ONLY if not out (dismissed = False)
+                runs_display = f"{inning['runs']}*" if inning['balls'] > 0 and not inning['dismissed'] else str(inning['runs'])
+                response += f"| {i} | {inning['opposition'][:12]} | {runs_display} | {inning['balls']} | {sr:.1f} |\n"
+            
+            response += "\n"
+            
+            # Calculate averages
+            total_runs = sum(m['runs'] for m in innings_data)
+            total_balls = sum(m['balls'] for m in innings_data)
+            avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
+            innings_count = len([m for m in innings_data if m['balls'] > 0])
+            
+            if innings_count > 0:
+                response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
+            
+            return response
 
         
         except Exception as e:
