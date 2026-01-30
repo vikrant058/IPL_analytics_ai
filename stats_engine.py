@@ -240,12 +240,16 @@ class StatsEngine:
                     if deliv['wicket'] == 1:
                         bowl_wickets += 1
             
+            # Determine opposition team (either team1 or team2)
+            bat_team1 = self.deliveries_df[self.deliveries_df['match_id'] == match_id]['batting_team'].iloc[0] if len(self.deliveries_df[self.deliveries_df['match_id'] == match_id]) > 0 else match_info['team1']
+            opposition_team = match_info['team2'] if bat_team1 == match_info['team1'] else match_info['team1']
+            
             results.append({
                 'match_id': match_id,
                 'date': match_info['date'] if 'date' in match_info else 'N/A',
                 'season': match_info['season'] if 'season' in match_info else 'N/A',
-                'batting_team': match_info['batting_team'] if 'batting_team' in match_info else 'N/A',
-                'opposition': match_info['bowling_team'] if 'bowling_team' in match_info else 'N/A',
+                'batting_team': bat_team1,
+                'opposition': opposition_team,
                 'batting': {
                     'runs': bat_runs,
                     'balls': bat_balls,
