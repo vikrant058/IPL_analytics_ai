@@ -978,10 +978,29 @@ EXAMPLES:
             
             # Get data - for both "innings" and "matches", show batting breakdown for batters
             innings_data = self.stats_engine.get_last_n_innings(found_player, n_period)
+            import sys
+            print(f"DEBUG: {found_player} - get_last_n_innings returned {len(innings_data)} innings", file=sys.stderr)
+            
+            # If no innings data at all, check if it's a data issue or player issue
+            if not innings_data:
+                # Try to fall back to overall stats if player exists but no recent innings
+                overall_stats = self.stats_engine.get_player_stats(found_player)
+                if overall_stats and 'batting' in overall_stats and overall_stats['batting']:
+                    response = f"📈 **{found_player} - Career Stats (No Recent Innings Data)**\n\n"
+                    response += "🏏 **Batting Statistics**\n\n"
+                    bat = overall_stats['batting']
+                    response += "| Metric | Value |\n|--------|-------|\n"
+                    response += f"| Matches | {bat.get('matches', 0)} |\n"
+                    response += f"| Runs | {bat.get('runs', 0)} |\n"
+                    response += f"| Average | {bat.get('average', 0):.2f} |\n"
+                    response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n\n"
+                    return response
+                return f"No data available for {found_player}."
             
             # Check if player has meaningful batting (not just rare tail-ender appearances)
             # Filter out innings where player only faced 0-2 balls (rare tail-ender bats)
             meaningful_innings = [i for i in innings_data if i['balls'] >= 3]
+            print(f"DEBUG: {found_player} - meaningful_innings (3+ balls): {len(meaningful_innings)}", file=sys.stderr)
             
             # If player has few meaningful batting innings (likely a bowler), show bowling instead
             if len(meaningful_innings) < 2:
@@ -995,12 +1014,19 @@ EXAMPLES:
                 response += "| Match # | Opposition | Wickets | Runs | Balls | Economy |\n"
                 response += "|---------|------------|---------|------|-------|----------|\n"
                 
+                # Track if player actually bowled in any match
+                bowled_count = 0
                 for i, match in enumerate(matches_data, 1):
                     bowl = match['bowling']
+                    # Show match even if no bowling, but calculate economy only if bowled
                     if bowl['balls'] > 0:
                         overs = bowl['balls'] / 6
                         economy = (bowl['runs'] / overs) if overs > 0 else 0
                         response += f"| {i} | {match['opposition'][:12]} | {bowl['wickets']} | {bowl['runs']} | {bowl['balls']} | {economy:.2f} |\n"
+                        bowled_count += 1
+                    else:
+                        # Show match but indicate didn't bowl
+                        response += f"| {i} | {match['opposition'][:12]} | - | - | - | - |\n"
                 
                 response += "\n"
                 
