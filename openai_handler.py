@@ -925,23 +925,64 @@ EXAMPLES:
                             match_phase: Optional[str] = None, 
                             match_situation: Optional[str] = None,
                             seasons: Optional[List[int]] = None) -> str:
-        """Get performance trend analysis for a player - last 5 matches breakdown"""
+        """Get performance trend analysis for a player - last 5 matches/innings breakdown"""
         try:
             found_player = self.stats_engine.find_player(player)
             if not found_player:
                 return f"Player '{player}' not found."
             
-            # Parse time period to get N matches
-            n_matches = 5  # Default
-            if time_period:
-                if "last" in time_period.lower() and "match" in time_period.lower():
-                    import re
-                    match = re.search(r'(\d+)', time_period)
-                    if match:
-                        n_matches = int(match.group(1))
+            # Parse time period to get N matches/innings
+            n_period = 5  # Default
+            use_innings = False
             
-            # Get last N matches data
-            matches_data = self.stats_engine.get_last_n_matches(found_player, n_matches)
+            if time_period:
+                time_lower = time_period.lower()
+                import re
+                
+                # Check if asking for innings or matches
+                if "inning" in time_lower:
+                    use_innings = True
+                    match = re.search(r'(\d+)', time_lower)
+                    if match:
+                        n_period = int(match.group(1))
+                elif "match" in time_lower or "last" in time_lower:
+                    use_innings = False
+                    match = re.search(r'(\d+)', time_lower)
+                    if match:
+                        n_period = int(match.group(1))
+            
+            # Get data based on type (innings or matches)
+            if use_innings:
+                # For batters: get last N batting innings
+                matches_data = self.stats_engine.get_last_n_innings(found_player, n_period)
+                if matches_data:
+                    response = f"📈 **{found_player} - Last {len(matches_data)} Batting Innings**\n\n"
+                    response += "🏏 **Batting Performance**\n\n"
+                    response += "| Inning | Opposition | Runs | Balls | SR | Result |\n"
+                    response += "|--------|------------|------|-------|----|---------|\n"
+                    
+                    for i, inning in enumerate(matches_data, 1):
+                        sr = (inning['runs'] / inning['balls'] * 100) if inning['balls'] > 0 else 0
+                        result = f"{'💯' if inning['runs'] > 50 else '🔥' if inning['runs'] > 30 else '⚪' if inning['runs'] > 10 else '❌'} {'Out' if inning['dismissed'] else 'NotOut'}"
+                        response += f"| {i} | {inning['opposition'][:12]} | {inning['runs']} | {inning['balls']} | {sr:.1f} | {result} |\n"
+                    
+                    response += "\n"
+                    
+                    # Calculate averages
+                    total_runs = sum(m['runs'] for m in matches_data)
+                    total_balls = sum(m['balls'] for m in matches_data)
+                    avg_sr = (total_runs / total_balls * 100) if total_balls > 0 else 0
+                    innings_count = len([m for m in matches_data if m['balls'] > 0])
+                    
+                    if innings_count > 0:
+                        response += f"**Recent Stats**: Average {total_runs / innings_count:.1f} | Strike Rate {avg_sr:.1f}\n\n"
+                    
+                    return response
+                else:
+                    return f"No recent inning data available for {found_player}."
+            else:
+                # For matches: get last N matches (covers both batters and bowlers)
+                matches_data = self.stats_engine.get_last_n_matches(found_player, n_period)
             
             if not matches_data:
                 return f"No recent match data available for {found_player}."

@@ -188,6 +188,63 @@ class StatsEngine:
             'bowling': bowling_stats
         }
     
+    def get_last_n_innings(self, player: str, n: int = 5) -> List[Dict]:
+        """Get last N batting innings for a batter"""
+        found_player = self.find_player(player)
+        if not found_player:
+            return []
+        
+        # Get all innings where player batted
+        bat_deliveries = self.deliveries_df[self.deliveries_df['batter'] == found_player].copy()
+        
+        if len(bat_deliveries) == 0:
+            return []
+        
+        # Group by match_id and inning to get unique batting innings
+        innings_list = []
+        for (match_id, inning), deliv_group in bat_deliveries.groupby(['match_id', 'inning']):
+            match_info = self.matches_df[self.matches_df['id'] == match_id]
+            if match_info.empty:
+                continue
+            
+            match_info = match_info.iloc[0]
+            
+            # Calculate runs and balls for this inning
+            bat_runs = 0
+            bat_balls = 0
+            dismissed = False
+            
+            for _, deliv in deliv_group.iterrows():
+                bat_runs += deliv['batter_runs']
+                bat_balls += 1
+                if deliv['wicket'] == 1:
+                    dismissed = True
+            
+            # Determine batting team for this inning
+            if inning == 1:
+                batting_team = match_info['team1']
+                bowling_team = match_info['team2']
+            else:
+                batting_team = match_info['team2']
+                bowling_team = match_info['team1']
+            
+            innings_list.append({
+                'match_id': match_id,
+                'inning': inning,
+                'date': match_info['date'] if 'date' in match_info else 'N/A',
+                'season': match_info['season'] if 'season' in match_info else 'N/A',
+                'batting_team': batting_team,
+                'opposition': bowling_team,
+                'runs': bat_runs,
+                'balls': bat_balls,
+                'dismissed': dismissed
+            })
+        
+        # Sort by match_id descending (most recent first) and get last N
+        innings_list = sorted(innings_list, key=lambda x: -x['match_id'])[:n]
+        
+        return innings_list
+    
     def get_last_n_matches(self, player: str, n: int = 5) -> List[Dict]:
         """Get match-by-match data for player's last N appearances"""
         found_player = self.find_player(player)
