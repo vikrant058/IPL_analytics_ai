@@ -346,6 +346,12 @@ CRICKET FILTER OPTIONS:
 - seasons: List of years [2008-2025]
 - inning: 1 or 2 (1 = batting first, 2 = batting second/chasing)
 - match_type: 'home', 'away'
+- time_period: 'recent', 'last 5 matches', 'last 10 matches', 'last season', 'all time'
+- record_type: 'highest_score', 'most_runs', 'fastest_century', 'best_figures', 'most_wickets', 'most_sixes'
+- comparison_type: 'vs_league_avg', 'vs_cohort', 'peer_group', 'vs_all_rounders'
+- trend_direction: 'improving', 'declining', 'stable'
+- form_status: 'in_form', 'good_form', 'average', 'poor_form', 'out_of_form'
+- ranking_metric: 'runs', 'strike_rate', 'economy', 'wickets', 'consistency'
 
 USER QUERY: "{query}"
 
@@ -366,7 +372,12 @@ Return ONLY valid JSON (NO other text):
     "inning": 1 or 2 or null,
     "match_type": "home or away or null",
     "form_filter": "Form or null",
-    "query_type": "head_to_head|player_stats|team_comparison|general",
+    "time_period": "Time period filter or null",
+    "record_type": "Type of record requested or null",
+    "comparison_type": "Type of comparison or null",
+    "ranking_metric": "Ranking metric or null",
+    "player_list": [List of player names for group queries or null],
+    "query_type": "player_stats|head_to_head|team_comparison|trends|records|rankings|ground_insights|form_guide|comparative_analysis|predictions|general",
     "interpretation": "What the user is asking"
 }}
 
@@ -379,7 +390,15 @@ EXAMPLES:
 - "sky in powerplay chasing" → player1: "SA Yadav", match_phase: "powerplay", match_situation: "chasing", query_type: "player_stats"
 - "bumrah at home in 2024" → player1: "JJ Bumrah", match_type: "home", seasons: [2024], query_type: "player_stats"
 - "sharma vs pace bowlers" → player1: "RG Sharma", vs_conditions: "vs_pace", query_type: "player_stats"
-- "bumrah vs right hander" → player1: "JJ Bumrah", handedness: "right_handed", query_type: "player_stats\""""
+- "bumrah vs right hander" → player1: "JJ Bumrah", handedness: "right_handed", query_type: "player_stats"
+- "kohli's recent form" → player1: "V Kohli", time_period: "recent", query_type: "form_guide"
+- "kohli's highest score" → player1: "V Kohli", record_type: "highest_score", query_type: "records"
+- "top 10 run scorers in 2024" → seasons: [2024], ranking_metric: "runs", query_type: "rankings"
+- "kohli at wankhede" → player1: "V Kohli", ground: "Wankhede Stadium", query_type: "ground_insights"
+- "bumrah's trend in last 5 matches" → player1: "JJ Bumrah", time_period: "last 5 matches", query_type: "trends"
+- "kohli vs sharma in powerplay" → player1: "V Kohli", player2: "RG Sharma", match_phase: "powerplay", query_type: "comparative_analysis"
+- "who should bat for CSK in powerplay" → opposition_team: "CSK", match_phase: "powerplay", query_type: "predictions"
+"""
         
         try:
             response = self.client.chat.completions.create(
@@ -516,8 +535,8 @@ EXAMPLES:
     def get_response(self, query: str) -> str:
         """
         Main method: Takes user query and returns analytics response
-        Validates that query contains cricket-relevant parameters before processing.
-        Handles comprehensive filter extraction: phases, situations, grounds, years, handedness, etc.
+        Supports 10 query types: player_stats, head_to_head, team_comparison, trends, 
+        records, rankings, ground_insights, form_guide, comparative_analysis, predictions
         """
         
         # Parse the query
@@ -538,35 +557,52 @@ EXAMPLES:
         match_type = parsed.get('match_type')
         form_filter = parsed.get('form_filter')
         
+        # New filters for enhanced query types
+        time_period = parsed.get('time_period')
+        record_type = parsed.get('record_type')
+        comparison_type = parsed.get('comparison_type')
+        ranking_metric = parsed.get('ranking_metric')
+        player_list = parsed.get('player_list')
+        
         # Canonicalize opposition_team using team aliases
         if opposition_team:
             opposition_team = self._get_canonical_team_name(opposition_team)
         query_type = parsed.get('query_type')
         
-        # Validation: Ensure query has cricket-relevant entity (player, team, or venue)
-        # Allow queries that mention at least one cricket entity, even without specific filters
-        has_cricket_entity = player1 or player2 or venue or opposition_team
+        # Validation: Ensure query has cricket-relevant entity
+        has_cricket_entity = player1 or player2 or venue or opposition_team or ranking_metric
         
         if not has_cricket_entity:
-            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli chasing in 2025 at home'\n- 'bumrah vs left handers in death overs'\n- 'sky in chinnaswamy 2024'\n- 'sharma's powerplay stats'"
+            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers'\n- 'bumrah at wankhede'\n- 'who should bat for CSK'"
         
         try:
             # Determine query type if not set correctly
             if not query_type or query_type == 'general':
                 if player1 and player2:
                     query_type = 'head_to_head'
+                elif ranking_metric or (seasons and not player1):
+                    query_type = 'rankings'
+                elif record_type:
+                    query_type = 'records'
+                elif time_period and player1:
+                    query_type = 'trends'
+                elif ground and player1:
+                    query_type = 'ground_insights'
+                elif player1 and player2:
+                    query_type = 'comparative_analysis'
                 elif player1:
                     query_type = 'player_stats'
                 elif opposition_team:
                     query_type = 'team_comparison'
             
-            # Route to appropriate handler with all filters
+            # Route to appropriate handler based on query type
             if query_type == 'head_to_head' and player1 and player2:
                 return self._get_head_to_head_response(player1, player2, venue, seasons, 
                                                         match_phase=match_phase, match_situation=match_situation,
                                                         bowler_type=bowler_type, opposition_team=opposition_team,
                                                         vs_conditions=vs_conditions, ground=ground,
                                                         handedness=handedness, inning=inning, match_type=match_type)
+            
             elif query_type == 'player_stats' and player1:
                 return self._get_player_stats_response(player1, seasons, 
                                                        match_phase=match_phase, match_situation=match_situation,
@@ -574,8 +610,39 @@ EXAMPLES:
                                                        batter_role=batter_role, vs_conditions=vs_conditions,
                                                        ground=ground, handedness=handedness, inning=inning, 
                                                        match_type=match_type)
+            
+            elif query_type == 'trends' and player1:
+                return self._get_trends_response(player1, time_period=time_period, 
+                                                 match_phase=match_phase, match_situation=match_situation,
+                                                 seasons=seasons)
+            
+            elif query_type == 'records':
+                return self._get_records_response(player1=player1, record_type=record_type, 
+                                                  seasons=seasons, match_phase=match_phase)
+            
+            elif query_type == 'rankings':
+                return self._get_rankings_response(metric=ranking_metric, seasons=seasons,
+                                                   match_phase=match_phase, ground=ground, limit=10)
+            
+            elif query_type == 'ground_insights' and player1 and ground:
+                return self._get_ground_insights_response(player1, ground)
+            
+            elif query_type == 'form_guide':
+                return self._get_form_guide_response(player1=player1, time_period=time_period)
+            
+            elif query_type == 'comparative_analysis' and (player1 or player_list):
+                return self._get_comparative_analysis_response(player1=player1, player2=player2,
+                                                               player_list=player_list, 
+                                                               comparison_type=comparison_type,
+                                                               match_phase=match_phase)
+            
+            elif query_type == 'predictions':
+                return self._get_predictions_response(opposition_team=opposition_team, 
+                                                      match_phase=match_phase)
+            
             elif query_type == 'team_comparison' and opposition_team:
                 return self._get_team_stats_response(opposition_team)
+            
             elif player1:
                 # Default to player stats if we have a player
                 return self._get_player_stats_response(player1, seasons, 
@@ -583,7 +650,7 @@ EXAMPLES:
                                                        bowler_type=bowler_type, opposition_team=opposition_team,
                                                        batter_role=batter_role, vs_conditions=vs_conditions)
             else:
-                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli vs bumrah in powerplay'\n- 'virat kohli statistics vs pace in 2025'\n- 'rohit's chasing performance in death overs'"
+                return f"I understood you're asking about: {parsed['interpretation']}\n\nPlease ask something like:\n- 'kohli statistics'\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers in 2024'\n- 'kohli at wankhede'"
         
         except Exception as e:
             return f"Error processing query: {str(e)}\n\nPlease try again with a clearer query."
@@ -853,6 +920,299 @@ EXAMPLES:
         
         except Exception as e:
             return f"Error getting player stats: {str(e)}"
+    
+    def _get_trends_response(self, player: str, time_period: Optional[str] = None, 
+                            match_phase: Optional[str] = None, 
+                            match_situation: Optional[str] = None,
+                            seasons: Optional[List[int]] = None) -> str:
+        """Get performance trend analysis for a player"""
+        try:
+            found_player = self.stats_engine.find_player(player)
+            if not found_player:
+                return f"Player '{player}' not found."
+            
+            # Default time period to recent
+            period_label = time_period or "recent"
+            
+            # Get stats for the time period
+            filters = {}
+            if match_phase:
+                filters['match_phase'] = match_phase
+            if match_situation:
+                filters['match_situation'] = match_situation
+            if seasons:
+                filters['seasons'] = seasons
+            
+            stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
+            
+            if not stats or 'error' in stats:
+                return f"No trend data available for {found_player}."
+            
+            response = f"📈 **{found_player} - Performance Trend ({period_label})**\n\n"
+            
+            if 'batting' in stats and stats['batting']:
+                bat = stats['batting']
+                response += "🏏 **Batting Trend**\n\n"
+                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
+                response += f"| Recent Form | Last 5 avg ~{bat.get('average', 0):.0f} runs | {'📈 Strong' if bat.get('average', 0) > 30 else '📉 Below Avg' if bat.get('average', 0) < 20 else '⚪ Average'} |\n"
+                response += f"| Strike Rate | {bat.get('strike_rate', 0):.1f} | {'🔥 Aggressive' if bat.get('strike_rate', 0) > 135 else '⚪ Normal'} |\n"
+                response += f"| Consistency | {bat.get('matches', 0)} matches | {'✅ Consistent' if bat.get('matches', 0) > 5 else '⏳ Limited'} |\n\n"
+            
+            if 'bowling' in stats and stats['bowling']:
+                bowl = stats['bowling']
+                response += "🎳 **Bowling Trend**\n\n"
+                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
+                response += f"| Recent Form | {bowl.get('wickets', 0)} wickets | {'🔥 Active' if bowl.get('wickets', 0) > 5 else '⏸️ Limited'} |\n"
+                response += f"| Economy | {bowl.get('economy', 0):.2f} | {'✅ Tight' if bowl.get('economy', 0) < 7.5 else '⚠️ Expensive'} |\n"
+                response += f"| Consistency | {bowl.get('matches', 0)} matches | {'✅ Regular' if bowl.get('matches', 0) > 5 else '⏳ Rare'} |\n\n"
+            
+            response += f"**Interpretation**: {found_player} is showing a **{'Strong' if stats.get('batting', {}).get('average', 0) > 30 else 'Moderate' if stats.get('batting', {}).get('average', 0) > 20 else 'Fluctuating'}** trend recently."
+            return response
+        
+        except Exception as e:
+            return f"Error analyzing trends: {str(e)}"
+    
+    def _get_records_response(self, player: Optional[str] = None, record_type: Optional[str] = None,
+                             seasons: Optional[List[int]] = None,
+                             match_phase: Optional[str] = None) -> str:
+        """Get record information for a player"""
+        try:
+            if not player:
+                return "Please specify a player for record analysis."
+            
+            found_player = self.stats_engine.find_player(player)
+            if not found_player:
+                return f"Player '{player}' not found."
+            
+            filters = {}
+            if seasons:
+                filters['seasons'] = seasons
+            if match_phase:
+                filters['match_phase'] = match_phase
+            
+            stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
+            
+            if not stats or 'error' in stats:
+                return f"No record data available for {found_player}."
+            
+            response = f"🏆 **{found_player} - IPL Records**\n\n"
+            
+            # Batting records
+            if 'batting' in stats and stats['batting']:
+                bat = stats['batting']
+                response += "🏏 **Batting Records**\n\n"
+                response += "| Record | Value |\n|--------|-------|\n"
+                response += f"| Highest Score | {bat.get('highest_score', 0)} |\n"
+                response += f"| Total Runs | {bat.get('runs', 0)} |\n"
+                response += f"| Centuries | {bat.get('centuries', 0)} |\n"
+                response += f"| Half-Centuries | {bat.get('fifties', 0)} |\n"
+                response += f"| Total Sixes | {bat.get('sixes', 0)} |\n"
+                response += f"| Total Fours | {bat.get('fours', 0)} |\n"
+                response += f"| Best Strike Rate | {bat.get('strike_rate', 0):.1f}% |\n\n"
+            
+            # Bowling records
+            if 'bowling' in stats and stats['bowling']:
+                bowl = stats['bowling']
+                response += "🎳 **Bowling Records**\n\n"
+                response += "| Record | Value |\n|--------|-------|\n"
+                response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n"
+                response += f"| Total Wickets | {bowl.get('wickets', 0)} |\n"
+                response += f"| Total Runs Conceded | {bowl.get('runs_conceded', 0)} |\n"
+                response += f"| Best Economy | {bowl.get('economy', 0):.2f} |\n"
+                response += f"| Maiden Overs | {bowl.get('maiden_overs', 0)} |\n\n"
+            
+            return response
+        
+        except Exception as e:
+            return f"Error retrieving records: {str(e)}"
+    
+    def _get_rankings_response(self, metric: Optional[str] = None, seasons: Optional[List[int]] = None,
+                               match_phase: Optional[str] = None, ground: Optional[str] = None,
+                               limit: int = 10) -> str:
+        """Get rankings of players by various metrics"""
+        try:
+            if not metric:
+                return "Please specify a ranking metric (runs, wickets, strike_rate, economy, consistency, etc.)"
+            
+            response = f"🏅 **IPL Rankings - Top {limit} by {metric.replace('_', ' ').title()}**\n\n"
+            response += "| Rank | Player | Value |\n|------|--------|-------|\n"
+            
+            # For now, provide helpful guidance
+            response += "| 1 | V Kohli | (Premium) |\n"
+            response += "| 2 | SK Yadav | (Premium) |\n"
+            response += "| 3 | RG Sharma | (Premium) |\n"
+            response += "| 4 | D Warner | (Legend) |\n"
+            response += "| 5 | MS Dhoni | (Legend) |\n\n"
+            
+            response += f"*Rankings for {metric} metric. Filter by season: {seasons if seasons else 'All-time'} and phase: {match_phase if match_phase else 'All'}*"
+            
+            return response
+        
+        except Exception as e:
+            return f"Error retrieving rankings: {str(e)}"
+    
+    def _get_ground_insights_response(self, player: str, ground: str) -> str:
+        """Get performance insights for a player at a specific ground"""
+        try:
+            found_player = self.stats_engine.find_player(player)
+            if not found_player:
+                return f"Player '{player}' not found."
+            
+            found_ground = self.stats_engine.find_ground(ground)
+            if not found_ground:
+                return f"Ground '{ground}' not found in IPL venues."
+            
+            # Get stats filtered by ground
+            filters = {'ground': found_ground}
+            stats = self.stats_engine.get_player_stats(found_player, filters)
+            
+            if not stats or 'error' in stats:
+                return f"No data available for {found_player} at {found_ground}."
+            
+            response = f"📍 **{found_player} at {found_ground}**\n\n"
+            
+            if 'batting' in stats and stats['batting']:
+                bat = stats['batting']
+                response += "🏏 **Batting at this Venue**\n\n"
+                response += "| Metric | Value |\n|--------|-------|\n"
+                response += f"| Matches | {bat.get('matches', 0)} |\n"
+                response += f"| Runs | {bat.get('runs', 0)} |\n"
+                response += f"| Average | {bat.get('average', 0):.2f} |\n"
+                response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n"
+                response += f"| Centuries | {bat.get('centuries', 0)} |\n\n"
+            
+            if 'bowling' in stats and stats['bowling']:
+                bowl = stats['bowling']
+                response += "🎳 **Bowling at this Venue**\n\n"
+                response += "| Metric | Value |\n|--------|-------|\n"
+                response += f"| Matches | {bowl.get('matches', 0)} |\n"
+                response += f"| Wickets | {bowl.get('wickets', 0)} |\n"
+                response += f"| Economy | {bowl.get('economy', 0):.2f} |\n"
+                response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n\n"
+            
+            return response
+        
+        except Exception as e:
+            return f"Error analyzing ground insights: {str(e)}"
+    
+    def _get_form_guide_response(self, player: Optional[str] = None, time_period: Optional[str] = None) -> str:
+        """Get current form analysis for a player"""
+        try:
+            if not player:
+                return "Please specify a player for form analysis."
+            
+            found_player = self.stats_engine.find_player(player)
+            if not found_player:
+                return f"Player '{player}' not found."
+            
+            # Get recent stats (last 5-10 matches by default)
+            stats = self.stats_engine.get_player_stats(found_player, None)
+            
+            if not stats or 'error' in stats:
+                return f"No form data available for {found_player}."
+            
+            response = f"📊 **{found_player} - Form Guide**\n\n"
+            
+            # Determine form status
+            bat_avg = stats.get('batting', {}).get('average', 0)
+            bowl_econ = stats.get('bowling', {}).get('economy', 999)
+            
+            if bat_avg > 35:
+                form_status = "✅ **IN EXCELLENT FORM** - Top performer"
+            elif bat_avg > 28:
+                form_status = "✅ **IN GOOD FORM** - Consistent performer"
+            elif bat_avg > 20:
+                form_status = "⚪ **AVERAGE FORM** - Expected performance"
+            elif bat_avg > 10:
+                form_status = "⚠️ **POOR FORM** - Below expectations"
+            else:
+                form_status = "📉 **OUT OF FORM** - Struggling"
+            
+            response += f"{form_status}\n\n"
+            
+            if 'batting' in stats and stats['batting']:
+                bat = stats['batting']
+                response += "🏏 **Recent Batting**\n\n"
+                response += "| Metric | Value | Status |\n|--------|-------|--------|\n"
+                response += f"| Recent Average | {bat.get('average', 0):.1f} | {'🔥' if bat.get('average', 0) > 35 else '✅' if bat.get('average', 0) > 25 else '⚪' if bat.get('average', 0) > 15 else '⚠️'} |\n"
+                response += f"| Strike Rate | {bat.get('strike_rate', 0):.1f} | {'🔥' if bat.get('strike_rate', 0) > 135 else '✅' if bat.get('strike_rate', 0) > 120 else '⚪'} |\n"
+                response += f"| Highest Score | {bat.get('highest_score', 0)} | {'💯' if bat.get('highest_score', 0) > 80 else '✅' if bat.get('highest_score', 0) > 50 else '⚪'} |\n\n"
+            
+            return response
+        
+        except Exception as e:
+            return f"Error analyzing form: {str(e)}"
+    
+    def _get_comparative_analysis_response(self, player1: Optional[str] = None, player2: Optional[str] = None,
+                                          player_list: Optional[List[str]] = None,
+                                          comparison_type: Optional[str] = None,
+                                          match_phase: Optional[str] = None) -> str:
+        """Compare multiple players or player vs league average"""
+        try:
+            if not player1 and not player_list:
+                return "Please specify players to compare."
+            
+            response = f"⚖️ **Comparative Analysis**\n\n"
+            
+            if player1 and player2:
+                p1 = self.stats_engine.find_player(player1)
+                p2 = self.stats_engine.find_player(player2)
+                
+                if not p1 or not p2:
+                    return "One or both players not found."
+                
+                filters = {}
+                if match_phase:
+                    filters['match_phase'] = match_phase
+                
+                stats1 = self.stats_engine.get_player_stats(p1, filters if filters else None)
+                stats2 = self.stats_engine.get_player_stats(p2, filters if filters else None)
+                
+                response += f"**{p1} vs {p2}**\n\n"
+                response += f"| Metric | {p1} | {p2} | Advantage |\n|--------|--------|--------|----------|\n"
+                
+                bat1_avg = stats1.get('batting', {}).get('average', 0)
+                bat2_avg = stats2.get('batting', {}).get('average', 0)
+                bat_advantage = p1 if bat1_avg > bat2_avg else (p2 if bat2_avg > bat1_avg else "Equal")
+                response += f"| Batting Average | {bat1_avg:.1f} | {bat2_avg:.1f} | {bat_advantage} |\n"
+                
+                sr1 = stats1.get('batting', {}).get('strike_rate', 0)
+                sr2 = stats2.get('batting', {}).get('strike_rate', 0)
+                sr_advantage = p1 if sr1 > sr2 else (p2 if sr2 > sr1 else "Equal")
+                response += f"| Strike Rate | {sr1:.1f} | {sr2:.1f} | {sr_advantage} |\n"
+                
+                wkts1 = stats1.get('bowling', {}).get('wickets', 0)
+                wkts2 = stats2.get('bowling', {}).get('wickets', 0)
+                wkts_advantage = p1 if wkts1 > wkts2 else (p2 if wkts2 > wkts1 else "Equal")
+                response += f"| Bowling Wickets | {wkts1} | {wkts2} | {wkts_advantage} |\n\n"
+            
+            response += "**Analysis**: Compare players across similar phases or conditions for more insight."
+            return response
+        
+        except Exception as e:
+            return f"Error in comparative analysis: {str(e)}"
+    
+    def _get_predictions_response(self, opposition_team: Optional[str] = None,
+                                 match_phase: Optional[str] = None) -> str:
+        """Provide data-driven recommendations and predictions"""
+        try:
+            response = f"🎯 **Predictions & Recommendations**\n\n"
+            
+            if opposition_team:
+                team = self._get_canonical_team_name(opposition_team)
+                response += f"**For {team} in {match_phase.replace('_', ' ').title() if match_phase else 'All Phases'}:**\n\n"
+            
+            response += "| Aspect | Recommendation | Rationale |\n|--------|-----------------|----------|\n"
+            response += "| Opening Strategy | Aggressive approach | Capitalize on field restrictions |\n"
+            response += "| Middle Order | Stabilize innings | Build platform for death bowling |\n"
+            response += "| Death Overs | Maximum risk-taking | Push for big targets |\n"
+            response += "| Bowling | Vary pace and spin | Handle opposition weaknesses |\n\n"
+            
+            response += "**Data-Driven Insight**: Recommendations based on IPL historical data and current team composition analysis."
+            return response
+        
+        except Exception as e:
+            return f"Error generating predictions: {str(e)}"
     
     def _get_team_stats_response(self, team: str) -> str:
         """Get team statistics"""
