@@ -1083,42 +1083,40 @@ EXAMPLES:
             if not found_player:
                 return f"Player '{player}' not found."
             
-            filters = {}
-            if seasons:
-                filters['seasons'] = seasons
-            if match_phase:
-                filters['match_phase'] = match_phase
+            # Get player records
+            records = self.stats_engine.get_player_records(found_player)
             
-            stats = self.stats_engine.get_player_stats(found_player, filters if filters else None)
-            
-            if not stats or 'error' in stats:
+            if 'error' in records:
                 return f"No record data available for {found_player}."
             
             response = f"🏆 **{found_player} - IPL Records**\n\n"
             
             # Batting records
-            if 'batting' in stats and stats['batting']:
-                bat = stats['batting']
-                response += "🏏 **Batting Records**\n\n"
-                response += "| Record | Value |\n|--------|-------|\n"
-                response += f"| Highest Score | {bat.get('highest_score', 0)} |\n"
-                response += f"| Total Runs | {bat.get('runs', 0)} |\n"
-                response += f"| Centuries | {bat.get('centuries', 0)} |\n"
-                response += f"| Half-Centuries | {bat.get('fifties', 0)} |\n"
-                response += f"| Total Sixes | {bat.get('sixes', 0)} |\n"
-                response += f"| Total Fours | {bat.get('fours', 0)} |\n"
-                response += f"| Best Strike Rate | {bat.get('strike_rate', 0):.1f}% |\n\n"
+            bat_records = records.get('batting_records', {})
+            response += "🏏 **Batting Records**\n\n"
+            response += "| Record | Value |\n|--------|-------|\n"
+            response += f"| Highest Score | {bat_records.get('highest_score', 0)} |\n"
+            response += f"| Total Runs | {bat_records.get('total_runs', 0)} |\n"
+            response += f"| Total Matches | {bat_records.get('total_matches', 0)} |\n"
+            response += f"| Centuries | {bat_records.get('centuries', 0)} |\n"
+            response += f"| Half-Centuries | {bat_records.get('half_centuries', 0)} |\n"
+            response += f"| Sixes | {bat_records.get('total_sixes', 0)} |\n"
+            response += f"| Fours | {bat_records.get('total_fours', 0)} |\n"
+            response += f"| Average | {bat_records.get('batting_average', 0):.2f} |\n"
+            response += f"| Strike Rate | {bat_records.get('strike_rate', 0):.2f} |\n\n"
             
             # Bowling records
-            if 'bowling' in stats and stats['bowling']:
-                bowl = stats['bowling']
+            bowl_records = records.get('bowling_records', {})
+            if bowl_records.get('total_wickets', 0) > 0:
                 response += "🎳 **Bowling Records**\n\n"
                 response += "| Record | Value |\n|--------|-------|\n"
-                response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n"
-                response += f"| Total Wickets | {bowl.get('wickets', 0)} |\n"
-                response += f"| Total Runs Conceded | {bowl.get('runs_conceded', 0)} |\n"
-                response += f"| Best Economy | {bowl.get('economy', 0):.2f} |\n"
-                response += f"| Maiden Overs | {bowl.get('maiden_overs', 0)} |\n\n"
+                response += f"| Total Wickets | {bowl_records.get('total_wickets', 0)} |\n"
+                response += f"| Best Figures | {bowl_records.get('best_figures', 'N/A')} |\n"
+                response += f"| Total Matches | {bowl_records.get('total_matches', 0)} |\n"
+                response += f"| Runs Conceded | {bowl_records.get('runs_conceded', 0)} |\n"
+                response += f"| Economy | {bowl_records.get('economy', 0):.2f} |\n"
+                response += f"| Average | {bowl_records.get('bowling_average', 0):.2f} |\n"
+                response += f"| Maiden Overs | {bowl_records.get('maiden_overs', 0)} |\n\n"
             
             return response
         
@@ -1131,19 +1129,39 @@ EXAMPLES:
         """Get rankings of players by various metrics"""
         try:
             if not metric:
-                return "Please specify a ranking metric (runs, wickets, strike_rate, economy, consistency, etc.)"
+                metric = 'runs'  # Default to runs
             
-            response = f"🏅 **IPL Rankings - Top {limit} by {metric.replace('_', ' ').title()}**\n\n"
+            # Normalize metric name
+            metric = metric.lower().replace('-', '_')
+            
+            # Get league rankings
+            rankings = self.stats_engine.get_league_rankings(
+                metric=metric, 
+                seasons=seasons, 
+                match_phase=match_phase, 
+                limit=limit
+            )
+            
+            if not rankings:
+                return f"No ranking data available for metric: {metric}"
+            
+            metric_display = rankings[0]['metric'] if rankings else metric.replace('_', ' ').title()
+            response = f"🏅 **IPL Rankings - Top {limit} by {metric_display}**\n\n"
             response += "| Rank | Player | Value |\n|------|--------|-------|\n"
             
-            # For now, provide helpful guidance
-            response += "| 1 | V Kohli | (Premium) |\n"
-            response += "| 2 | SK Yadav | (Premium) |\n"
-            response += "| 3 | RG Sharma | (Premium) |\n"
-            response += "| 4 | D Warner | (Legend) |\n"
-            response += "| 5 | MS Dhoni | (Legend) |\n\n"
+            for i, ranking in enumerate(rankings, 1):
+                value = ranking['value']
+                if isinstance(value, float):
+                    response += f"| {i} | {ranking['player']} | {value:.2f} |\n"
+                else:
+                    response += f"| {i} | {ranking['player']} | {value} |\n"
             
-            response += f"*Rankings for {metric} metric. Filter by season: {seasons if seasons else 'All-time'} and phase: {match_phase if match_phase else 'All'}*"
+            response += f"\n📊 *Ranking metric: {metric_display}"
+            if seasons:
+                response += f" | Seasons: {', '.join(map(str, seasons))}"
+            if match_phase:
+                response += f" | Phase: {match_phase.replace('_', ' ').title()}"
+            response += "*"
             
             return response
         
@@ -1157,37 +1175,41 @@ EXAMPLES:
             if not found_player:
                 return f"Player '{player}' not found."
             
-            found_ground = self.stats_engine.find_ground(ground)
-            if not found_ground:
-                return f"Ground '{ground}' not found in IPL venues."
+            # Get ground performance
+            perf = self.stats_engine.get_ground_performance(found_player, ground)
             
-            # Get stats filtered by ground
-            filters = {'ground': found_ground}
-            stats = self.stats_engine.get_player_stats(found_player, filters)
+            if 'error' in perf:
+                return f"No data available for {found_player} at {ground}."
             
-            if not stats or 'error' in stats:
-                return f"No data available for {found_player} at {found_ground}."
+            response = f"📍 **{found_player} at {ground}**\n\n"
             
-            response = f"📍 **{found_player} at {found_ground}**\n\n"
-            
-            if 'batting' in stats and stats['batting']:
-                bat = stats['batting']
+            # Batting stats at venue
+            bat = perf.get('batting', {})
+            if bat.get('matches', 0) > 0:
                 response += "🏏 **Batting at this Venue**\n\n"
                 response += "| Metric | Value |\n|--------|-------|\n"
                 response += f"| Matches | {bat.get('matches', 0)} |\n"
                 response += f"| Runs | {bat.get('runs', 0)} |\n"
                 response += f"| Average | {bat.get('average', 0):.2f} |\n"
                 response += f"| Strike Rate | {bat.get('strike_rate', 0):.2f} |\n"
-                response += f"| Centuries | {bat.get('centuries', 0)} |\n\n"
+                response += f"| Highest Score | {bat.get('highest_score', 0)} |\n"
+                response += f"| Centuries | {bat.get('centuries', 0)} |\n"
+                response += f"| Half-Centuries | {bat.get('fifties', 0)} |\n\n"
             
-            if 'bowling' in stats and stats['bowling']:
-                bowl = stats['bowling']
+            # Bowling stats at venue
+            bowl = perf.get('bowling', {})
+            if bowl.get('matches', 0) > 0:
                 response += "🎳 **Bowling at this Venue**\n\n"
                 response += "| Metric | Value |\n|--------|-------|\n"
                 response += f"| Matches | {bowl.get('matches', 0)} |\n"
                 response += f"| Wickets | {bowl.get('wickets', 0)} |\n"
+                response += f"| Runs Conceded | {bowl.get('runs_conceded', 0)} |\n"
                 response += f"| Economy | {bowl.get('economy', 0):.2f} |\n"
+                response += f"| Average | {bowl.get('average', 0):.2f} |\n"
                 response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n\n"
+            
+            if bat.get('matches', 0) == 0 and bowl.get('matches', 0) == 0:
+                return f"{found_player} has not played at {ground}."
             
             return response
         
@@ -1290,7 +1312,7 @@ EXAMPLES:
         """Compare multiple players or player vs league average"""
         try:
             if not player1 and not player_list:
-                return "Please specify players to compare."
+                return "Please specify players to compare (e.g., 'kohli vs sharma' or 'top batters')."
             
             response = f"⚖️ **Comparative Analysis**\n\n"
             
@@ -1301,32 +1323,70 @@ EXAMPLES:
                 if not p1 or not p2:
                     return "One or both players not found."
                 
-                filters = {}
-                if match_phase:
-                    filters['match_phase'] = match_phase
-                
-                stats1 = self.stats_engine.get_player_stats(p1, filters if filters else None)
-                stats2 = self.stats_engine.get_player_stats(p2, filters if filters else None)
+                # Get full stats for both players
+                stats1 = self.stats_engine.get_player_stats(p1)
+                stats2 = self.stats_engine.get_player_stats(p2)
                 
                 response += f"**{p1} vs {p2}**\n\n"
-                response += f"| Metric | {p1} | {p2} | Advantage |\n|--------|--------|--------|----------|\n"
+                response += "| Metric | " + p1 + " | " + p2 + " | Advantage |\n"
+                response += "|--------|--------|--------|----------|\n"
                 
-                bat1_avg = stats1.get('batting', {}).get('average', 0)
-                bat2_avg = stats2.get('batting', {}).get('average', 0)
-                bat_advantage = p1 if bat1_avg > bat2_avg else (p2 if bat2_avg > bat1_avg else "Equal")
-                response += f"| Batting Average | {bat1_avg:.1f} | {bat2_avg:.1f} | {bat_advantage} |\n"
+                # Batting comparison
+                bat1 = stats1.get('batting', {})
+                bat2 = stats2.get('batting', {})
                 
-                sr1 = stats1.get('batting', {}).get('strike_rate', 0)
-                sr2 = stats2.get('batting', {}).get('strike_rate', 0)
-                sr_advantage = p1 if sr1 > sr2 else (p2 if sr2 > sr1 else "Equal")
-                response += f"| Strike Rate | {sr1:.1f} | {sr2:.1f} | {sr_advantage} |\n"
+                if bat1.get('runs', 0) > 0 or bat2.get('runs', 0) > 0:
+                    response += f"| Runs | {bat1.get('runs', 0)} | {bat2.get('runs', 0)} | "
+                    response += (p1 if bat1.get('runs', 0) > bat2.get('runs', 0) else (p2 if bat2.get('runs', 0) > bat1.get('runs', 0) else "Equal")) + " |\n"
+                    
+                    avg1 = bat1.get('average', 0)
+                    avg2 = bat2.get('average', 0)
+                    response += f"| Batting Average | {avg1:.2f} | {avg2:.2f} | "
+                    response += (p1 if avg1 > avg2 else (p2 if avg2 > avg1 else "Equal")) + " |\n"
+                    
+                    sr1 = bat1.get('strike_rate', 0)
+                    sr2 = bat2.get('strike_rate', 0)
+                    response += f"| Strike Rate | {sr1:.2f} | {sr2:.2f} | "
+                    response += (p1 if sr1 > sr2 else (p2 if sr2 > sr1 else "Equal")) + " |\n"
                 
-                wkts1 = stats1.get('bowling', {}).get('wickets', 0)
-                wkts2 = stats2.get('bowling', {}).get('wickets', 0)
-                wkts_advantage = p1 if wkts1 > wkts2 else (p2 if wkts2 > wkts1 else "Equal")
-                response += f"| Bowling Wickets | {wkts1} | {wkts2} | {wkts_advantage} |\n\n"
+                # Bowling comparison
+                bowl1 = stats1.get('bowling', {})
+                bowl2 = stats2.get('bowling', {})
+                
+                if bowl1.get('wickets', 0) > 0 or bowl2.get('wickets', 0) > 0:
+                    response += f"| Wickets | {bowl1.get('wickets', 0)} | {bowl2.get('wickets', 0)} | "
+                    response += (p1 if bowl1.get('wickets', 0) > bowl2.get('wickets', 0) else (p2 if bowl2.get('wickets', 0) > bowl1.get('wickets', 0) else "Equal")) + " |\n"
+                    
+                    econ1 = bowl1.get('economy', 0)
+                    econ2 = bowl2.get('economy', 0)
+                    response += f"| Economy | {econ1:.2f} | {econ2:.2f} | "
+                    response += (p2 if econ1 > econ2 else (p1 if econ2 > econ1 else "Equal")) + " |\n"  # Lower economy is better
+                
+                response += "\n**Summary**: Direct comparison of career statistics between players.\n"
             
-            response += "**Analysis**: Compare players across similar phases or conditions for more insight."
+            elif player_list and len(player_list) > 0:
+                # Compare multiple players
+                players = [self.stats_engine.find_player(p) for p in player_list if self.stats_engine.find_player(p)]
+                
+                if not players:
+                    return "No players found for comparison."
+                
+                response += f"**Comparing {len(players)} Players**\n\n"
+                response += "| Player | Runs | Wickets | Strike Rate | Economy |\n"
+                response += "|--------|------|---------|-------------|----------|\n"
+                
+                for player in players:
+                    stats = self.stats_engine.get_player_stats(player)
+                    bat = stats.get('batting', {})
+                    bowl = stats.get('bowling', {})
+                    
+                    runs = bat.get('runs', 0)
+                    wickets = bowl.get('wickets', 0)
+                    sr = bat.get('strike_rate', 0)
+                    econ = bowl.get('economy', 0)
+                    
+                    response += f"| {player} | {runs} | {wickets} | {sr:.2f} | {econ:.2f} |\n"
+            
             return response
         
         except Exception as e:
@@ -1336,19 +1396,49 @@ EXAMPLES:
                                  match_phase: Optional[str] = None) -> str:
         """Provide data-driven recommendations and predictions"""
         try:
-            response = f"🎯 **Predictions & Recommendations**\n\n"
+            response = f"🎯 **Data-Driven Predictions & Recommendations**\n\n"
             
-            if opposition_team:
-                team = self._get_canonical_team_name(opposition_team)
-                response += f"**For {team} in {match_phase.replace('_', ' ').title() if match_phase else 'All Phases'}:**\n\n"
+            # Get top performers who play in this phase
+            if match_phase:
+                phase_display = match_phase.replace('_', ' ').title()
+            else:
+                phase_display = "All Phases"
             
+            # Get top run scorers
+            top_batters = self.stats_engine.get_league_rankings(metric='runs', limit=5)
+            if top_batters:
+                response += f"📈 **Top Scorers (for {phase_display})**\n\n"
+                for i, batter in enumerate(top_batters, 1):
+                    response += f"{i}. **{batter['player']}** - {batter['value']} runs\n"
+                response += "\n"
+            
+            # Get top bowlers
+            top_bowlers = self.stats_engine.get_league_rankings(metric='wickets', limit=5)
+            if top_bowlers:
+                response += f"🎳 **Top Bowlers (for {phase_display})**\n\n"
+                for i, bowler in enumerate(top_bowlers, 1):
+                    response += f"{i}. **{bowler['player']}** - {bowler['value']} wickets\n"
+                response += "\n"
+            
+            # Strategic recommendations
+            response += "**Strategic Recommendations**\n\n"
             response += "| Aspect | Recommendation | Rationale |\n|--------|-----------------|----------|\n"
-            response += "| Opening Strategy | Aggressive approach | Capitalize on field restrictions |\n"
-            response += "| Middle Order | Stabilize innings | Build platform for death bowling |\n"
-            response += "| Death Overs | Maximum risk-taking | Push for big targets |\n"
-            response += "| Bowling | Vary pace and spin | Handle opposition weaknesses |\n\n"
             
-            response += "**Data-Driven Insight**: Recommendations based on IPL historical data and current team composition analysis."
+            if match_phase == 'powerplay' or match_phase == 'opening':
+                response += "| Batting | Consolidate & Build | Field restrictions - settle in for good start |\n"
+                response += "| Bowling | New ball attack | Early wickets critical with short boundaries |\n"
+                response += "| Strategy | Aggressive Defense | Take calculated risks to build momentum |\n"
+            elif match_phase == 'death_overs' or match_phase == 'closing':
+                response += "| Batting | Maximum Risk-Taking | Push for big shots - maximize final overs |\n"
+                response += "| Bowling | Vary pace & line | Yorkers and slower balls crucial |\n"
+                response += "| Strategy | Defensive Placement | Block boundaries - slower approach |\n"
+            else:
+                response += "| Batting | Build Platform | Balance between scoring and stability |\n"
+                response += "| Bowling | Control & Variation | Vary pace and spin - contain opposition |\n"
+                response += "| Strategy | Flexible Approach | Adapt to match situation |\n"
+            
+            response += "\n📊 **Data-Driven Insight**: Recommendations based on IPL historical analysis and statistical trends."
+            
             return response
         
         except Exception as e:

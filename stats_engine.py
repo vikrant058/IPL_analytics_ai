@@ -1019,6 +1019,158 @@ class StatsEngine:
             'strike_rate': round((wickets / balls * 100), 2) if balls > 0 else 0,
         }
 
+    def get_league_rankings(self, metric: str = 'runs', seasons: List[int] = None, 
+                            match_phase: str = None, limit: int = 10) -> List[Dict]:
+        """Get league rankings for a specific metric
+        
+        Metrics: 'runs', 'wickets', 'strike_rate', 'economy', 'consistency', 'matches'
+        """
+        players = self._get_all_players()
+        rankings = []
+        
+        for player in players:
+            try:
+                filters = {}
+                if seasons:
+                    filters['seasons'] = seasons
+                if match_phase:
+                    filters['match_phase'] = match_phase
+                
+                stats = self.get_player_stats(player, filters if filters else None)
+                
+                if metric == 'runs':
+                    value = stats.get('batting', {}).get('runs', 0)
+                    if value > 0:
+                        rankings.append({
+                            'player': player,
+                            'value': value,
+                            'metric': 'Runs'
+                        })
+                elif metric == 'wickets':
+                    value = stats.get('bowling', {}).get('wickets', 0)
+                    if value > 0:
+                        rankings.append({
+                            'player': player,
+                            'value': value,
+                            'metric': 'Wickets'
+                        })
+                elif metric == 'strike_rate':
+                    value = stats.get('batting', {}).get('strike_rate', 0)
+                    if value > 0 and stats.get('batting', {}).get('balls', 0) >= 100:  # Min 100 balls for SR ranking
+                        rankings.append({
+                            'player': player,
+                            'value': round(value, 2),
+                            'metric': 'Strike Rate'
+                        })
+                elif metric == 'economy':
+                    value = stats.get('bowling', {}).get('economy', 0)
+                    if value > 0 and stats.get('bowling', {}).get('balls', 0) >= 240:  # Min 240 balls (40 overs)
+                        rankings.append({
+                            'player': player,
+                            'value': round(value, 2),
+                            'metric': 'Economy'
+                        })
+                elif metric == 'matches':
+                    value = stats.get('batting', {}).get('matches', 0) + stats.get('bowling', {}).get('matches', 0)
+                    if value > 0:
+                        rankings.append({
+                            'player': player,
+                            'value': value,
+                            'metric': 'Matches'
+                        })
+                elif metric == 'average':
+                    value = stats.get('batting', {}).get('average', 0)
+                    if value > 0 and stats.get('batting', {}).get('innings', 0) >= 10:  # Min 10 innings for average
+                        rankings.append({
+                            'player': player,
+                            'value': round(value, 2),
+                            'metric': 'Batting Average'
+                        })
+            except:
+                pass
+        
+        # Sort by value descending and return top N
+        rankings.sort(key=lambda x: x['value'], reverse=True)
+        return rankings[:limit]
+    
+    def get_player_records(self, player: str) -> Dict:
+        """Get all records for a player"""
+        found_player = self.find_player(player)
+        if not found_player:
+            return {'error': f'Player {found_player} not found'}
+        
+        stats = self.get_player_stats(found_player)
+        
+        return {
+            'player': found_player,
+            'batting_records': {
+                'highest_score': stats.get('batting', {}).get('highest_score', 0),
+                'total_runs': stats.get('batting', {}).get('runs', 0),
+                'total_matches': stats.get('batting', {}).get('matches', 0),
+                'total_sixes': stats.get('batting', {}).get('sixes', 0),
+                'total_fours': stats.get('batting', {}).get('fours', 0),
+                'centuries': stats.get('batting', {}).get('centuries', 0),
+                'half_centuries': stats.get('batting', {}).get('fifties', 0),
+                'batting_average': stats.get('batting', {}).get('average', 0),
+                'strike_rate': stats.get('batting', {}).get('strike_rate', 0)
+            },
+            'bowling_records': {
+                'best_figures': stats.get('bowling', {}).get('best_figures', 'N/A'),
+                'total_wickets': stats.get('bowling', {}).get('wickets', 0),
+                'total_matches': stats.get('bowling', {}).get('matches', 0),
+                'runs_conceded': stats.get('bowling', {}).get('runs_conceded', 0),
+                'economy': stats.get('bowling', {}).get('economy', 0),
+                'bowling_average': stats.get('bowling', {}).get('average', 0),
+                'maiden_overs': stats.get('bowling', {}).get('maiden_overs', 0)
+            }
+        }
+    
+    def get_ground_performance(self, player: str, ground: str) -> Dict:
+        """Get player's performance at a specific ground"""
+        found_player = self.find_player(player)
+        if not found_player:
+            return {'error': f'Player {found_player} not found'}
+        
+        filters = {'ground': ground}
+        stats = self.get_player_stats(found_player, filters)
+        
+        return {
+            'player': found_player,
+            'ground': ground,
+            'batting': stats.get('batting', {}),
+            'bowling': stats.get('bowling', {})
+        }
+    
+    def get_player_comparison(self, players: List[str], metric: str = 'runs') -> Dict:
+        """Compare multiple players on a specific metric"""
+        comparison = {}
+        
+        for player in players:
+            try:
+                stats = self.get_player_stats(player)
+                
+                if metric == 'runs':
+                    value = stats.get('batting', {}).get('runs', 0)
+                elif metric == 'wickets':
+                    value = stats.get('bowling', {}).get('wickets', 0)
+                elif metric == 'strike_rate':
+                    value = stats.get('batting', {}).get('strike_rate', 0)
+                elif metric == 'economy':
+                    value = stats.get('bowling', {}).get('economy', 0)
+                elif metric == 'average':
+                    value = stats.get('batting', {}).get('average', 0)
+                else:
+                    value = 0
+                
+                comparison[player] = {
+                    'value': round(value, 2) if isinstance(value, float) else value,
+                    'metric': metric
+                }
+            except:
+                pass
+        
+        return comparison
+
     def get_primary_skill(self, player: str) -> str:
         """Determine a player's primary skill (batter/bowler) based on participation
         
