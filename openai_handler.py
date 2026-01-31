@@ -398,20 +398,22 @@ class CricketChatbot:
                 }
         
         # Build context about available aliases for the prompt
-        player_alias_samples = {k: v for k, v in list(self.player_aliases.items())[:8]}
+        # Create a display-friendly version of aliases for the prompt
+        player_alias_samples = {}
+        for i, (player, aliases) in enumerate(list(self._canonical_aliases.items())[:8]):
+            player_alias_samples[player] = aliases
+        
         team_alias_samples = {k: v for k, v in list(self.team_aliases.items())[:6]}
         
         prompt = f"""You are an expert cricket analytics assistant. Parse this cricket query intelligently.
 
 USE THESE PLAYER ALIASES TO RESOLVE NAMES:
 {json.dumps(player_alias_samples, indent=2)}
-... and {len(self.player_aliases)-8} more aliases loaded from player_aliases.json
+... and {len(self._canonical_aliases)-8} more player aliases loaded from player_aliases.json
 
 USE THESE TEAM ALIASES:
 {json.dumps(team_alias_samples, indent=2)}
 ... and {len(self.team_aliases)-6} more team aliases
-
-CRICKET FILTER OPTIONS:
 - match_phase: 'powerplay' (0-6 overs), 'middle_overs' (6-16 overs), 'death_overs' (16+ overs), 'opening' (0-3 overs), 'closing' (17-20 overs)
 - match_situation: 'batting_first', 'chasing', 'defending', 'pressure_chase', 'winning_position'
 - bowler_type: 'pace', 'spin', 'left_arm', 'right_arm'
@@ -580,9 +582,13 @@ EXAMPLES:
         
         player_lower = player_input.lower().strip()
         
-        # Direct match in aliases
+        # Direct match in aliases - now returns a list, pick the most popular one
         if player_lower in self.player_aliases:
-            return self.player_aliases[player_lower]
+            players_list = self.player_aliases[player_lower]
+            if players_list:
+                # Pick the one with most aliases (most popular/important)
+                best_player = max(players_list, key=lambda p: len(self._canonical_aliases.get(p, [])))
+                return best_player
         
         # Check if it's already a canonical name in dataset
         for player in self.all_players:
