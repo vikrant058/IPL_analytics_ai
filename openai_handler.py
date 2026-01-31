@@ -365,9 +365,9 @@ class CricketChatbot:
         
         # ===== CHECK FOR RECORD QUERIES FIRST (highest score, most runs, best figures) =====
         record_keywords = {
-            'highest_score': ['highest individual score', 'max individual score', 'highest score by batter', 'highest batter score', 'highest player score', 'highest player total'],
+            'highest_score': ['highest individual score', 'max individual score', 'highest score by batter', 'highest batter score', 'highest player score', 'highest player total', 'highest score'],
             'highest_team_score': ['highest team total', 'highest team score', 'team total', 'team score', 'highest team runs'],
-            'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer', 'most runs by'],
+            'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer', 'most runs by', 'total runs'],
             'most_sixes': ['most sixes', 'maximum sixes'],
             'most_fours': ['most fours', 'maximum fours'],
             'best_figures': ['best bowling figures', 'best figures', 'best bowling'],
@@ -385,10 +385,36 @@ class CricketChatbot:
         
         # Also check for explicit "record" keyword for queries like "bumrah's record"
         if not detected_record_type and "record" in query_lower:
-            # Default to most_runs for generic "record" queries
-            # (will be clarified by stats_engine based on player role)
-            detected_record_type = "most_runs"
-        if detected_record_type:
+            # Check if asking for ALL records or a specific record
+            # "kohli records" = all records (plural)
+            # "kohli highest score" = specific record
+            if query_lower.endswith("record") or query_lower.endswith("records") or " records" in query_lower:
+                # Asking for all records - don't set a specific record_type
+                detected_record_type = None
+            else:
+                # Default to most_runs for other generic "record" references
+                detected_record_type = "most_runs"
+        
+        # IMPORTANT: If query mentions "record" or "records" as the final/main thing, clear specific record_type
+        # This ensures "kohli records" shows all records, not just one
+        if ("record" in query_lower or "records" in query_lower) and detected_record_type:
+            # Check if this is a generic "records" query by looking for "record" or "records" keyword
+            # that's NOT preceded by a specific record type
+            if query_lower.endswith("record") or query_lower.endswith("records"):
+                # Generic records query - clear the specific type but KEEP the "records" query type
+                detected_record_type = None
+            elif "bowling record" in query_lower:
+                # Generic bowling records - clear the specific type
+                detected_record_type = None
+            elif "batting record" in query_lower:
+                # Generic batting records - clear the specific type
+                detected_record_type = None
+        
+        # If query explicitly mentions "record" or "records", it's definitely a records query
+        # This catches "kohli records", "bumrah bowling records", etc.
+        has_record_keyword = "record" in query_lower and (query_lower.endswith("records") or query_lower.endswith("record") or " records " in query_lower or " record " in query_lower)
+        
+        if detected_record_type or has_record_keyword:
             # Determine if this is a player-specific record or overall record
             # Player-specific patterns: "kohli highest score", "bumrah's record", "sachin fastest century"
             # Overall patterns: "highest score in IPL", "most runs ever", "best figures", "highest player total"
@@ -427,6 +453,7 @@ class CricketChatbot:
             
             if is_player_specific and player1:
                 # Player-specific record (e.g., "kohli's highest score")
+                record_description = detected_record_type.replace('_', ' ').title() if detected_record_type else "Records"
                 return {
                     "player1": player1,
                     "player2": None,
@@ -449,10 +476,11 @@ class CricketChatbot:
                     "player_list": None,
                     "form_filter": None,
                     "query_type": "records",
-                    "interpretation": f"{detected_record_type.replace('_', ' ').title()} record for {player1}"
+                    "interpretation": f"{record_description} record for {player1}"
                 }
             else:
                 # Overall record (e.g., "highest score in IPL")
+                record_description = detected_record_type.replace('_', ' ').title() if detected_record_type else "Records"
                 return {
                     "player1": None,
                     "player2": None,
@@ -475,7 +503,7 @@ class CricketChatbot:
                     "player_list": None,
                     "form_filter": None,
                     "query_type": "records",
-                    "interpretation": f"{detected_record_type.replace('_', ' ').title()} in IPL"
+                    "interpretation": f"{record_description} in IPL"
                 }
         
         # ===== CHECK FOR RANKING QUERIES SECOND (top batsmen, most runs, etc.) =====
@@ -1468,6 +1496,12 @@ EXAMPLES:
             if not found_player:
                 return f"Player '{player}' not found."
             
+            # If a specific record_type is requested, try to return a concise answer
+            if record_type:
+                concise_response = self._get_single_record_answer(found_player, record_type)
+                if concise_response:
+                    return concise_response
+            
             # Get player records
             records = self.stats_engine.get_player_records(found_player)
             
@@ -1507,6 +1541,70 @@ EXAMPLES:
         
         except Exception as e:
             return f"Error retrieving records: {str(e)}"
+    
+    def _get_single_record_answer(self, player: str, record_type: str) -> Optional[str]:
+        """Get a concise one-line answer for specific record queries like 'kohli highest score'"""
+        try:
+            if record_type == 'highest_score':
+                # Get the match where player had their highest score
+                player_innings = self.stats_engine.deliveries_df[
+                    self.stats_engine.deliveries_df['batter'] == player
+                ].groupby('match_id')['batsman_runs'].sum().reset_index()
+                
+                if player_innings.empty:
+                    return f"{player} has no IPL records."
+                
+                highest_match_id = player_innings.loc[player_innings['batsman_runs'].idxmax(), 'match_id']
+                highest_score = int(player_innings['batsman_runs'].max())
+                
+                # Get match details
+                match_details = self.stats_engine.matches_df[
+                    self.stats_engine.matches_df['id'] == highest_match_id
+                ]
+                if match_details.empty:
+                    return f"**Highest Score**: {highest_score} runs"
+                
+                match_row = match_details.iloc[0]
+                opponent = match_row['team2'] if match_row['team1'] == player or self._identify_player_team_in_match(player, match_row) == 'team1' else match_row['team1']
+                
+                return f"🎯 **{player} Highest Score**: **{highest_score}** against {opponent}"
+            
+            elif record_type == 'most_runs':
+                records = self.stats_engine.get_player_records(player)
+                total_runs = records.get('batting_records', {}).get('total_runs', 0)
+                return f"📊 **{player} Total Runs**: **{total_runs}** runs in IPL"
+            
+            elif record_type == 'most_wickets':
+                records = self.stats_engine.get_player_records(player)
+                total_wickets = records.get('bowling_records', {}).get('total_wickets', 0)
+                if total_wickets == 0:
+                    return None  # Not a bowler
+                return f"🎯 **{player} Total Wickets**: **{total_wickets}** wickets in IPL"
+            
+            elif record_type == 'best_figures':
+                records = self.stats_engine.get_player_records(player)
+                best_figures = records.get('bowling_records', {}).get('best_figures', None)
+                if not best_figures or best_figures == 'N/A':
+                    return None  # Not a bowler
+                return f"🎯 **{player} Best Figures**: **{best_figures}** in IPL"
+            
+            elif record_type == 'fastest_fifty':
+                # This would require ball-by-ball data, so return None to use table format
+                return None
+            
+            elif record_type == 'fastest_century':
+                # This would require ball-by-ball data, so return None to use table format
+                return None
+            
+            return None
+        
+        except Exception as e:
+            return None  # Fall back to table format if there's an error
+    
+    def _identify_player_team_in_match(self, player: str, match_row) -> str:
+        """Identify which team a player was in for a specific match"""
+        # This is simplified - in a real scenario we'd check the deliveries table
+        return 'team1'
     
     def _get_overall_records(self, record_type: Optional[str] = None, seasons: Optional[List[int]] = None) -> str:
         """Get overall league records (not player-specific)"""
