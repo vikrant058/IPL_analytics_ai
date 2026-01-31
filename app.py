@@ -1,4 +1,4 @@
-# IPL Analytics ChatBot - Modern UI with Bottom Navigation
+# IPL Analytics ChatBot - Modern UI with Fixed Bottom Navigation
 import streamlit as st
 import pandas as pd
 from data_loader import IPLDataLoader
@@ -45,65 +45,29 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Modern styling with bottom navigation ready
+# Modern styling with fixed bottom navigation
 st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 120px;
+        padding-bottom: 130px;
     }
     
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-top: 2px solid #e8eaed;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 80px;
-        z-index: 999;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
-    }
-    
-    .nav-button {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 80px;
-        cursor: pointer;
-        border: none;
-        background: none;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        font-size: 12px;
-        color: #888;
+    /* Navigation buttons */
+    .stButton > button {
+        border-radius: 6px;
         font-weight: 500;
-    }
-    
-    .nav-button:hover {
-        color: #2c3e50;
-        background-color: #f8f9fa;
-    }
-    
-    .nav-button.active {
-        color: #556b82;
         background-color: #f0f1f3;
-        border-top: 3px solid #556b82;
+        color: #2c3e50;
+        border: 1px solid #d0d1d3;
+        transition: all 0.2s ease;
+        height: 70px;
+        font-size: 16px;
     }
     
-    .nav-icon {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-    
-    .nav-label {
-        font-size: 11px;
+    .stButton > button:hover {
+        background-color: #e0e1e3;
+        border-color: #556b82;
     }
     
     /* Typography */
@@ -116,21 +80,6 @@ st.markdown("""
     h2, h3 {
         color: #556b82;
         font-weight: 600;
-    }
-    
-    /* Buttons */
-    .stButton > button {
-        border-radius: 6px;
-        font-weight: 500;
-        background-color: #f0f1f3;
-        color: #2c3e50;
-        border: 1px solid #d0d1d3;
-        transition: all 0.2s ease;
-    }
-    
-    .stButton > button:hover {
-        background-color: #e0e1e3;
-        border-color: #556b82;
     }
     
     /* Mobile responsive */
@@ -174,7 +123,7 @@ loader, stats_engine, ai_engine = load_data()
 
 # Initialize session state
 if "current_page" not in st.session_state:
-    st.session_state.current_page = "chatbot"
+    st.session_state.current_page = "cricbot"
 
 # Header
 st.markdown("""
@@ -186,38 +135,12 @@ st.markdown("""
 
 st.divider()
 
-# Navigation buttons
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    if st.button("💬 Chatbot", key="nav_chatbot", use_container_width=True):
-        st.session_state.current_page = "chatbot"
-        st.rerun()
-
-with col2:
-    if st.button("📊 Profiles", key="nav_profiles", use_container_width=True):
-        st.session_state.current_page = "profiles"
-        st.rerun()
-
-with col3:
-    if st.button("⚔️ Compare", key="nav_compare", use_container_width=True):
-        st.session_state.current_page = "compare"
-        st.rerun()
-
-with col4:
-    if st.button("📈 Trends", key="nav_trends", use_container_width=True):
-        st.session_state.current_page = "trends"
-        st.rerun()
-
-st.divider()
-
-# Page routing
 page = st.session_state.current_page
 
-# ============ CHATBOT PAGE ============
-if page == "chatbot":
-    st.markdown("### 💬 Ask me anything about IPL Cricket")
-    st.markdown("*Get instant AI insights on player stats, records, and trends*")
+# ============ CRICBOT PAGE ============
+if page == "cricbot":
+    st.markdown("### 🤖 Cricbot - Your Cricket Assistant")
+    st.markdown("*Ask me anything about IPL cricket*")
     st.markdown("")
     
     api_key, _ = _get_openai_api_key()
@@ -236,12 +159,12 @@ OPENAI_API_KEY=sk-proj-your-key-here
             with col1:
                 user_query = st.text_input(
                     "Your query:",
-                    placeholder="e.g., 'kohli statistics'",
+                    placeholder="e.g., 'kohli statistics' or 'bumrah vs csk'",
                     key="chatbot_input",
                     label_visibility="collapsed"
                 )
             with col2:
-                search_btn = st.button("🔍", key="search_btn", use_container_width=True)
+                search_btn = st.button("Search", key="search_btn", use_container_width=True)
             
             st.info("💡 **Try asking all these capabilities**: Player stats • Records & Rankings • Head-to-Head • Recent Form • Team Performance • Specific Filters")
             
@@ -254,9 +177,9 @@ OPENAI_API_KEY=sk-proj-your-key-here
         except Exception as e:
             st.error(f"❌ Error: {str(e)[:100]}")
 
-# ============ PROFILES PAGE ============
+# ============ PLAYER PROFILES PAGE ============
 elif page == "profiles":
-    st.markdown("### 📊 Player & Team Statistics")
+    st.markdown("### 👤 Player Profiles")
     st.markdown("*Browse IPL player and team data*")
     st.markdown("")
     
@@ -326,9 +249,9 @@ elif page == "profiles":
             })
             st.dataframe(team_df, use_container_width=True, hide_index=True)
 
-# ============ COMPARE PAGE ============
-elif page == "compare":
-    st.markdown("### ⚔️ Head-to-Head Comparison")
+# ============ HEAD-TO-HEAD PAGE ============
+elif page == "h2h":
+    st.markdown("### ⚔️ Player H2H Comparison")
     st.markdown("*Compare any two players*")
     st.markdown("")
     
@@ -343,7 +266,7 @@ elif page == "compare":
     with col2:
         p2 = st.selectbox("Player 2", [p for p in all_players if p != p1], key="p2")
     
-    if st.button("📊 Compare", key="compare_btn", use_container_width=True):
+    if st.button("⚔️ Compare", key="compare_btn", use_container_width=True):
         st.divider()
         result = ai_engine.get_player_head_to_head(p1, p2)
         
@@ -356,9 +279,9 @@ elif page == "compare":
             else:
                 st.info("Comparison data processing...")
 
-# ============ TRENDS PAGE ============
-elif page == "trends":
-    st.markdown("### 📈 Recent Form & Trends")
+# ============ PLAYER FORM PAGE ============
+elif page == "form":
+    st.markdown("### 📈 Player Form & Trends")
     st.markdown("*Track player performance over recent matches*")
     st.markdown("")
     
@@ -377,12 +300,42 @@ elif page == "trends":
         else:
             st.info("No recent match data available.")
 
-# Footer
-st.divider()
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.caption("🏏 IPL Analytics AI")
-with col2:
-    st.caption("Powered by Streamlit + OpenAI")
-with col3:
-    st.caption("1,169 matches | 278K+ deliveries")
+# ============ BOTTOM NAVIGATION BAR ============
+st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
+
+st.markdown("""
+<div style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 2px solid #e8eaed;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    height: 90px;
+    z-index: 999;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+" id="bottom-nav">
+</div>
+""", unsafe_allow_html=True)
+
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4, gap="small")
+
+with nav_col1:
+    if st.button("🤖 Cricbot", use_container_width=True, key="btn_cricbot"):
+        st.session_state.current_page = "cricbot"
+
+with nav_col2:
+    if st.button("👤 Profiles", use_container_width=True, key="btn_profiles"):
+        st.session_state.current_page = "profiles"
+
+with nav_col3:
+    if st.button("⚔️ H2H", use_container_width=True, key="btn_h2h"):
+        st.session_state.current_page = "h2h"
+
+with nav_col4:
+    if st.button("📈 Form", use_container_width=True, key="btn_form"):
+        st.session_state.current_page = "form"
