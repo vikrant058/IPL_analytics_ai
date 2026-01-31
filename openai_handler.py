@@ -359,10 +359,10 @@ class CricketChatbot:
         """
         
         # OPTIMIZATION: Try simple pattern matching first for common queries
-        # This avoids expensive GPT calls for queries like "player last N matches"
+        # This avoids expensive GPT calls for queries like "player last N matches" or "player stats"
         query_lower = query.lower()
         
-        # Check if this is a "player last N matches/innings" query
+        # Check if this is a "player last N matches/innings" query (trends)
         import re
         time_period_match = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
         if time_period_match:
@@ -395,6 +395,54 @@ class CricketChatbot:
                     "form_filter": None,
                     "query_type": "trends",
                     "interpretation": f"Trends for {player1} in last {number} {period_type}"
+                }
+        
+        # OPTIMIZATION: Try to resolve a simple player stats query without GPT
+        # This handles queries like "sachin stats", "kohli", "bumrah performance", etc.
+        player1 = self._resolve_player_name(query)
+        if player1 and not ' vs ' in query_lower and not ' against ' in query_lower:
+            # Check if this looks like a simple player stats query
+            # (has player name, but no "vs" comparison, no head-to-head)
+            
+            # Extract any available filters without calling GPT
+            extracted_filters = self._extract_filter_keywords(query)
+            
+            # If no complex filters, just return basic player stats
+            if not any([
+                extracted_filters.get('bowler_type'),
+                extracted_filters.get('match_phase'),
+                extracted_filters.get('match_situation'),
+                extracted_filters.get('batter_role'),
+                extracted_filters.get('vs_conditions'),
+                extracted_filters.get('ground'),
+                extracted_filters.get('handedness'),
+                extracted_filters.get('inning'),
+                extracted_filters.get('match_type'),
+            ]):
+                # Simple player stats query - no complex filters needed
+                return {
+                    "player1": player1,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": extracted_filters.get('seasons'),
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": None,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": extracted_filters.get('time_period'),
+                    "record_type": None,
+                    "comparison_type": None,
+                    "ranking_metric": None,
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "player_stats",
+                    "interpretation": f"Stats for {player1}"
                 }
         
         # Build context about available aliases for the prompt
