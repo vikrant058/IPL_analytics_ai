@@ -258,8 +258,18 @@ class StatsEngine:
         # Union of all matches
         all_matches = set(batter_matches['match_id'].unique()) | set(bowler_matches['match_id'].unique())
         
-        # Get match details sorted by date (descending - most recent first)
-        match_ids = sorted(list(all_matches), key=lambda x: -x)[:n]
+        # Get match details sorted by DATE (descending - most recent first), not by match_id
+        # This ensures we get truly recent matches, not just highest match IDs
+        matches_with_dates = []
+        for match_id in all_matches:
+            match_info = self.matches_df[self.matches_df['id'] == match_id]
+            if not match_info.empty:
+                date = match_info.iloc[0]['date']
+                matches_with_dates.append((match_id, date))
+        
+        # Sort by date in descending order (most recent first)
+        matches_with_dates.sort(key=lambda x: x[1], reverse=True)
+        match_ids = [m[0] for m in matches_with_dates[:n]]
         
         results = []
         for match_id in match_ids:
