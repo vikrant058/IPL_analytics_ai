@@ -365,7 +365,7 @@ class CricketChatbot:
         
         # ===== CHECK FOR RECORD QUERIES FIRST (highest score, most runs, best figures) =====
         record_keywords = {
-            'highest_score': ['highest score', 'highest individual score', 'max individual score'],
+            'highest_score': ['highest score', 'highest individual score', 'max individual score', 'highest team total', 'team total'],
             'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer'],
             'most_sixes': ['most sixes', 'maximum sixes'],
             'most_fours': ['most fours', 'maximum fours'],
@@ -382,11 +382,39 @@ class CricketChatbot:
                 detected_record_type = record_type
                 break
         
+        # Also check for explicit "record" keyword for queries like "bumrah's record"
+        if not detected_record_type and "record" in query_lower:
+            # Default to most_runs for generic "record" queries
+            # (will be clarified by stats_engine based on player role)
+            detected_record_type = "most_runs"
         if detected_record_type:
-            # Check if it's asking for a specific player's record or overall records
-            player1 = self._resolve_player_name(query)
+            # Determine if this is a player-specific record or overall record
+            # Player-specific patterns: "kohli highest score", "bumrah's record", "sachin fastest century"
+            # Overall patterns: "highest score in IPL", "most runs ever", "best figures"
             
-            if player1:
+            is_player_specific = False
+            player1 = None
+            
+            # Skip player resolution if query clearly asks for overall/team records
+            has_overall_keywords = any(word in query_lower for word in 
+                ["in ipl", "in the ipl", "overall", "team", "total", "batsman", "bowler", 
+                 "in a match", "in cricket", "in iplt20", "in tournament", "ever", "all time"])
+            
+            # Check for explicit player mentions with possessive or direct patterns
+            if "'s " in query_lower or " by " in query_lower or " of " in query_lower or "in career" in query_lower:
+                # Explicitly mentions player with possessive or "by player"
+                player1 = self._resolve_player_name(query)
+                if player1:
+                    is_player_specific = True
+            
+            # Check for direct player name mentions (without overall keywords)
+            elif not has_overall_keywords:
+                # Query like "kohli highest score" - might be player-specific
+                player1 = self._resolve_player_name(query)
+                if player1:
+                    is_player_specific = True
+            
+            if is_player_specific and player1:
                 # Player-specific record (e.g., "kohli's highest score")
                 return {
                     "player1": player1,
