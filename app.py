@@ -50,55 +50,40 @@ st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 130px;
+        padding-bottom: 140px;
     }
     
-    /* Hide streamlit footer and header when bottom nav is visible */
-    footer {
-        display: none !important;
-    }
-    
-    /* Fixed Bottom Navigation Bar - using Streamlit's column layout */
-    div[data-testid="stHorizontalBlock"]:last-of-type {
+    /* Fixed Bottom Navigation Bar */
+    .bottom-nav-container {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
+        height: 100px;
         background: white;
         border-top: 2px solid #e8eaed;
-        z-index: 999;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         display: flex;
         justify-content: space-around;
-        width: 100vw;
-        height: 90px;
-        padding: 0 !important;
-        margin: 0 !important;
+        align-items: center;
+        z-index: 999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        width: 100%;
     }
     
-    /* Style buttons in bottom nav */
-    div[data-testid="stHorizontalBlock"]:last-of-type .stButton {
-        flex: 1;
-        height: 90px;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
-    div[data-testid="stHorizontalBlock"]:last-of-type .stButton > button {
-        height: 90px;
+    /* Streamlit buttons in bottom nav */
+    .bottom-nav-container [data-testid="baseButton-secondary"] {
+        height: 100px;
         width: 100%;
         border: none !important;
         background: white !important;
         color: #888 !important;
         border-top: 3px solid transparent !important;
-        border-radius: 0 !important;
         font-size: 16px !important;
         transition: all 0.3s ease !important;
         padding: 0 !important;
-        margin: 0 !important;
     }
     
-    div[data-testid="stHorizontalBlock"]:last-of-type .stButton > button:hover {
+    .bottom-nav-container [data-testid="baseButton-secondary"]:hover {
         background-color: #f8f9fa !important;
         color: #2c3e50 !important;
     }
@@ -339,6 +324,8 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
+st.markdown('<div class="bottom-nav-container">', unsafe_allow_html=True)
+
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
@@ -360,3 +347,5 @@ with nav_col4:
     if st.button("📈 Form", key="btn_form", use_container_width=True):
         st.session_state.current_page = "form"
         st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
