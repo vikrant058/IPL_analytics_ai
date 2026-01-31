@@ -1043,18 +1043,19 @@ EXAMPLES:
                 response += f"| Best Figures | {bowl.get('best_figures', 'N/A')} |\n"
                 response += f"| Maiden Overs | {bowl.get('maiden_overs', 0)} |\n\n"
                 
-                # Get bowling breakdown by batter handedness
-                breakdown = self.stats_engine.get_bowling_handedness_breakdown(found_player, filters)
-                if breakdown and len(breakdown) > 0:
-                    response += "**BREAKDOWN BY BATTER HANDEDNESS**\n\n"
-                    response += "| Batter Type | Balls | Wickets | Runs | Economy |\n|---|---|---|---|---|\n"
-                    for hand_type, hand_stats in breakdown.items():
-                        hand_label = hand_type.replace('vs_', '').replace('_', ' ').title()
-                        balls = hand_stats.get('balls', 0)
-                        wickets = hand_stats.get('wickets', 0)
-                        runs = hand_stats.get('runs_conceded', 0)
-                        economy = hand_stats.get('economy', 0)
-                        response += f"| {hand_label} | {balls} | {wickets} | {runs} | {economy:.2f} |\n"
+                # Only show bowling breakdown by batter handedness if explicitly asked
+                if filters.get('handedness'):
+                    breakdown = self.stats_engine.get_bowling_handedness_breakdown(found_player, filters)
+                    if breakdown and len(breakdown) > 0:
+                        response += "**BREAKDOWN BY BATTER HANDEDNESS**\n\n"
+                        response += "| Batter Type | Balls | Wickets | Runs | Economy |\n|---|---|---|---|---|\n"
+                        for hand_type, hand_stats in breakdown.items():
+                            hand_label = hand_type.replace('vs_', '').replace('_', ' ').title()
+                            balls = hand_stats.get('balls', 0)
+                            wickets = hand_stats.get('wickets', 0)
+                            runs = hand_stats.get('runs_conceded', 0)
+                            economy = hand_stats.get('economy', 0)
+                            response += f"| {hand_label} | {balls} | {wickets} | {runs} | {economy:.2f} |\n"
             
             return response
         
