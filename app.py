@@ -1,4 +1,4 @@
-# IPL Analytics ChatBot - Modern UI with Fixed Bottom Navigation
+# IPL Analytics ChatBot - Modern UI with Working Bottom Navigation
 import streamlit as st
 import pandas as pd
 from data_loader import IPLDataLoader
@@ -50,25 +50,45 @@ st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 130px;
+        padding-bottom: 140px;
     }
     
-    /* Navigation buttons */
-    .stButton > button {
-        border-radius: 6px;
-        font-weight: 500;
-        background-color: #f0f1f3;
-        color: #2c3e50;
-        border: 1px solid #d0d1d3;
-        transition: all 0.2s ease;
-        height: 70px;
-        font-size: 16px;
+    /* Fixed Bottom Navigation Bar */
+    .bottom-nav-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: white;
+        border-top: 2px solid #e8eaed;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        width: 100%;
     }
     
-    .stButton > button:hover {
-        background-color: #e0e1e3;
-        border-color: #556b82;
+    /* Streamlit buttons in bottom nav */
+    .bottom-nav-container [data-testid="baseButton-secondary"] {
+        height: 100px;
+        width: 100%;
+        border: none !important;
+        background: white !important;
+        color: #888 !important;
+        border-top: 3px solid transparent !important;
+        font-size: 16px !important;
+        transition: all 0.3s ease !important;
+        padding: 0 !important;
     }
+    
+    .bottom-nav-container [data-testid="baseButton-secondary"]:hover {
+        background-color: #f8f9fa !important;
+        color: #2c3e50 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
     
     /* Typography */
     h1 {
@@ -80,6 +100,21 @@ st.markdown("""
     h2, h3 {
         color: #556b82;
         font-weight: 600;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        border-radius: 6px;
+        font-weight: 500;
+        background-color: #f0f1f3;
+        color: #2c3e50;
+        border: 1px solid #d0d1d3;
+        transition: all 0.2s ease;
+    }
+    
+    .stButton > button:hover {
+        background-color: #e0e1e3;
+        border-color: #556b82;
     }
     
     /* Mobile responsive */
@@ -97,17 +132,6 @@ st.markdown("""
             font-size: 18px !important;
         }
     }
-    
-    @media (max-width: 480px) {
-        .main {
-            padding-left: 4px !important;
-            padding-right: 4px !important;
-        }
-        
-        h1 {
-            font-size: 20px !important;
-        }
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -121,7 +145,7 @@ def load_data():
 
 loader, stats_engine, ai_engine = load_data()
 
-# Initialize session state
+# Initialize session state for page navigation
 if "current_page" not in st.session_state:
     st.session_state.current_page = "cricbot"
 
@@ -135,6 +159,7 @@ st.markdown("""
 
 st.divider()
 
+# Display current page based on session state
 page = st.session_state.current_page
 
 # ============ CRICBOT PAGE ============
@@ -166,7 +191,7 @@ OPENAI_API_KEY=sk-proj-your-key-here
             with col2:
                 search_btn = st.button("Search", key="search_btn", use_container_width=True)
             
-            st.info("💡 **Try asking all these capabilities**: Player stats • Records & Rankings • Head-to-Head • Recent Form • Team Performance • Specific Filters")
+            st.info("💡 **Try asking**: Player stats • Records & Rankings • Head-to-Head • Recent Form • Team Performance • Specific Filters")
             
             if search_btn and user_query:
                 st.divider()
@@ -300,42 +325,29 @@ elif page == "form":
         else:
             st.info("No recent match data available.")
 
-# ============ BOTTOM NAVIGATION BAR ============
-st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
+# ============ FIXED BOTTOM NAVIGATION BAR ============
+st.markdown('<div class="bottom-nav-container">', unsafe_allow_html=True)
 
-st.markdown("""
-<div style="
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    border-top: 2px solid #e8eaed;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 12px 0;
-    height: 90px;
-    z-index: 999;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-" id="bottom-nav">
-</div>
-""", unsafe_allow_html=True)
-
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4, gap="small")
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("🤖 Cricbot", use_container_width=True, key="btn_cricbot"):
+    if st.button("🤖 Cricbot", key="btn_cricbot", use_container_width=True):
         st.session_state.current_page = "cricbot"
+        st.rerun()
 
 with nav_col2:
-    if st.button("👤 Profiles", use_container_width=True, key="btn_profiles"):
+    if st.button("👤 Profiles", key="btn_profiles", use_container_width=True):
         st.session_state.current_page = "profiles"
+        st.rerun()
 
 with nav_col3:
-    if st.button("⚔️ H2H", use_container_width=True, key="btn_h2h"):
+    if st.button("⚔️ H2H", key="btn_h2h", use_container_width=True):
         st.session_state.current_page = "h2h"
+        st.rerun()
 
 with nav_col4:
-    if st.button("📈 Form", use_container_width=True, key="btn_form"):
+    if st.button("📈 Form", key="btn_form", use_container_width=True):
         st.session_state.current_page = "form"
+        st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
