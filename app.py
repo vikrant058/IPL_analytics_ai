@@ -243,37 +243,7 @@ OPENAI_API_KEY=sk-proj-your-key-here
             with col2:
                 search_btn = st.button("🔍", key="search_btn", use_container_width=True)
             
-            st.markdown("**💡 Try asking:**")
-            
-            col1, col2, col3, col4 = st.columns(4)
-            queries = [
-                ("Kohli Stats", "virat kohli statistics", "q1"),
-                ("Bumrah", "jasprit bumrah bowling", "q2"),
-                ("Kohli vs Bumrah", "kohli vs bumrah", "q3"),
-                ("Records", "highest score in ipl", "q4"),
-            ]
-            
-            for i, (label, qry, key) in enumerate(queries):
-                with [col1, col2, col3, col4][i]:
-                    if st.button(label, key=key, use_container_width=True):
-                        user_query = qry
-                        search_btn = True
-            
-            col1, col2, col3, col4 = st.columns(4)
-            queries2 = [
-                ("Top Runs", "most runs in ipl", "q5"),
-                ("Bumrah Records", "bumrah best figures", "q6"),
-                ("Trends", "kohli last 5 matches", "q7"),
-                ("Wickets", "most wickets in ipl", "q8"),
-            ]
-            
-            for i, (label, qry, key) in enumerate(queries2):
-                with [col1, col2, col3, col4][i]:
-                    if st.button(label, key=key, use_container_width=True):
-                        user_query = qry
-                        search_btn = True
-            
-            st.markdown("")
+            st.info("💡 **Try asking all these capabilities**: Player stats • Records & Rankings • Head-to-Head • Recent Form • Team Performance • Specific Filters")
             
             if search_btn and user_query:
                 st.divider()
