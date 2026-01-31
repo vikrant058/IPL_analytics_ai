@@ -1514,19 +1514,12 @@ EXAMPLES:
                 rankings = self.stats_engine.get_league_rankings(metric='wickets', seasons=seasons, limit=10)
                 record_display = "Most Wickets"
             elif record_type == 'highest_team_score':
-                # Highest team total - group by match and get total runs per team
-                team_scores = self.stats_engine.matches_df[['match_id', 'team1', 'team2', 'runs_team1', 'runs_team2']].copy()
+                # Highest team total - group deliveries by match and batting team to calculate runs
+                team_runs = self.stats_engine.deliveries_df.groupby(['match_id', 'batting_team'])['total_runs'].sum().reset_index()
+                team_runs.columns = ['match_id', 'team', 'runs']
                 
-                # Create two rows per match - one for each team
-                team1_scores = team_scores[['match_id', 'team1', 'runs_team1']].rename(
-                    columns={'team1': 'team', 'runs_team1': 'runs'}
-                )
-                team2_scores = team_scores[['match_id', 'team2', 'runs_team2']].rename(
-                    columns={'team2': 'team', 'runs_team2': 'runs'}
-                )
-                
-                all_team_scores = pd.concat([team1_scores, team2_scores], ignore_index=True)
-                top_team_scores = all_team_scores.nlargest(10, 'runs')
+                # Get top 10 team performances
+                top_team_scores = team_runs.nlargest(10, 'runs')
                 
                 rankings = []
                 for _, row in top_team_scores.iterrows():
