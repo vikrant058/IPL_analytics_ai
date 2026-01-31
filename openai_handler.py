@@ -100,12 +100,16 @@ class CricketChatbot:
                 
                 # Store canonical aliases for later use
                 self._canonical_aliases = data.get("aliases", {})
-                    
-                # Build reverse mapping: alias -> canonical name
+                
+                # Build reverse mapping: alias -> [list of canonical names]
+                # This allows handling cases where multiple players have the same alias
                 alias_map = {}
-                for canonical_name, alias_list in data.get("aliases", {}).items():
+                for canonical_name, alias_list in self._canonical_aliases.items():
                     for alias in alias_list:
-                        alias_map[alias.lower()] = canonical_name
+                        alias_lower = alias.lower()
+                        if alias_lower not in alias_map:
+                            alias_map[alias_lower] = []
+                        alias_map[alias_lower].append(canonical_name)
                 
                 return alias_map
         except Exception as e:
@@ -149,11 +153,12 @@ class CricketChatbot:
         # Check for longest-match-first to avoid matching "a" in "a zampa" when looking for "kohli"
         # This prevents short aliases from incorrectly matching longer queries
         matches = []
-        for alias, full_name in self.player_aliases.items():
+        for alias, players_list in self.player_aliases.items():
             if alias in query_lower:
-                # Count how many aliases this player has (as a tiebreaker - more aliases = more popular)
-                player_alias_count = len(self._canonical_aliases.get(full_name, []))
-                matches.append((alias, full_name, len(alias), player_alias_count))
+                # players_list is now a list of canonical names that share this alias
+                for full_name in players_list:
+                    player_alias_count = len(self._canonical_aliases.get(full_name, []))
+                    matches.append((alias, full_name, len(alias), player_alias_count))
         
         if matches:
             # Sort by: 1) alias length (longest first), 2) player alias count (more aliases = more popular)
