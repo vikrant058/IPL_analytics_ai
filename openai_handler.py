@@ -862,7 +862,7 @@ EXAMPLES:
         query_type = parsed.get('query_type')
         
         # Validation: Ensure query has cricket-relevant entity
-        has_cricket_entity = player1 or player2 or venue or opposition_team or ranking_metric
+        has_cricket_entity = player1 or player2 or venue or opposition_team or ranking_metric or record_type
         
         if not has_cricket_entity:
             return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers'\n- 'bumrah at wankhede'\n- 'who should bat for CSK'"
@@ -1447,10 +1447,11 @@ EXAMPLES:
     def _get_records_response(self, player: Optional[str] = None, record_type: Optional[str] = None,
                              seasons: Optional[List[int]] = None,
                              match_phase: Optional[str] = None) -> str:
-        """Get record information for a player"""
+        """Get record information for a player or overall league records"""
         try:
+            # If no player specified, show overall league records
             if not player:
-                return "Please specify a player for record analysis."
+                return self._get_overall_records(record_type, seasons)
             
             found_player = self.stats_engine.find_player(player)
             if not found_player:
@@ -1495,6 +1496,58 @@ EXAMPLES:
         
         except Exception as e:
             return f"Error retrieving records: {str(e)}"
+    
+    def _get_overall_records(self, record_type: Optional[str] = None, seasons: Optional[List[int]] = None) -> str:
+        """Get overall league records (not player-specific)"""
+        try:
+            if not record_type:
+                record_type = "highest_score"
+            
+            # Map record_type to ranking metric
+            record_to_metric = {
+                'highest_score': 'highest_score',
+                'most_runs': 'runs',
+                'most_wickets': 'wickets',
+                'best_figures': 'best_figures',
+                'fastest_fifty': 'fastest_fifty',
+                'fastest_century': 'fastest_century',
+                'most_sixes': 'sixes',
+                'most_fours': 'fours',
+            }
+            
+            metric = record_to_metric.get(record_type, 'runs')
+            
+            # Get league rankings for this metric (top 10 is essentially the records)
+            rankings = self.stats_engine.get_league_rankings(
+                metric=metric,
+                seasons=seasons,
+                limit=10
+            )
+            
+            if not rankings:
+                return f"No data available for {record_type.replace('_', ' ')}."
+            
+            # Format response
+            record_display = record_type.replace('_', ' ').title()
+            response = f"🏆 **IPL Records - {record_display}**\n\n"
+            response += "| Rank | Player | Value |\n|------|--------|-------|\n"
+            
+            for i, ranking in enumerate(rankings[:10], 1):
+                value = ranking['value']
+                if isinstance(value, float) and value % 1 != 0:  # Only show decimals if needed
+                    response += f"| {i} | {ranking['player']} | {value:.2f} |\n"
+                else:
+                    response += f"| {i} | {ranking['player']} | {value} |\n"
+            
+            response += f"\n📊 *{record_display} Leaderboard"
+            if seasons:
+                response += f" | Seasons: {', '.join(map(str, seasons))}"
+            response += "*"
+            
+            return response
+        
+        except Exception as e:
+            return f"Error retrieving overall records: {str(e)}"
     
     def _get_rankings_response(self, metric: Optional[str] = None, seasons: Optional[List[int]] = None,
                                match_phase: Optional[str] = None, ground: Optional[str] = None,
