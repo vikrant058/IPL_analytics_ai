@@ -365,8 +365,9 @@ class CricketChatbot:
         
         # ===== CHECK FOR RECORD QUERIES FIRST (highest score, most runs, best figures) =====
         record_keywords = {
-            'highest_score': ['highest score', 'highest individual score', 'max individual score', 'highest team total', 'team total'],
-            'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer'],
+            'highest_score': ['highest individual score', 'max individual score', 'highest score by batter', 'highest batter score', 'highest player score', 'highest player total'],
+            'highest_team_score': ['highest team total', 'highest team score', 'team total', 'team score', 'highest team runs'],
+            'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer', 'most runs by'],
             'most_sixes': ['most sixes', 'maximum sixes'],
             'most_fours': ['most fours', 'maximum fours'],
             'best_figures': ['best bowling figures', 'best figures', 'best bowling'],
@@ -1503,32 +1504,86 @@ EXAMPLES:
             if not record_type:
                 record_type = "highest_score"
             
-            # Map record_type to ranking metric
-            record_to_metric = {
-                'highest_score': 'highest_score',
-                'most_runs': 'runs',
-                'most_wickets': 'wickets',
-                'best_figures': 'best_figures',
-                'fastest_fifty': 'fastest_fifty',
-                'fastest_century': 'fastest_century',
-                'most_sixes': 'sixes',
-                'most_fours': 'fours',
-            }
+            # For overall records, use get_league_rankings where available
+            # For unsupported metrics, provide a simple fallback
             
-            metric = record_to_metric.get(record_type, 'runs')
-            
-            # Get league rankings for this metric (top 10 is essentially the records)
-            rankings = self.stats_engine.get_league_rankings(
-                metric=metric,
-                seasons=seasons,
-                limit=10
-            )
+            if record_type == 'most_runs':
+                rankings = self.stats_engine.get_league_rankings(metric='runs', seasons=seasons, limit=10)
+                record_display = "Most Runs"
+            elif record_type == 'most_wickets':
+                rankings = self.stats_engine.get_league_rankings(metric='wickets', seasons=seasons, limit=10)
+                record_display = "Most Wickets"
+            elif record_type == 'highest_team_score':
+                # Highest team total - group by match and get total runs per team
+                team_scores = self.stats_engine.matches_df[['match_id', 'team1', 'team2', 'runs_team1', 'runs_team2']].copy()
+                
+                # Create two rows per match - one for each team
+                team1_scores = team_scores[['match_id', 'team1', 'runs_team1']].rename(
+                    columns={'team1': 'team', 'runs_team1': 'runs'}
+                )
+                team2_scores = team_scores[['match_id', 'team2', 'runs_team2']].rename(
+                    columns={'team2': 'team', 'runs_team2': 'runs'}
+                )
+                
+                all_team_scores = pd.concat([team1_scores, team2_scores], ignore_index=True)
+                top_team_scores = all_team_scores.nlargest(10, 'runs')
+                
+                rankings = []
+                for _, row in top_team_scores.iterrows():
+                    rankings.append({
+                        'player': row['team'],
+                        'value': int(row['runs']),
+                        'metric': 'Highest Team Score'
+                    })
+                record_display = "Highest Team Total"
+            elif record_type == 'highest_score':
+                # For highest individual score, we need to get it from deliveries
+                # Group by match/batter and get the max runs scored in an innings
+                innings_scores = self.stats_engine.deliveries_df.groupby(['match_id', 'batter'])['batsman_runs'].sum().reset_index()
+                top_scores = innings_scores.nlargest(10, 'batsman_runs')
+                
+                rankings = []
+                for _, row in top_scores.iterrows():
+                    rankings.append({
+                        'player': row['batter'],
+                        'value': int(row['batsman_runs']),
+                        'metric': 'Highest Score'
+                    })
+                record_display = "Highest Individual Score"
+            elif record_type == 'best_figures':
+                # Best bowling figures - need to parse from raw data
+                # This is complex, so provide top wicket takers instead
+                rankings = self.stats_engine.get_league_rankings(metric='wickets', seasons=seasons, limit=10)
+                record_display = "Most Wickets"
+            elif record_type == 'fastest_fifty':
+                # Not easily calculable without ball-by-ball data, use strike rate leaders
+                rankings = self.stats_engine.get_league_rankings(metric='strike_rate', seasons=seasons, limit=10)
+                record_display = "Highest Strike Rate"
+            elif record_type == 'fastest_century':
+                # Similar to fifty, use strike rate
+                rankings = self.stats_engine.get_league_rankings(metric='strike_rate', seasons=seasons, limit=10)
+                record_display = "Highest Strike Rate"
+            elif record_type == 'most_sixes':
+                # Group by batter and count sixes
+                sixes_df = self.stats_engine.deliveries_df[self.stats_engine.deliveries_df['batsman_runs'] == 6]
+                top_sixes = sixes_df.groupby('batter').size().nlargest(10)
+                rankings = [{'player': player, 'value': count, 'metric': 'Sixes'} for player, count in top_sixes.items()]
+                record_display = "Most Sixes"
+            elif record_type == 'most_fours':
+                # Group by batter and count fours
+                fours_df = self.stats_engine.deliveries_df[self.stats_engine.deliveries_df['batsman_runs'] == 4]
+                top_fours = fours_df.groupby('batter').size().nlargest(10)
+                rankings = [{'player': player, 'value': count, 'metric': 'Fours'} for player, count in top_fours.items()]
+                record_display = "Most Fours"
+            else:
+                # Default to runs
+                rankings = self.stats_engine.get_league_rankings(metric='runs', seasons=seasons, limit=10)
+                record_display = "Most Runs"
             
             if not rankings:
                 return f"No data available for {record_type.replace('_', ' ')}."
             
             # Format response
-            record_display = record_type.replace('_', ' ').title()
             response = f"🏆 **IPL Records - {record_display}**\n\n"
             response += "| Rank | Player | Value |\n|------|--------|-------|\n"
             
