@@ -361,9 +361,132 @@ class CricketChatbot:
         # OPTIMIZATION: Try simple pattern matching first for common queries
         # This avoids expensive GPT calls for queries like "player last N matches" or "player stats"
         query_lower = query.lower()
+        import re
+        
+        # ===== CHECK FOR RECORD QUERIES FIRST (highest score, most runs, best figures) =====
+        record_keywords = {
+            'highest_score': ['highest score', 'highest individual score', 'max individual score'],
+            'most_runs': ['most runs', 'most run scorers', 'most scored', 'highest scorer'],
+            'most_sixes': ['most sixes', 'maximum sixes'],
+            'most_fours': ['most fours', 'maximum fours'],
+            'best_figures': ['best bowling figures', 'best figures', 'best bowling'],
+            'most_wickets': ['most wickets', 'most taken'],
+            'lowest_score': ['lowest score', 'minimum score'],
+            'fastest_fifty': ['fastest fifty', 'fastest 50'],
+            'fastest_century': ['fastest century', 'fastest 100', 'fastest hundred'],
+        }
+        
+        detected_record_type = None
+        for record_type, keywords in record_keywords.items():
+            if any(kw in query_lower for kw in keywords):
+                detected_record_type = record_type
+                break
+        
+        if detected_record_type:
+            # Check if it's asking for a specific player's record or overall records
+            player1 = self._resolve_player_name(query)
+            
+            if player1:
+                # Player-specific record (e.g., "kohli's highest score")
+                return {
+                    "player1": player1,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": self._extract_filter_keywords(query).get('seasons'),
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": None,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": None,
+                    "record_type": detected_record_type,
+                    "comparison_type": None,
+                    "ranking_metric": None,
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "records",
+                    "interpretation": f"{detected_record_type.replace('_', ' ').title()} record for {player1}"
+                }
+            else:
+                # Overall record (e.g., "highest score in IPL")
+                return {
+                    "player1": None,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": self._extract_filter_keywords(query).get('seasons'),
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": None,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": None,
+                    "record_type": detected_record_type,
+                    "comparison_type": None,
+                    "ranking_metric": None,
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "records",
+                    "interpretation": f"{detected_record_type.replace('_', ' ').title()} in IPL"
+                }
+        
+        # ===== CHECK FOR RANKING QUERIES SECOND (top batsmen, most runs, etc.) =====
+        # Check for ranking keywords
+        has_top_keyword = 'top ' in query_lower or 'best ' in query_lower or 'highest ' in query_lower or 'leaderboard' in query_lower
+        
+        ranking_keywords = {
+            'economy': ['economy'],
+            'strike_rate': ['strike rate', 'sr'],
+            'average': ['average', 'batting avg'],
+            'wickets': ['wickets', 'wicket taker', 'bowler'],
+            'runs': ['runs', 'run scorer', 'run scorers', 'most scored'],
+            'sixes': ['sixes'],
+        }
+        
+        detected_ranking_metric = None
+        if has_top_keyword:  # Only look for metrics if query has ranking keyword
+            for metric, keywords in ranking_keywords.items():
+                if any(kw in query_lower for kw in keywords):
+                    detected_ranking_metric = metric
+                    break
+        
+        if detected_ranking_metric and has_top_keyword:
+            # This is a ranking query (e.g., "top 10 run scorers", "best economy")
+            return {
+                "player1": None,
+                "player2": None,
+                "venue": None,
+                "seasons": self._extract_filter_keywords(query).get('seasons'),
+                "bowler_type": None,
+                "match_phase": None,
+                "match_situation": None,
+                "opposition_team": None,
+                "batter_role": None,
+                "vs_conditions": None,
+                "ground": None,
+                "handedness": None,
+                "inning": None,
+                "match_type": None,
+                "time_period": None,
+                "record_type": None,
+                "comparison_type": None,
+                "ranking_metric": detected_ranking_metric,
+                "player_list": None,
+                "form_filter": None,
+                "query_type": "rankings",
+                "interpretation": f"Top {detected_ranking_metric.replace('_', ' ')} in IPL"
+            }
         
         # Check if this is a "player last N matches/innings" query (trends)
-        import re
         time_period_match = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
         if time_period_match:
             # This is likely a trends query
