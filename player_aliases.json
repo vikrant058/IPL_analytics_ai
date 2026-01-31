@@ -1,80 +1,1938 @@
 {
   "aliases": {
-    "V Kohli": [
-      "coholli",
-      "king kohli",
-      "kohli",
-      "kohli v",
-      "kohli viraat",
-      "kohli virat",
-      "v k",
-      "v kohli",
-      "veerat",
-      "viraat",
-      "viraat kohli",
-      "viraat koli",
-      "virat",
-      "virat cohhli",
-      "virat kholi",
-      "virat kohl",
-      "virat kohli",
-      "virat kohli ji",
-      "virat koli",
-      "virrat kohli",
-      "vk",
-      "vkohli"
+    "A Ashish Reddy": [
+      "a",
+      "a ashish reddy",
+      "a reddy",
+      "ashish",
+      "reddy",
+      "reddy a"
     ],
-    "RG Sharma": [
-      "hitman",
-      "r sharma",
-      "rg sharma",
-      "ro hit",
-      "ro sharma",
-      "roheit",
-      "roheit sharma",
-      "rohhit",
-      "rohhit sharma",
-      "rohit",
-      "rohit s",
-      "rohit sharm",
-      "rohit sharma",
-      "rohit sharma ji",
-      "rohit sharmaa",
-      "rohit sharmas",
-      "rohit sharme",
-      "rohit sharmer",
-      "rohit shrama",
-      "roht",
-      "rs",
-      "sharma rohit",
-      "the wall"
+    "A Badoni": [
+      "a",
+      "a badoni",
+      "badoni",
+      "badoni a"
     ],
-    "MS Dhoni": [
-      "captain cool",
-      "ddhoni",
-      "dhone",
-      "dhonee",
-      "dhoni",
-      "dhoni mahi",
-      "dhoni ms",
-      "dhoni thala",
-      "dhonni",
-      "dhony",
-      "m dhoni",
-      "m s dhoni",
-      "m.s. dhoni",
-      "mahendra dhoni",
-      "mahendra singh dhoni",
-      "mahendra singh doni",
-      "mahi dhoni",
-      "mahinder singh dhoni",
-      "ms d",
-      "ms dhoney",
-      "ms dhoni",
-      "ms doni",
-      "msd",
-      "singh dhoni",
-      "thala"
+    "A Chandila": [
+      "a",
+      "a chandila",
+      "chandila",
+      "chandila a"
+    ],
+    "A Chopra": [
+      "a",
+      "a chopra",
+      "chopra",
+      "chopra a"
+    ],
+    "A Choudhary": [
+      "a",
+      "a choudhary",
+      "choudhary",
+      "choudhary a"
+    ],
+    "A Dananjaya": [
+      "a",
+      "a dananjaya",
+      "dananjaya",
+      "dananjaya a"
+    ],
+    "A Flintoff": [
+      "a",
+      "a flintoff",
+      "flintoff",
+      "flintoff a"
+    ],
+    "A Kamboj": [
+      "a",
+      "a kamboj",
+      "kamboj",
+      "kamboj a"
+    ],
+    "A Kumble": [
+      "a",
+      "a kumble",
+      "kumble",
+      "kumble a"
+    ],
+    "A Manohar": [
+      "a",
+      "a manohar",
+      "manohar",
+      "manohar a"
+    ],
+    "A Mhatre": [
+      "a",
+      "a mhatre",
+      "mhatre",
+      "mhatre a"
+    ],
+    "A Mishra": [
+      "a",
+      "a mishra",
+      "mishra",
+      "mishra a"
+    ],
+    "A Mithun": [
+      "a",
+      "a mithun",
+      "mithun",
+      "mithun a"
+    ],
+    "A Mukund": [
+      "a",
+      "a mukund",
+      "mukund",
+      "mukund a"
+    ],
+    "A Nehra": [
+      "a",
+      "a nehra",
+      "nehra",
+      "nehra a"
+    ],
+    "A Nel": [
+      "a",
+      "a nel",
+      "nel",
+      "nel a"
+    ],
+    "A Nortje": [
+      "a",
+      "a nortje",
+      "nortje",
+      "nortje a"
+    ],
+    "A Raghuvanshi": [
+      "a",
+      "a raghuvanshi",
+      "raghuvanshi",
+      "raghuvanshi a"
+    ],
+    "A Singh": [
+      "a",
+      "a singh",
+      "singh",
+      "singh a"
+    ],
+    "A Symonds": [
+      "a",
+      "a symonds",
+      "symonds",
+      "symonds a"
+    ],
+    "A Tomar": [
+      "a",
+      "a tomar",
+      "tomar",
+      "tomar a"
+    ],
+    "A Uniyal": [
+      "a",
+      "a uniyal",
+      "uniyal",
+      "uniyal a"
+    ],
+    "A Zampa": [
+      "a",
+      "a zampa",
+      "zampa",
+      "zampa a"
+    ],
+    "AA Bilakhia": [
+      "a bilakhia",
+      "aa",
+      "aa bilakhia",
+      "bilakhia",
+      "bilakhia aa"
+    ],
+    "AA Chavan": [
+      "a chavan",
+      "aa",
+      "aa chavan",
+      "chavan",
+      "chavan aa"
+    ],
+    "AA Jhunjhunwala": [
+      "a jhunjhunwala",
+      "aa",
+      "aa jhunjhunwala",
+      "jhunjhunwala",
+      "jhunjhunwala aa"
+    ],
+    "AA Kazi": [
+      "a kazi",
+      "aa",
+      "aa kazi",
+      "kazi",
+      "kazi aa"
+    ],
+    "AA Kulkarni": [
+      "a kulkarni",
+      "aa",
+      "aa kulkarni",
+      "kulkarni",
+      "kulkarni aa"
+    ],
+    "AA Noffke": [
+      "a noffke",
+      "aa",
+      "aa noffke",
+      "noffke",
+      "noffke aa"
+    ],
+    "AB Agarkar": [
+      "a agarkar",
+      "ab",
+      "ab agarkar",
+      "agarkar",
+      "agarkar ab"
+    ],
+    "AB Barath": [
+      "a barath",
+      "ab",
+      "ab barath",
+      "barath",
+      "barath ab"
+    ],
+    "AB Dinda": [
+      "a dinda",
+      "ab",
+      "ab dinda",
+      "dinda",
+      "dinda ab"
+    ],
+    "AB McDonald": [
+      "a mcdonald",
+      "ab",
+      "ab mcdonald",
+      "mcdonald",
+      "mcdonald ab"
+    ],
+    "AB de Villiers": [
+      "ab devilliers",
+      "ab de villiers",
+      "ab deviller",
+      "ab deville",
+      "ab de v",
+      "ab",
+      "abd",
+      "de villiers",
+      "devilliers",
+      "ab develier",
+      "mr 360",
+      "mr360",
+      "ab de vee",
+      "abd viliiers"
+    ],
+    "AC Blizzard": [
+      "a blizzard",
+      "ac",
+      "ac blizzard",
+      "blizzard",
+      "blizzard ac"
+    ],
+    "AC Gilchrist": [
+      "a gilchrist",
+      "ac",
+      "ac gilchrist",
+      "gilchrist",
+      "gilchrist ac"
+    ],
+    "AC Thomas": [
+      "a thomas",
+      "ac",
+      "ac thomas",
+      "thomas",
+      "thomas ac"
+    ],
+    "AC Voges": [
+      "a voges",
+      "ac",
+      "ac voges",
+      "voges",
+      "voges ac"
+    ],
+    "AD Hales": [
+      "a hales",
+      "ad",
+      "ad hales",
+      "hales",
+      "hales ad"
+    ],
+    "AD Mascarenhas": [
+      "a mascarenhas",
+      "ad",
+      "ad mascarenhas",
+      "mascarenhas",
+      "mascarenhas ad"
+    ],
+    "AD Mathews": [
+      "a mathews",
+      "ad",
+      "ad mathews",
+      "mathews",
+      "mathews ad"
+    ],
+    "AD Nath": [
+      "a nath",
+      "ad",
+      "ad nath",
+      "nath",
+      "nath ad"
+    ],
+    "AD Russell": [
+      "a russell",
+      "ad",
+      "ad russell",
+      "russell",
+      "russell ad"
+    ],
+    "AF Milne": [
+      "a milne",
+      "af",
+      "af milne",
+      "milne",
+      "milne af"
+    ],
+    "AG Murtaza": [
+      "a murtaza",
+      "ag",
+      "ag murtaza",
+      "murtaza",
+      "murtaza ag"
+    ],
+    "AG Paunikar": [
+      "a paunikar",
+      "ag",
+      "ag paunikar",
+      "paunikar",
+      "paunikar ag"
+    ],
+    "AJ Finch": [
+      "a finch",
+      "aj",
+      "aj finch",
+      "finch",
+      "finch aj"
+    ],
+    "AJ Hosein": [
+      "a hosein",
+      "aj",
+      "aj hosein",
+      "hosein",
+      "hosein aj"
+    ],
+    "AJ Turner": [
+      "a turner",
+      "aj",
+      "aj turner",
+      "turner",
+      "turner aj"
+    ],
+    "AJ Tye": [
+      "a tye",
+      "aj",
+      "aj tye",
+      "tye",
+      "tye aj"
+    ],
+    "AK Markram": [
+      "a markram",
+      "ak",
+      "ak markram",
+      "markram",
+      "markram ak"
+    ],
+    "AL Menaria": [
+      "a menaria",
+      "al",
+      "al menaria",
+      "menaria",
+      "menaria al"
+    ],
+    "AM Nayar": [
+      "a nayar",
+      "am",
+      "am nayar",
+      "nayar",
+      "nayar am"
+    ],
+    "AM Rahane": [
+      "a rahane",
+      "am",
+      "am rahane",
+      "rahane",
+      "rahane am"
+    ],
+    "AM Salvi": [
+      "a salvi",
+      "am",
+      "am salvi",
+      "salvi",
+      "salvi am"
+    ],
+    "AN Ahmed": [
+      "a ahmed",
+      "ahmed",
+      "ahmed an",
+      "an",
+      "an ahmed"
+    ],
+    "AN Ghosh": [
+      "a ghosh",
+      "an",
+      "an ghosh",
+      "ghosh",
+      "ghosh an"
+    ],
+    "AP Dole": [
+      "a dole",
+      "ap",
+      "ap dole",
+      "dole",
+      "dole ap"
+    ],
+    "AP Majumdar": [
+      "a majumdar",
+      "ap",
+      "ap majumdar",
+      "majumdar",
+      "majumdar ap"
+    ],
+    "AP Tare": [
+      "a tare",
+      "ap",
+      "ap tare",
+      "tare",
+      "tare ap"
+    ],
+    "AR Bawne": [
+      "a bawne",
+      "ar",
+      "ar bawne",
+      "bawne",
+      "bawne ar"
+    ],
+    "AR Patel": [
+      "a patel",
+      "ar",
+      "ar patel",
+      "patel",
+      "patel ar"
+    ],
+    "AS Joseph": [
+      "a joseph",
+      "as",
+      "as joseph",
+      "joseph",
+      "joseph as"
+    ],
+    "AS Rajpoot": [
+      "a rajpoot",
+      "as",
+      "as rajpoot",
+      "rajpoot",
+      "rajpoot as"
+    ],
+    "AS Raut": [
+      "a raut",
+      "as",
+      "as raut",
+      "raut",
+      "raut as"
+    ],
+    "AS Roy": [
+      "a roy",
+      "as",
+      "as roy",
+      "roy",
+      "roy as"
+    ],
+    "AS Yadav": [
+      "a yadav",
+      "as",
+      "as yadav",
+      "yadav",
+      "yadav as"
+    ],
+    "AT Carey": [
+      "a carey",
+      "at",
+      "at carey",
+      "carey",
+      "carey at"
+    ],
+    "AT Rayudu": [
+      "a rayudu",
+      "at",
+      "at rayudu",
+      "rayudu",
+      "rayudu at"
+    ],
+    "AU Rashid": [
+      "a rashid",
+      "au",
+      "au rashid",
+      "rashid",
+      "rashid au"
+    ],
+    "AUK Pathan": [
+      "a pathan",
+      "auk",
+      "auk pathan",
+      "pathan",
+      "pathan auk"
+    ],
+    "Abdul Basith": [
+      "a basith",
+      "abdul",
+      "abdul basith",
+      "basith",
+      "basith abdul"
+    ],
+    "Abdul Samad": [
+      "a samad",
+      "abdul",
+      "abdul samad",
+      "samad",
+      "samad abdul"
+    ],
+    "Abdur Razzak": [
+      "a razzak",
+      "abdur",
+      "abdur razzak",
+      "razzak",
+      "razzak abdur"
+    ],
+    "Abhishek Sharma": [
+      "a sharma",
+      "abhishek",
+      "abhishek sharma",
+      "sharma",
+      "sharma abhishek"
+    ],
+    "Abishek Porel": [
+      "a porel",
+      "abishek",
+      "abishek porel",
+      "porel",
+      "porel abishek"
+    ],
+    "Akash Deep": [
+      "a deep",
+      "akash",
+      "akash deep",
+      "deep",
+      "deep akash"
+    ],
+    "Akash Madhwal": [
+      "a madhwal",
+      "akash",
+      "akash madhwal",
+      "madhwal",
+      "madhwal akash"
+    ],
+    "Akash Singh": [
+      "a singh",
+      "akash",
+      "akash singh",
+      "singh",
+      "singh akash"
+    ],
+    "Aman Hakim Khan": [
+      "a khan",
+      "aman",
+      "aman hakim khan",
+      "aman khan",
+      "hakim",
+      "khan",
+      "khan aman"
+    ],
+    "Anand Rajan": [
+      "a rajan",
+      "anand",
+      "anand rajan",
+      "rajan",
+      "rajan anand"
+    ],
+    "Aniket Verma": [
+      "a verma",
+      "aniket",
+      "aniket verma",
+      "verma",
+      "verma aniket"
+    ],
+    "Anirudh Singh": [
+      "a singh",
+      "anirudh",
+      "anirudh singh",
+      "singh",
+      "singh anirudh"
+    ],
+    "Ankit Sharma": [
+      "a sharma",
+      "ankit",
+      "ankit sharma",
+      "sharma",
+      "sharma ankit"
+    ],
+    "Ankit Soni": [
+      "a soni",
+      "ankit",
+      "ankit soni",
+      "soni",
+      "soni ankit"
+    ],
+    "Anmolpreet Singh": [
+      "a singh",
+      "anmolpreet",
+      "anmolpreet singh",
+      "singh",
+      "singh anmolpreet"
+    ],
+    "Anuj Rawat": [
+      "a rawat",
+      "anuj",
+      "anuj rawat",
+      "rawat",
+      "rawat anuj"
+    ],
+    "Anureet Singh": [
+      "a singh",
+      "anureet",
+      "anureet singh",
+      "singh",
+      "singh anureet"
+    ],
+    "Arjun Tendulkar": [
+      "a tendulkar",
+      "arjun",
+      "arjun tendulkar",
+      "tendulkar",
+      "tendulkar arjun"
+    ],
+    "Arshad Khan": [
+      "a khan",
+      "arshad",
+      "arshad khan",
+      "khan",
+      "khan arshad"
+    ],
+    "Arshad Khan (2)": [
+      "(2)",
+      "(2) arshad",
+      "a (2)",
+      "arshad",
+      "arshad (2)",
+      "arshad khan (2)",
+      "khan"
+    ],
+    "Arshdeep Singh": [
+      "a singh",
+      "arshdeep",
+      "arshdeep singh",
+      "singh",
+      "singh arshdeep"
+    ],
+    "Ashutosh Sharma": [
+      "a sharma",
+      "ashutosh",
+      "ashutosh sharma",
+      "sharma",
+      "sharma ashutosh"
+    ],
+    "Ashwani Kumar": [
+      "a kumar",
+      "ashwani",
+      "ashwani kumar",
+      "kumar",
+      "kumar ashwani"
+    ],
+    "Atharva Taide": [
+      "a taide",
+      "atharva",
+      "atharva taide",
+      "taide",
+      "taide atharva"
+    ],
+    "Avesh Khan": [
+      "a khan",
+      "avesh",
+      "avesh khan",
+      "khan",
+      "khan avesh"
+    ],
+    "Azhar Mahmood": [
+      "a mahmood",
+      "azhar",
+      "azhar mahmood",
+      "mahmood",
+      "mahmood azhar"
+    ],
+    "Azmatullah Omarzai": [
+      "a omarzai",
+      "azmatullah",
+      "azmatullah omarzai",
+      "omarzai",
+      "omarzai azmatullah"
+    ],
+    "B Akhil": [
+      "akhil",
+      "akhil b",
+      "b",
+      "b akhil"
+    ],
+    "B Chipli": [
+      "b",
+      "b chipli",
+      "chipli",
+      "chipli b"
+    ],
+    "B Geeves": [
+      "b",
+      "b geeves",
+      "geeves",
+      "geeves b"
+    ],
+    "B Indrajith": [
+      "b",
+      "b indrajith",
+      "indrajith",
+      "indrajith b"
+    ],
+    "B Kumar": [
+      "b",
+      "b kumar",
+      "kumar",
+      "kumar b"
+    ],
+    "B Laughlin": [
+      "b",
+      "b laughlin",
+      "laughlin",
+      "laughlin b"
+    ],
+    "B Lee": [
+      "b",
+      "b lee",
+      "lee",
+      "lee b"
+    ],
+    "B Sai Sudharsan": [
+      "b",
+      "b sai sudharsan",
+      "b sudharsan",
+      "sai",
+      "sudharsan",
+      "sudharsan b"
+    ],
+    "B Stanlake": [
+      "b",
+      "b stanlake",
+      "stanlake",
+      "stanlake b"
+    ],
+    "B Sumanth": [
+      "b",
+      "b sumanth",
+      "sumanth",
+      "sumanth b"
+    ],
+    "BA Bhatt": [
+      "b bhatt",
+      "ba",
+      "ba bhatt",
+      "bhatt",
+      "bhatt ba"
+    ],
+    "BA Stokes": [
+      "b stokes",
+      "ba",
+      "ba stokes",
+      "stokes",
+      "stokes ba"
+    ],
+    "BAW Mendis": [
+      "b mendis",
+      "baw",
+      "baw mendis",
+      "mendis",
+      "mendis baw"
+    ],
+    "BB McCullum": [
+      "b mccullum",
+      "bb",
+      "bb mccullum",
+      "mccullum",
+      "mccullum bb"
+    ],
+    "BB Samantray": [
+      "b samantray",
+      "bb",
+      "bb samantray",
+      "samantray",
+      "samantray bb"
+    ],
+    "BB Sran": [
+      "b sran",
+      "bb",
+      "bb sran",
+      "sran",
+      "sran bb"
+    ],
+    "BCJ Cutting": [
+      "b cutting",
+      "bcj",
+      "bcj cutting",
+      "cutting",
+      "cutting bcj"
+    ],
+    "BE Hendricks": [
+      "b hendricks",
+      "be",
+      "be hendricks",
+      "hendricks",
+      "hendricks be"
+    ],
+    "BJ Haddin": [
+      "b haddin",
+      "bj",
+      "bj haddin",
+      "haddin",
+      "haddin bj"
+    ],
+    "BJ Hodge": [
+      "b hodge",
+      "bj",
+      "bj hodge",
+      "hodge",
+      "hodge bj"
+    ],
+    "BJ Rohrer": [
+      "b rohrer",
+      "bj",
+      "bj rohrer",
+      "rohrer",
+      "rohrer bj"
+    ],
+    "BKG Mendis": [
+      "b mendis",
+      "bkg",
+      "bkg mendis",
+      "mendis",
+      "mendis bkg"
+    ],
+    "BMAJ Mendis": [
+      "b mendis",
+      "bmaj",
+      "bmaj mendis",
+      "mendis",
+      "mendis bmaj"
+    ],
+    "BR Dunk": [
+      "b dunk",
+      "br",
+      "br dunk",
+      "dunk",
+      "dunk br"
+    ],
+    "BR Sharath": [
+      "b sharath",
+      "br",
+      "br sharath",
+      "sharath",
+      "sharath br"
+    ],
+    "BW Hilfenhaus": [
+      "b hilfenhaus",
+      "bw",
+      "bw hilfenhaus",
+      "hilfenhaus",
+      "hilfenhaus bw"
+    ],
+    "Basil Thampi": [
+      "b thampi",
+      "basil",
+      "basil thampi",
+      "thampi",
+      "thampi basil"
+    ],
+    "Bipul Sharma": [
+      "b sharma",
+      "bipul",
+      "bipul sharma",
+      "sharma",
+      "sharma bipul"
+    ],
+    "C Bosch": [
+      "bosch",
+      "bosch c",
+      "c",
+      "c bosch"
+    ],
+    "C Ganapathy": [
+      "c",
+      "c ganapathy",
+      "ganapathy",
+      "ganapathy c"
+    ],
+    "C Green": [
+      "c",
+      "c green",
+      "green",
+      "green c"
+    ],
+    "C Madan": [
+      "c",
+      "c madan",
+      "madan",
+      "madan c"
+    ],
+    "C Munro": [
+      "c",
+      "c munro",
+      "munro",
+      "munro c"
+    ],
+    "C Nanda": [
+      "c",
+      "c nanda",
+      "nanda",
+      "nanda c"
+    ],
+    "C Sakariya": [
+      "c",
+      "c sakariya",
+      "sakariya",
+      "sakariya c"
+    ],
+    "C de Grandhomme": [
+      "c",
+      "c de grandhomme",
+      "c grandhomme",
+      "de",
+      "grandhomme",
+      "grandhomme c"
+    ],
+    "CA Ingram": [
+      "c ingram",
+      "ca",
+      "ca ingram",
+      "ingram",
+      "ingram ca"
+    ],
+    "CA Lynn": [
+      "c lynn",
+      "ca",
+      "ca lynn",
+      "lynn",
+      "lynn ca"
+    ],
+    "CA Pujara": [
+      "c pujara",
+      "ca",
+      "ca pujara",
+      "pujara",
+      "pujara ca"
+    ],
+    "CH Gayle": [
+      "c gayle",
+      "ch",
+      "ch gayle",
+      "chris gayle",
+      "gayle",
+      "gayle ch",
+      "universe boss"
+    ],
+    "CH Morris": [
+      "c morris",
+      "ch",
+      "ch morris",
+      "morris",
+      "morris ch"
+    ],
+    "CJ Anderson": [
+      "anderson",
+      "anderson cj",
+      "c anderson",
+      "cj",
+      "cj anderson"
+    ],
+    "CJ Dala": [
+      "c dala",
+      "cj",
+      "cj dala",
+      "dala",
+      "dala cj"
+    ],
+    "CJ Ferguson": [
+      "c ferguson",
+      "cj",
+      "cj ferguson",
+      "ferguson",
+      "ferguson cj"
+    ],
+    "CJ Green": [
+      "c green",
+      "cj",
+      "cj green",
+      "green",
+      "green cj"
+    ],
+    "CJ Jordan": [
+      "c jordan",
+      "cj",
+      "cj jordan",
+      "jordan",
+      "jordan cj"
+    ],
+    "CJ McKay": [
+      "c mckay",
+      "cj",
+      "cj mckay",
+      "mckay",
+      "mckay cj"
+    ],
+    "CK Kapugedera": [
+      "c kapugedera",
+      "ck",
+      "ck kapugedera",
+      "kapugedera",
+      "kapugedera ck"
+    ],
+    "CK Langeveldt": [
+      "c langeveldt",
+      "ck",
+      "ck langeveldt",
+      "langeveldt",
+      "langeveldt ck"
+    ],
+    "CL White": [
+      "c white",
+      "cl",
+      "cl white",
+      "white",
+      "white cl"
+    ],
+    "CM Gautam": [
+      "c gautam",
+      "cm",
+      "cm gautam",
+      "gautam",
+      "gautam cm"
+    ],
+    "CR Brathwaite": [
+      "brathwaite",
+      "brathwaite cr",
+      "c brathwaite",
+      "cr",
+      "cr brathwaite"
+    ],
+    "CR Woakes": [
+      "c woakes",
+      "cr",
+      "cr woakes",
+      "woakes",
+      "woakes cr"
+    ],
+    "CRD Fernando": [
+      "c fernando",
+      "crd",
+      "crd fernando",
+      "fernando",
+      "fernando crd"
+    ],
+    "CV Varun": [
+      "c varun",
+      "cv",
+      "cv varun",
+      "varun",
+      "varun cv"
+    ],
+    "D Brevis": [
+      "brevis",
+      "brevis d",
+      "d",
+      "d brevis"
+    ],
+    "D Ferreira": [
+      "d",
+      "d ferreira",
+      "ferreira",
+      "ferreira d"
+    ],
+    "D Jansen": [
+      "d",
+      "d jansen",
+      "jansen",
+      "jansen d"
+    ],
+    "D Kalyankrishna": [
+      "d",
+      "d kalyankrishna",
+      "kalyankrishna",
+      "kalyankrishna d"
+    ],
+    "D Padikkal": [
+      "d",
+      "d padikkal",
+      "padikkal",
+      "padikkal d"
+    ],
+    "D Pretorius": [
+      "d",
+      "d pretorius",
+      "pretorius",
+      "pretorius d"
+    ],
+    "D Salunkhe": [
+      "d",
+      "d salunkhe",
+      "salunkhe",
+      "salunkhe d"
+    ],
+    "D Wiese": [
+      "d",
+      "d wiese",
+      "wiese",
+      "wiese d"
+    ],
+    "D du Preez": [
+      "d",
+      "d du preez",
+      "d preez",
+      "du",
+      "preez",
+      "preez d"
+    ],
+    "DA Miller": [
+      "d miller",
+      "da",
+      "da miller",
+      "miller",
+      "miller da"
+    ],
+    "DA Warner": [
+      "david warner",
+      "warner",
+      "warner david",
+      "warner da",
+      "warner d",
+      "da warner",
+      "d warner",
+      "warner d",
+      "big show",
+      "davey",
+      "dave warner",
+      "warner davey"
+    ],
+    "DAJ Bracewell": [
+      "bracewell",
+      "bracewell daj",
+      "d bracewell",
+      "daj",
+      "daj bracewell"
+    ],
+    "DB Das": [
+      "d das",
+      "das",
+      "das db",
+      "db",
+      "db das"
+    ],
+    "DB Ravi Teja": [
+      "d teja",
+      "db",
+      "db ravi teja",
+      "db teja",
+      "ravi",
+      "teja",
+      "teja db"
+    ],
+    "DE Bollinger": [
+      "bollinger",
+      "bollinger de",
+      "d bollinger",
+      "de",
+      "de bollinger"
+    ],
+    "DG Nalkande": [
+      "d nalkande",
+      "dg",
+      "dg nalkande",
+      "nalkande",
+      "nalkande dg"
+    ],
+    "DH Yagnik": [
+      "d yagnik",
+      "dh",
+      "dh yagnik",
+      "yagnik",
+      "yagnik dh"
+    ],
+    "DJ Bravo": [
+      "bravo",
+      "bravo dj",
+      "d bravo",
+      "dj",
+      "dj bravo"
+    ],
+    "DJ Harris": [
+      "d harris",
+      "dj",
+      "dj harris",
+      "harris",
+      "harris dj"
+    ],
+    "DJ Hooda": [
+      "d hooda",
+      "dj",
+      "dj hooda",
+      "hooda",
+      "hooda dj"
+    ],
+    "DJ Hussey": [
+      "d hussey",
+      "dj",
+      "dj hussey",
+      "hussey",
+      "hussey dj"
+    ],
+    "DJ Jacobs": [
+      "d jacobs",
+      "dj",
+      "dj jacobs",
+      "jacobs",
+      "jacobs dj"
+    ],
+    "DJ Malan": [
+      "d malan",
+      "dj",
+      "dj malan",
+      "malan",
+      "malan dj"
+    ],
+    "DJ Mitchell": [
+      "d mitchell",
+      "dj",
+      "dj mitchell",
+      "mitchell",
+      "mitchell dj"
+    ],
+    "DJ Muthuswami": [
+      "d muthuswami",
+      "dj",
+      "dj muthuswami",
+      "muthuswami",
+      "muthuswami dj"
+    ],
+    "DJ Thornely": [
+      "d thornely",
+      "dj",
+      "dj thornely",
+      "thornely",
+      "thornely dj"
+    ],
+    "DJ Willey": [
+      "d willey",
+      "dj",
+      "dj willey",
+      "willey",
+      "willey dj"
+    ],
+    "DJG Sammy": [
+      "d sammy",
+      "djg",
+      "djg sammy",
+      "sammy",
+      "sammy djg"
+    ],
+    "DJM Short": [
+      "d short",
+      "djm",
+      "djm short",
+      "short",
+      "short djm"
+    ],
+    "DL Chahar": [
+      "chahar",
+      "chahar dl",
+      "d chahar",
+      "dl",
+      "dl chahar"
+    ],
+    "DL Vettori": [
+      "d vettori",
+      "dl",
+      "dl vettori",
+      "vettori",
+      "vettori dl"
+    ],
+    "DM Bravo": [
+      "bravo",
+      "bravo dm",
+      "d bravo",
+      "dm",
+      "dm bravo"
+    ],
+    "DNT Zoysa": [
+      "d zoysa",
+      "dnt",
+      "dnt zoysa",
+      "zoysa",
+      "zoysa dnt"
+    ],
+    "DP Conway": [
+      "conway",
+      "conway dp",
+      "d conway",
+      "dp",
+      "dp conway"
+    ],
+    "DP Nannes": [
+      "d nannes",
+      "dp",
+      "dp nannes",
+      "nannes",
+      "nannes dp"
+    ],
+    "DP Vijaykumar": [
+      "d vijaykumar",
+      "dp",
+      "dp vijaykumar",
+      "vijaykumar",
+      "vijaykumar dp"
+    ],
+    "DPMD Jayawardene": [
+      "d jayawardene",
+      "dpmd",
+      "dpmd jayawardene",
+      "jayawardene",
+      "jayawardene dpmd"
+    ],
+    "DR Martyn": [
+      "d martyn",
+      "dr",
+      "dr martyn",
+      "martyn",
+      "martyn dr"
+    ],
+    "DR Sams": [
+      "d sams",
+      "dr",
+      "dr sams",
+      "sams",
+      "sams dr"
+    ],
+    "DR Shorey": [
+      "d shorey",
+      "dr",
+      "dr shorey",
+      "shorey",
+      "shorey dr"
+    ],
+    "DR Smith": [
+      "d smith",
+      "dr",
+      "dr smith",
+      "smith",
+      "smith dr"
+    ],
+    "DS Kulkarni": [
+      "d kulkarni",
+      "ds",
+      "ds kulkarni",
+      "kulkarni",
+      "kulkarni ds"
+    ],
+    "DS Lehmann": [
+      "d lehmann",
+      "ds",
+      "ds lehmann",
+      "lehmann",
+      "lehmann ds"
+    ],
+    "DS Rathi": [
+      "d rathi",
+      "ds",
+      "ds rathi",
+      "rathi",
+      "rathi ds"
+    ],
+    "DT Christian": [
+      "christian",
+      "christian dt",
+      "d christian",
+      "dt",
+      "dt christian"
+    ],
+    "DT Patil": [
+      "d patil",
+      "dt",
+      "dt patil",
+      "patil",
+      "patil dt"
+    ],
+    "DW Steyn": [
+      "d steyn",
+      "dw",
+      "dw steyn",
+      "steyn",
+      "steyn dw"
+    ],
+    "Dhruv Jurel": [
+      "d jurel",
+      "dhruv",
+      "dhruv jurel",
+      "jurel",
+      "jurel dhruv"
+    ],
+    "E Lewis": [
+      "e",
+      "e lewis",
+      "lewis",
+      "lewis e"
+    ],
+    "E Malinga": [
+      "e",
+      "e malinga",
+      "malinga",
+      "malinga e"
+    ],
+    "EJG Morgan": [
+      "e morgan",
+      "ejg",
+      "ejg morgan",
+      "morgan",
+      "morgan ejg"
+    ],
+    "ER Dwivedi": [
+      "dwivedi",
+      "dwivedi er",
+      "e dwivedi",
+      "er",
+      "er dwivedi"
+    ],
+    "F Behardien": [
+      "behardien",
+      "behardien f",
+      "f",
+      "f behardien"
+    ],
+    "F du Plessis": [
+      "du",
+      "du plessis",
+      "f",
+      "f du plessis",
+      "f plessis",
+      "faf",
+      "plessis",
+      "plessis f"
+    ],
+    "FA Allen": [
+      "allen",
+      "allen fa",
+      "f allen",
+      "fa",
+      "fa allen"
+    ],
+    "FH Edwards": [
+      "edwards",
+      "edwards fh",
+      "f edwards",
+      "fh",
+      "fh edwards"
+    ],
+    "FY Fazal": [
+      "f fazal",
+      "fazal",
+      "fazal fy",
+      "fy",
+      "fy fazal"
+    ],
+    "Fazalhaq Farooqi": [
+      "f farooqi",
+      "farooqi",
+      "farooqi fazalhaq",
+      "fazalhaq",
+      "fazalhaq farooqi"
+    ],
+    "G Coetzee": [
+      "coetzee",
+      "coetzee g",
+      "g",
+      "g coetzee"
+    ],
+    "G Gambhir": [
+      "g",
+      "g gambhir",
+      "gambhir",
+      "gambhir g"
+    ],
+    "GB Hogg": [
+      "g hogg",
+      "gb",
+      "gb hogg",
+      "hogg",
+      "hogg gb"
+    ],
+    "GC Smith": [
+      "g smith",
+      "gc",
+      "gc smith",
+      "smith",
+      "smith gc"
+    ],
+    "GC Viljoen": [
+      "g viljoen",
+      "gc",
+      "gc viljoen",
+      "viljoen",
+      "viljoen gc"
+    ],
+    "GD McGrath": [
+      "g mcgrath",
+      "gd",
+      "gd mcgrath",
+      "mcgrath",
+      "mcgrath gd"
+    ],
+    "GD Phillips": [
+      "g phillips",
+      "gd",
+      "gd phillips",
+      "phillips",
+      "phillips gd"
+    ],
+    "GH Vihari": [
+      "g vihari",
+      "gh",
+      "gh vihari",
+      "vihari",
+      "vihari gh"
+    ],
+    "GHS Garton": [
+      "g garton",
+      "garton",
+      "garton ghs",
+      "ghs",
+      "ghs garton"
+    ],
+    "GJ Bailey": [
+      "bailey",
+      "bailey gj",
+      "g bailey",
+      "gj",
+      "gj bailey"
+    ],
+    "GJ Maxwell": [
+      "g maxwell",
+      "gj",
+      "gj maxwell",
+      "maxwell",
+      "maxwell gj"
+    ],
+    "GR Napier": [
+      "g napier",
+      "gr",
+      "gr napier",
+      "napier",
+      "napier gr"
+    ],
+    "GS Sandhu": [
+      "g sandhu",
+      "gs",
+      "gs sandhu",
+      "sandhu",
+      "sandhu gs"
+    ],
+    "Gagandeep Singh": [
+      "g singh",
+      "gagandeep",
+      "gagandeep singh",
+      "singh",
+      "singh gagandeep"
+    ],
+    "Gulbadin Naib": [
+      "g naib",
+      "gulbadin",
+      "gulbadin naib",
+      "naib",
+      "naib gulbadin"
+    ],
+    "Gurkeerat Singh": [
+      "g singh",
+      "gurkeerat",
+      "gurkeerat singh",
+      "singh",
+      "singh gurkeerat"
+    ],
+    "Gurnoor Brar": [
+      "brar",
+      "brar gurnoor",
+      "g brar",
+      "gurnoor",
+      "gurnoor brar"
+    ],
+    "H Das": [
+      "das",
+      "das h",
+      "h",
+      "h das"
+    ],
+    "H Klaasen": [
+      "h",
+      "h klaasen",
+      "klaasen",
+      "klaasen h"
+    ],
+    "H Sharma": [
+      "h",
+      "h sharma",
+      "sharma",
+      "sharma h"
+    ],
+    "HC Brook": [
+      "brook",
+      "brook hc",
+      "h brook",
+      "hc",
+      "hc brook"
+    ],
+    "HE van der Dussen": [
+      "der",
+      "dussen",
+      "dussen he",
+      "h dussen",
+      "he",
+      "he dussen",
+      "he van der dussen",
+      "van"
+    ],
+    "HF Gurney": [
+      "gurney",
+      "gurney hf",
+      "h gurney",
+      "hf",
+      "hf gurney"
+    ],
+    "HH Gibbs": [
+      "gibbs",
+      "gibbs hh",
+      "h gibbs",
+      "hh",
+      "hh gibbs"
+    ],
+    "HH Pandya": [
+      "h pandya",
+      "har dik",
+      "hardhik",
+      "hardick",
+      "hardicks",
+      "hardik",
+      "hardik p",
+      "hardik pandhya",
+      "hardik pandi",
+      "hardik pandia",
+      "hardik pandy",
+      "hardik pandya",
+      "hardik pandyaa",
+      "hardik sharmaa",
+      "hardikk",
+      "hardikpandya",
+      "hardiq",
+      "hardiq pandya",
+      "hh pandi",
+      "hh pandya",
+      "pandya hardik",
+      "pandya hardiq"
+    ],
+    "HM Amla": [
+      "amla",
+      "amla hm",
+      "h amla",
+      "hm",
+      "hm amla"
+    ],
+    "HR Shokeen": [
+      "h shokeen",
+      "hr",
+      "hr shokeen",
+      "shokeen",
+      "shokeen hr"
+    ],
+    "HV Patel": [
+      "h patel",
+      "hv",
+      "hv patel",
+      "patel",
+      "patel hv"
+    ],
+    "Harbhajan Singh": [
+      "bhajji",
+      "h singh",
+      "harbhajan",
+      "harbhajan singh",
+      "singh",
+      "singh harbhajan"
+    ],
+    "Harmeet Singh": [
+      "h singh",
+      "harmeet",
+      "harmeet singh",
+      "singh",
+      "singh harmeet"
+    ],
+    "Harpreet Brar": [
+      "brar",
+      "brar harpreet",
+      "h brar",
+      "harpreet",
+      "harpreet brar"
+    ],
+    "Harpreet Singh": [
+      "h singh",
+      "harpreet",
+      "harpreet singh",
+      "singh",
+      "singh harpreet"
+    ],
+    "Harsh Dubey": [
+      "dubey",
+      "dubey harsh",
+      "h dubey",
+      "harsh",
+      "harsh dubey"
+    ],
+    "Harshit Rana": [
+      "h rana",
+      "harshit",
+      "harshit rana",
+      "rana",
+      "rana harshit"
+    ],
+    "I Malhotra": [
+      "i",
+      "i malhotra",
+      "malhotra",
+      "malhotra i"
+    ],
+    "I Sharma": [
+      "i",
+      "i sharma",
+      "sharma",
+      "sharma i"
+    ],
+    "I Udana": [
+      "i",
+      "i udana",
+      "udana",
+      "udana i"
+    ],
+    "IC Pandey": [
+      "i pandey",
+      "ic",
+      "ic pandey",
+      "pandey",
+      "pandey ic"
+    ],
+    "IC Porel": [
+      "i porel",
+      "ic",
+      "ic porel",
+      "porel",
+      "porel ic"
+    ],
+    "IK Pathan": [
+      "i pathan",
+      "ik",
+      "ik pathan",
+      "pathan",
+      "pathan ik"
+    ],
+    "IR Jaggi": [
+      "i jaggi",
+      "ir",
+      "ir jaggi",
+      "jaggi",
+      "jaggi ir"
+    ],
+    "IS Sodhi": [
+      "i sodhi",
+      "is",
+      "is sodhi",
+      "sodhi",
+      "sodhi is"
+    ],
+    "Imran Tahir": [
+      "i tahir",
+      "imran",
+      "imran tahir",
+      "tahir",
+      "tahir imran"
+    ],
+    "Iqbal Abdulla": [
+      "abdulla",
+      "abdulla iqbal",
+      "i abdulla",
+      "iqbal",
+      "iqbal abdulla"
+    ],
+    "Ishan Kishan": [
+      "i kishan",
+      "ishan",
+      "ishan kishan",
+      "kishan",
+      "kishan ishan"
+    ],
+    "J Arunkumar": [
+      "arunkumar",
+      "arunkumar j",
+      "j",
+      "j arunkumar"
+    ],
+    "J Botha": [
+      "botha",
+      "botha j",
+      "j",
+      "j botha"
+    ],
+    "J Fraser-McGurk": [
+      "fraser-mcgurk",
+      "fraser-mcgurk j",
+      "j",
+      "j fraser-mcgurk"
+    ],
+    "J Little": [
+      "j",
+      "j little",
+      "little",
+      "little j"
+    ],
+    "J Overton": [
+      "j",
+      "j overton",
+      "overton",
+      "overton j"
+    ],
+    "J Suchith": [
+      "j",
+      "j suchith",
+      "suchith",
+      "suchith j"
+    ],
+    "J Syed Mohammad": [
+      "j",
+      "j mohammad",
+      "j syed mohammad",
+      "mohammad",
+      "mohammad j",
+      "syed"
+    ],
+    "J Theron": [
+      "j",
+      "j theron",
+      "theron",
+      "theron j"
+    ],
+    "J Yadav": [
+      "j",
+      "j yadav",
+      "yadav",
+      "yadav j"
+    ],
+    "JA Morkel": [
+      "j morkel",
+      "ja",
+      "ja morkel",
+      "morkel",
+      "morkel ja"
+    ],
+    "JA Richardson": [
+      "j richardson",
+      "ja",
+      "ja richardson",
+      "richardson",
+      "richardson ja"
+    ],
+    "JC Archer": [
+      "archer",
+      "archer jc",
+      "j archer",
+      "jc",
+      "jc archer"
+    ],
+    "JC Buttler": [
+      "buttler",
+      "buttler jc",
+      "j buttler",
+      "jc",
+      "jc buttler"
+    ],
+    "JD Ryder": [
+      "j ryder",
+      "jd",
+      "jd ryder",
+      "ryder",
+      "ryder jd"
+    ],
+    "JD Unadkat": [
+      "j unadkat",
+      "jd",
+      "jd unadkat",
+      "unadkat",
+      "unadkat jd"
+    ],
+    "JDP Oram": [
+      "j oram",
+      "jdp",
+      "jdp oram",
+      "oram",
+      "oram jdp"
+    ],
+    "JDS Neesham": [
+      "j neesham",
+      "jds",
+      "jds neesham",
+      "neesham",
+      "neesham jds"
+    ],
+    "JE Root": [
+      "j root",
+      "je",
+      "je root",
+      "root",
+      "root je"
+    ],
+    "JE Taylor": [
+      "j taylor",
+      "je",
+      "je taylor",
+      "taylor",
+      "taylor je"
+    ],
+    "JEC Franklin": [
+      "franklin",
+      "franklin jec",
+      "j franklin",
+      "jec",
+      "jec franklin"
+    ],
+    "JG Bethell": [
+      "bethell",
+      "bethell jg",
+      "j bethell",
+      "jg",
+      "jg bethell"
+    ],
+    "JH Kallis": [
+      "j kallis",
+      "jh",
+      "jh kallis",
+      "kallis",
+      "kallis jh"
     ],
     "JJ Bumrah": [
       "bhumrah",
@@ -101,79 +1959,298 @@
       "jj bumra",
       "jj bumrah"
     ],
-    "SA Yadav": [
-      "s yadav",
-      "sa yada",
-      "sa yadav",
-      "sky",
-      "sky surya",
-      "sky yada",
-      "sky yadav",
-      "skyh",
-      "skyyadav",
-      "surya",
-      "surya kl",
-      "surya kumaar",
-      "surya kumar",
-      "surya kumar yadav",
-      "surya yadav",
-      "surya yadavv",
-      "suryakumaar",
-      "suryakumar",
-      "suryakumar sa",
-      "suryakumar yada",
-      "suryakumar yadav",
-      "suryakumer",
+    "JJ Roy": [
+      "j roy",
+      "jj",
+      "jj roy",
+      "roy",
+      "roy jj"
+    ],
+    "JJ van der Wath": [
+      "der",
+      "j wath",
+      "jj",
+      "jj van der wath",
+      "jj wath",
+      "van",
+      "wath",
+      "wath jj"
+    ],
+    "JL Denly": [
+      "denly",
+      "denly jl",
+      "j denly",
+      "jl",
+      "jl denly"
+    ],
+    "JL Pattinson": [
+      "j pattinson",
+      "jl",
+      "jl pattinson",
+      "pattinson",
+      "pattinson jl"
+    ],
+    "JM Bairstow": [
+      "bairstow",
+      "bairstow jm",
+      "j bairstow",
+      "jm",
+      "jm bairstow"
+    ],
+    "JM Kemp": [
+      "j kemp",
+      "jm",
+      "jm kemp",
+      "kemp",
+      "kemp jm"
+    ],
+    "JM Sharma": [
+      "j sharma",
+      "jm",
+      "jm sharma",
+      "sharma",
+      "sharma jm"
+    ],
+    "JO Holder": [
+      "holder",
+      "holder jo",
+      "j holder",
+      "jo",
+      "jo holder"
+    ],
+    "JP Behrendorff": [
+      "behrendorff",
+      "behrendorff jp",
+      "j behrendorff",
+      "jp",
+      "jp behrendorff"
+    ],
+    "JP Duminy": [
+      "duminy",
+      "duminy jp",
+      "j duminy",
+      "jp",
+      "jp duminy"
+    ],
+    "JP Faulkner": [
+      "faulkner",
+      "faulkner jp",
+      "j faulkner",
+      "jp",
+      "jp faulkner"
+    ],
+    "JP Inglis": [
+      "inglis",
+      "inglis jp",
+      "j inglis",
+      "jp",
+      "jp inglis"
+    ],
+    "JPR Scantlebury-Searles": [
+      "j scantlebury-searles",
+      "jpr",
+      "jpr scantlebury-searles",
+      "scantlebury-searles",
+      "scantlebury-searles jpr"
+    ],
+    "JR Hazlewood": [
+      "hazlewood",
+      "hazlewood jr",
+      "j hazlewood",
+      "jr",
+      "jr hazlewood"
+    ],
+    "JR Hopes": [
+      "hopes",
+      "hopes jr",
+      "j hopes",
+      "jr",
+      "jr hopes"
+    ],
+    "JR Philippe": [
+      "j philippe",
+      "jr",
+      "jr philippe",
+      "philippe",
+      "philippe jr"
+    ],
+    "JW Hastings": [
+      "hastings",
+      "hastings jw",
+      "j hastings",
+      "jw",
+      "jw hastings"
+    ],
+    "Jalaj S Saxena": [
+      "j saxena",
+      "jalaj",
+      "jalaj s saxena",
+      "jalaj saxena",
+      "s",
+      "saxena",
+      "saxena jalaj"
+    ],
+    "Jaskaran Singh": [
+      "j singh",
+      "jaskaran",
+      "jaskaran singh",
+      "singh",
+      "singh jaskaran"
+    ],
+    "Joginder Sharma": [
+      "j sharma",
+      "joginder",
+      "joginder sharma",
+      "sharma",
+      "sharma joginder"
+    ],
+    "K Goel": [
+      "goel",
+      "goel k",
+      "k",
+      "k goel"
+    ],
+    "K Gowtham": [
+      "gowtham",
+      "gowtham k",
+      "k",
+      "k gowtham"
+    ],
+    "K Kartikeya": [
+      "k",
+      "k kartikeya",
+      "kartikeya",
+      "kartikeya k"
+    ],
+    "K Khejroliya": [
+      "k",
+      "k khejroliya",
+      "khejroliya",
+      "khejroliya k"
+    ],
+    "K Rabada": [
+      "k",
+      "k rabada",
+      "rabada",
+      "rabada k"
+    ],
+    "K Santokie": [
+      "k",
+      "k santokie",
+      "santokie",
+      "santokie k"
+    ],
+    "K Upadhyay": [
+      "k",
+      "k upadhyay",
+      "upadhyay",
+      "upadhyay k"
+    ],
+    "K Yadav": [
+      "k",
+      "k yadav",
       "yadav",
-      "yadav surya"
+      "yadav k"
     ],
-    "HH Pandya": [
-      "h pandya",
-      "har dik",
-      "hardhik",
-      "hardick",
-      "hardicks",
-      "hardik",
-      "hardik p",
-      "hardik pandhya",
-      "hardik pandi",
-      "hardik pandia",
-      "hardik pandy",
-      "hardik pandya",
-      "hardik pandyaa",
-      "hardik sharmaa",
-      "hardikk",
-      "hardikpandya",
-      "hardiq",
-      "hardiq pandya",
-      "hh pandi",
-      "hh pandya",
-      "pandya hardik",
-      "pandya hardiq"
+    "KA Jamieson": [
+      "jamieson",
+      "jamieson ka",
+      "k jamieson",
+      "ka",
+      "ka jamieson"
     ],
-    "RR Pant": [
-      "pant",
-      "pant rishabh",
-      "r pant",
-      "rishaab pant",
-      "rishab",
-      "rishab p",
-      "rishab pant",
-      "rishabh",
-      "rishabh p",
-      "rishabh pandt",
-      "rishabh pant",
-      "rishabh panth",
-      "rishabh pantha",
-      "rishabh pants",
-      "rishabh pent",
-      "rishabh pont",
-      "rishabh rant",
-      "rishabpant",
-      "rishbah pant",
-      "rishbh pant",
-      "rr pant",
-      "rr panta"
+    "KA Maharaj": [
+      "k maharaj",
+      "ka",
+      "ka maharaj",
+      "maharaj",
+      "maharaj ka"
+    ],
+    "KA Pollard": [
+      "k pollard",
+      "ka",
+      "ka pollard",
+      "pollard",
+      "pollard ka"
+    ],
+    "KAJ Roach": [
+      "k roach",
+      "kaj",
+      "kaj roach",
+      "roach",
+      "roach kaj"
+    ],
+    "KB Arun Karthik": [
+      "arun",
+      "k karthik",
+      "karthik",
+      "karthik kb",
+      "kb",
+      "kb arun karthik",
+      "kb karthik"
+    ],
+    "KC Cariappa": [
+      "cariappa",
+      "cariappa kc",
+      "k cariappa",
+      "kc",
+      "kc cariappa"
+    ],
+    "KC Sangakkara": [
+      "k sangakkara",
+      "kc",
+      "kc sangakkara",
+      "sangakkara",
+      "sangakkara kc"
+    ],
+    "KD Karthik": [
+      "k karthik",
+      "karthik",
+      "karthik kd",
+      "kd",
+      "kd karthik"
+    ],
+    "KH Pandya": [
+      "k pandya",
+      "kh",
+      "kh pandya",
+      "pandya",
+      "pandya kh"
+    ],
+    "KJ Abbott": [
+      "abbott",
+      "abbott kj",
+      "k abbott",
+      "kj",
+      "kj abbott"
+    ],
+    "KK Ahmed": [
+      "ahmed",
+      "ahmed kk",
+      "k ahmed",
+      "kk",
+      "kk ahmed"
+    ],
+    "KK Cooper": [
+      "cooper",
+      "cooper kk",
+      "k cooper",
+      "kk",
+      "kk cooper"
+    ],
+    "KK Nair": [
+      "k nair",
+      "kk",
+      "kk nair",
+      "nair",
+      "nair kk"
+    ],
+    "KL Nagarkoti": [
+      "k nagarkoti",
+      "kl",
+      "kl nagarkoti",
+      "nagarkoti",
+      "nagarkoti kl"
     ],
     "KL Rahul": [
       "k l rahul",
@@ -196,31 +2273,1463 @@
       "rahul kannur",
       "rahul kl"
     ],
-    "Y Chahal": [
-      "chahal",
-      "chahal yuzi",
-      "chahal yuzvendra",
-      "chahal yuzvi",
-      "chahal yz",
-      "y chahal",
-      "ychhal",
-      "yu chahal",
-      "yusvendra",
-      "yuzi",
-      "yuzvendar",
-      "yuzvendar chahal",
-      "yuzvendra",
-      "yuzvendra ch",
-      "yuzvendra cha",
-      "yuzvendra chaal",
-      "yuzvendra chahal",
-      "yuzvendra chahl",
-      "yuzvendra chalal",
-      "yuzvendra chhal",
-      "yuzvendre",
-      "yuzvi",
-      "yuzvi ch",
-      "yuzvi chahal"
+    "KM Asif": [
+      "asif",
+      "asif km",
+      "k asif",
+      "km",
+      "km asif"
+    ],
+    "KM Jadhav": [
+      "jadhav",
+      "jadhav km",
+      "k jadhav",
+      "km",
+      "km jadhav"
+    ],
+    "KMA Paul": [
+      "k paul",
+      "kma",
+      "kma paul",
+      "paul",
+      "paul kma"
+    ],
+    "KMDN Kulasekara": [
+      "k kulasekara",
+      "kmdn",
+      "kmdn kulasekara",
+      "kulasekara",
+      "kulasekara kmdn"
+    ],
+    "KP Appanna": [
+      "appanna",
+      "appanna kp",
+      "k appanna",
+      "kp",
+      "kp appanna"
+    ],
+    "KP Pietersen": [
+      "k pietersen",
+      "kp",
+      "kp pietersen",
+      "pietersen",
+      "pietersen kp"
+    ],
+    "KR Mayers": [
+      "k mayers",
+      "kr",
+      "kr mayers",
+      "mayers",
+      "mayers kr"
+    ],
+    "KR Sen": [
+      "k sen",
+      "kr",
+      "kr sen",
+      "sen",
+      "sen kr"
+    ],
+    "KS Bharat": [
+      "bharat",
+      "bharat ks",
+      "k bharat",
+      "ks",
+      "ks bharat"
+    ],
+    "KS Rathore": [
+      "k rathore",
+      "ks",
+      "ks rathore",
+      "rathore",
+      "rathore ks"
+    ],
+    "KS Sharma": [
+      "k sharma",
+      "ks",
+      "ks sharma",
+      "sharma",
+      "sharma ks"
+    ],
+    "KS Williamson": [
+      "k williamson",
+      "ks",
+      "ks williamson",
+      "williamson",
+      "williamson ks"
+    ],
+    "KT Maphaka": [
+      "k maphaka",
+      "kt",
+      "kt maphaka",
+      "maphaka",
+      "maphaka kt"
+    ],
+    "KV Sharma": [
+      "k sharma",
+      "kv",
+      "kv sharma",
+      "sharma",
+      "sharma kv"
+    ],
+    "KW Richardson": [
+      "k richardson",
+      "kw",
+      "kw richardson",
+      "richardson",
+      "richardson kw"
+    ],
+    "Kamran Akmal": [
+      "akmal",
+      "akmal kamran",
+      "k akmal",
+      "kamran",
+      "kamran akmal"
+    ],
+    "Kamran Khan": [
+      "k khan",
+      "kamran",
+      "kamran khan",
+      "khan",
+      "khan kamran"
+    ],
+    "Karanveer Singh": [
+      "k singh",
+      "karanveer",
+      "karanveer singh",
+      "singh",
+      "singh karanveer"
+    ],
+    "Karim Janat": [
+      "janat",
+      "janat karim",
+      "k janat",
+      "karim",
+      "karim janat"
+    ],
+    "Kartik Tyagi": [
+      "k tyagi",
+      "kartik",
+      "kartik tyagi",
+      "tyagi",
+      "tyagi kartik"
+    ],
+    "Kuldeep Yadav": [
+      "k yadav",
+      "kuldeep",
+      "kuldeep yadav",
+      "yadav",
+      "yadav kuldeep"
+    ],
+    "Kumar Kushagra": [
+      "k kushagra",
+      "kumar",
+      "kumar kushagra",
+      "kushagra",
+      "kushagra kumar"
+    ],
+    "L Ablish": [
+      "ablish",
+      "ablish l",
+      "l",
+      "l ablish"
+    ],
+    "L Balaji": [
+      "balaji",
+      "balaji l",
+      "l",
+      "l balaji"
+    ],
+    "L Ngidi": [
+      "l",
+      "l ngidi",
+      "ngidi",
+      "ngidi l"
+    ],
+    "L Ronchi": [
+      "l",
+      "l ronchi",
+      "ronchi",
+      "ronchi l"
+    ],
+    "L Wood": [
+      "l",
+      "l wood",
+      "wood",
+      "wood l"
+    ],
+    "LA Carseldine": [
+      "carseldine",
+      "carseldine la",
+      "l carseldine",
+      "la",
+      "la carseldine"
+    ],
+    "LA Pomersbach": [
+      "l pomersbach",
+      "la",
+      "la pomersbach",
+      "pomersbach",
+      "pomersbach la"
+    ],
+    "LB Williams": [
+      "l williams",
+      "lb",
+      "lb williams",
+      "williams",
+      "williams lb"
+    ],
+    "LE Plunkett": [
+      "l plunkett",
+      "le",
+      "le plunkett",
+      "plunkett",
+      "plunkett le"
+    ],
+    "LH Ferguson": [
+      "ferguson",
+      "ferguson lh",
+      "l ferguson",
+      "lh",
+      "lh ferguson"
+    ],
+    "LI Meriwala": [
+      "l meriwala",
+      "li",
+      "li meriwala",
+      "meriwala",
+      "meriwala li"
+    ],
+    "LJ Wright": [
+      "l wright",
+      "lj",
+      "lj wright",
+      "wright",
+      "wright lj"
+    ],
+    "LMP Simmons": [
+      "l simmons",
+      "lmp",
+      "lmp simmons",
+      "simmons",
+      "simmons lmp"
+    ],
+    "LPC Silva": [
+      "l silva",
+      "lpc",
+      "lpc silva",
+      "silva",
+      "silva lpc"
+    ],
+    "LR Shukla": [
+      "l shukla",
+      "lr",
+      "lr shukla",
+      "shukla",
+      "shukla lr"
+    ],
+    "LRPL Taylor": [
+      "l taylor",
+      "lrpl",
+      "lrpl taylor",
+      "taylor",
+      "taylor lrpl"
+    ],
+    "LS Livingstone": [
+      "l livingstone",
+      "livingstone",
+      "livingstone ls",
+      "ls",
+      "ls livingstone"
+    ],
+    "Lalit Yadav": [
+      "l yadav",
+      "lalit",
+      "lalit yadav",
+      "yadav",
+      "yadav lalit"
+    ],
+    "Liton Das": [
+      "das",
+      "das liton",
+      "l das",
+      "liton",
+      "liton das"
+    ],
+    "M Ashwin": [
+      "ash",
+      "ashwin",
+      "ashwin m",
+      "ashwin r",
+      "m",
+      "m ashwin"
+    ],
+    "M Jansen": [
+      "jansen",
+      "jansen m",
+      "m",
+      "m jansen"
+    ],
+    "M Kaif": [
+      "kaif",
+      "kaif m",
+      "m",
+      "m kaif"
+    ],
+    "M Kartik": [
+      "kartik",
+      "kartik m",
+      "m",
+      "m kartik"
+    ],
+    "M Klinger": [
+      "klinger",
+      "klinger m",
+      "m",
+      "m klinger"
+    ],
+    "M Manhas": [
+      "m",
+      "m manhas",
+      "manhas",
+      "manhas m"
+    ],
+    "M Markande": [
+      "m",
+      "m markande",
+      "markande",
+      "markande m"
+    ],
+    "M Morkel": [
+      "m",
+      "m morkel",
+      "morkel",
+      "morkel m"
+    ],
+    "M Muralitharan": [
+      "m",
+      "m muralitharan",
+      "muralitharan",
+      "muralitharan m"
+    ],
+    "M Ntini": [
+      "m",
+      "m ntini",
+      "ntini",
+      "ntini m"
+    ],
+    "M Pathirana": [
+      "m",
+      "m pathirana",
+      "pathirana",
+      "pathirana m"
+    ],
+    "M Prasidh Krishna": [
+      "krishna",
+      "krishna m",
+      "m",
+      "m krishna",
+      "m prasidh krishna",
+      "prasidh"
+    ],
+    "M Rawat": [
+      "m",
+      "m rawat",
+      "rawat",
+      "rawat m"
+    ],
+    "M Shahrukh Khan": [
+      "khan",
+      "khan m",
+      "m",
+      "m khan",
+      "m shahrukh khan",
+      "shahrukh"
+    ],
+    "M Siddharth": [
+      "m",
+      "m siddharth",
+      "siddharth",
+      "siddharth m"
+    ],
+    "M Theekshana": [
+      "m",
+      "m theekshana",
+      "theekshana",
+      "theekshana m"
+    ],
+    "M Tiwari": [
+      "m",
+      "m tiwari",
+      "tiwari",
+      "tiwari m"
+    ],
+    "M Vijay": [
+      "m",
+      "m vijay",
+      "vijay",
+      "vijay m"
+    ],
+    "M Vohra": [
+      "m",
+      "m vohra",
+      "vohra",
+      "vohra m"
+    ],
+    "M de Lange": [
+      "de",
+      "lange",
+      "lange m",
+      "m",
+      "m de lange",
+      "m lange"
+    ],
+    "MA Agarwal": [
+      "agarwal",
+      "agarwal ma",
+      "m agarwal",
+      "ma",
+      "ma agarwal"
+    ],
+    "MA Khote": [
+      "khote",
+      "khote ma",
+      "m khote",
+      "ma",
+      "ma khote"
+    ],
+    "MA Starc": [
+      "m starc",
+      "ma",
+      "ma starc",
+      "starc",
+      "starc ma"
+    ],
+    "MA Wood": [
+      "m wood",
+      "ma",
+      "ma wood",
+      "wood",
+      "wood ma"
+    ],
+    "MB Parmar": [
+      "m parmar",
+      "mb",
+      "mb parmar",
+      "parmar",
+      "parmar mb"
+    ],
+    "MC Henriques": [
+      "henriques",
+      "henriques mc",
+      "m henriques",
+      "mc",
+      "mc henriques"
+    ],
+    "MC Juneja": [
+      "juneja",
+      "juneja mc",
+      "m juneja",
+      "mc",
+      "mc juneja"
+    ],
+    "MD Mishra": [
+      "m mishra",
+      "md",
+      "md mishra",
+      "mishra",
+      "mishra md"
+    ],
+    "MD Shanaka": [
+      "m shanaka",
+      "md",
+      "md shanaka",
+      "shanaka",
+      "shanaka md"
+    ],
+    "MDKJ Perera": [
+      "m perera",
+      "mdkj",
+      "mdkj perera",
+      "perera",
+      "perera mdkj"
+    ],
+    "MEK Hussey": [
+      "hussey",
+      "hussey mek",
+      "m hussey",
+      "mek",
+      "mek hussey"
+    ],
+    "MF Maharoof": [
+      "m maharoof",
+      "maharoof",
+      "maharoof mf",
+      "mf",
+      "mf maharoof"
+    ],
+    "MG Bracewell": [
+      "bracewell",
+      "bracewell mg",
+      "m bracewell",
+      "mg",
+      "mg bracewell"
+    ],
+    "MG Johnson": [
+      "johnson",
+      "johnson mg",
+      "m johnson",
+      "mg",
+      "mg johnson"
+    ],
+    "MG Neser": [
+      "m neser",
+      "mg",
+      "mg neser",
+      "neser",
+      "neser mg"
+    ],
+    "MJ Clarke": [
+      "clarke",
+      "clarke mj",
+      "m clarke",
+      "mj",
+      "mj clarke"
+    ],
+    "MJ Guptill": [
+      "guptill",
+      "guptill mj",
+      "m guptill",
+      "mj",
+      "mj guptill"
+    ],
+    "MJ Henry": [
+      "henry",
+      "henry mj",
+      "m henry",
+      "mj",
+      "mj henry"
+    ],
+    "MJ Lumb": [
+      "lumb",
+      "lumb mj",
+      "m lumb",
+      "mj",
+      "mj lumb"
+    ],
+    "MJ McClenaghan": [
+      "m mcclenaghan",
+      "mcclenaghan",
+      "mcclenaghan mj",
+      "mj",
+      "mj mcclenaghan"
+    ],
+    "MJ Owen": [
+      "m owen",
+      "mj",
+      "mj owen",
+      "owen",
+      "owen mj"
+    ],
+    "MJ Santner": [
+      "m santner",
+      "mj",
+      "mj santner",
+      "santner",
+      "santner mj"
+    ],
+    "MJ Suthar": [
+      "m suthar",
+      "mj",
+      "mj suthar",
+      "suthar",
+      "suthar mj"
+    ],
+    "MK Lomror": [
+      "lomror",
+      "lomror mk",
+      "m lomror",
+      "mk",
+      "mk lomror"
+    ],
+    "MK Pandey": [
+      "m pandey",
+      "mk",
+      "mk pandey",
+      "pandey",
+      "pandey mk"
+    ],
+    "MK Tiwary": [
+      "m tiwary",
+      "mk",
+      "mk tiwary",
+      "tiwary",
+      "tiwary mk"
+    ],
+    "ML Hayden": [
+      "hayden",
+      "hayden ml",
+      "m hayden",
+      "ml",
+      "ml hayden"
+    ],
+    "MM Ali": [
+      "ali",
+      "ali mm",
+      "m ali",
+      "mm",
+      "mm ali"
+    ],
+    "MM Patel": [
+      "m patel",
+      "mm",
+      "mm patel",
+      "patel",
+      "patel mm"
+    ],
+    "MM Sharma": [
+      "m sharma",
+      "mm",
+      "mm sharma",
+      "sharma",
+      "sharma mm"
+    ],
+    "MN Samuels": [
+      "m samuels",
+      "mn",
+      "mn samuels",
+      "samuels",
+      "samuels mn"
+    ],
+    "MN van Wyk": [
+      "m wyk",
+      "mn",
+      "mn van wyk",
+      "mn wyk",
+      "van",
+      "wyk",
+      "wyk mn"
+    ],
+    "MP Breetzke": [
+      "breetzke",
+      "breetzke mp",
+      "m breetzke",
+      "mp",
+      "mp breetzke"
+    ],
+    "MP Stoinis": [
+      "m stoinis",
+      "mp",
+      "mp stoinis",
+      "stoinis",
+      "stoinis mp"
+    ],
+    "MP Yadav": [
+      "m yadav",
+      "mp",
+      "mp yadav",
+      "yadav",
+      "yadav mp"
+    ],
+    "MR Marsh": [
+      "m marsh",
+      "marsh",
+      "marsh mr",
+      "mr",
+      "mr marsh"
+    ],
+    "MS Bhandage": [
+      "bhandage",
+      "bhandage ms",
+      "m bhandage",
+      "ms",
+      "ms bhandage"
+    ],
+    "MS Bisla": [
+      "bisla",
+      "bisla ms",
+      "m bisla",
+      "ms",
+      "ms bisla"
+    ],
+    "MS Dhoni": [
+      "ms dhoni",
+      "m s dhoni",
+      "msd",
+      "dhoni",
+      "dhoni ms",
+      "mahendra",
+      "mahendra dhoni",
+      "mahendra singh",
+      "mahendra singh dhoni",
+      "ms d",
+      "m dhoni",
+      "dhoni captain",
+      "dhony",
+      "dhoney",
+      "msd dhoni"
+    ],
+    "MS Gony": [
+      "gony",
+      "gony ms",
+      "m gony",
+      "ms",
+      "ms gony"
+    ],
+    "MS Wade": [
+      "m wade",
+      "ms",
+      "ms wade",
+      "wade",
+      "wade ms"
+    ],
+    "MV Boucher": [
+      "boucher",
+      "boucher mv",
+      "m boucher",
+      "mv",
+      "mv boucher"
+    ],
+    "MW Short": [
+      "m short",
+      "mw",
+      "mw short",
+      "short",
+      "short mw"
+    ],
+    "Mandeep Singh": [
+      "m singh",
+      "mandeep",
+      "mandeep singh",
+      "singh",
+      "singh mandeep"
+    ],
+    "Mashrafe Mortaza": [
+      "m mortaza",
+      "mashrafe",
+      "mashrafe mortaza",
+      "mortaza",
+      "mortaza mashrafe"
+    ],
+    "Mayank Dagar": [
+      "dagar",
+      "dagar mayank",
+      "m dagar",
+      "mayank",
+      "mayank dagar"
+    ],
+    "Misbah-ul-Haq": [
+      "misbah-ul-haq"
+    ],
+    "Mohammad Ashraful": [
+      "ashraful",
+      "ashraful mohammad",
+      "m ashraful",
+      "mohammad",
+      "mohammad ashraful"
+    ],
+    "Mohammad Asif": [
+      "asif",
+      "asif mohammad",
+      "m asif",
+      "mohammad",
+      "mohammad asif"
+    ],
+    "Mohammad Hafeez": [
+      "hafeez",
+      "hafeez mohammad",
+      "m hafeez",
+      "mohammad",
+      "mohammad hafeez"
+    ],
+    "Mohammad Nabi": [
+      "m nabi",
+      "mohammad",
+      "mohammad nabi",
+      "nabi",
+      "nabi mohammad"
+    ],
+    "Mohammed Shami": [
+      "m shami",
+      "mohammed",
+      "mohammed shami",
+      "shami",
+      "shami mohammed"
+    ],
+    "Mohammed Siraj": [
+      "m siraj",
+      "mohammed",
+      "mohammed siraj",
+      "siraj",
+      "siraj mohammed"
+    ],
+    "Mohit Rathee": [
+      "m rathee",
+      "mohit",
+      "mohit rathee",
+      "rathee",
+      "rathee mohit"
+    ],
+    "Mohsin Khan": [
+      "khan",
+      "khan mohsin",
+      "m khan",
+      "mohsin",
+      "mohsin khan"
+    ],
+    "Monu Kumar": [
+      "kumar",
+      "kumar monu",
+      "m kumar",
+      "monu",
+      "monu kumar"
+    ],
+    "Mujeeb Ur Rahman": [
+      "m rahman",
+      "mujeeb",
+      "mujeeb rahman",
+      "mujeeb ur rahman",
+      "rahman",
+      "rahman mujeeb",
+      "ur"
+    ],
+    "Mukesh Choudhary": [
+      "choudhary",
+      "choudhary mukesh",
+      "m choudhary",
+      "mukesh",
+      "mukesh choudhary"
+    ],
+    "Mukesh Kumar": [
+      "kumar",
+      "kumar mukesh",
+      "m kumar",
+      "mukesh",
+      "mukesh kumar"
+    ],
+    "Musheer Khan": [
+      "khan",
+      "khan musheer",
+      "m khan",
+      "musheer",
+      "musheer khan"
+    ],
+    "Mustafizur Rahman": [
+      "m rahman",
+      "mustafizur",
+      "mustafizur rahman",
+      "rahman",
+      "rahman mustafizur"
+    ],
+    "N Burger": [
+      "burger",
+      "burger n",
+      "n",
+      "n burger"
+    ],
+    "N Jagadeesan": [
+      "jagadeesan",
+      "jagadeesan n",
+      "n",
+      "n jagadeesan"
+    ],
+    "N Pooran": [
+      "n",
+      "n pooran",
+      "pooran",
+      "pooran n"
+    ],
+    "N Rana": [
+      "n",
+      "n rana",
+      "rana",
+      "rana n"
+    ],
+    "N Saini": [
+      "n",
+      "n saini",
+      "saini",
+      "saini n"
+    ],
+    "N Thushara": [
+      "n",
+      "n thushara",
+      "thushara",
+      "thushara n"
+    ],
+    "N Wadhera": [
+      "n",
+      "n wadhera",
+      "wadhera",
+      "wadhera n"
+    ],
+    "NA Saini": [
+      "n saini",
+      "na",
+      "na saini",
+      "saini",
+      "saini na"
+    ],
+    "NB Singh": [
+      "n singh",
+      "nb",
+      "nb singh",
+      "singh",
+      "singh nb"
+    ],
+    "ND Doshi": [
+      "doshi",
+      "doshi nd",
+      "n doshi",
+      "nd",
+      "nd doshi"
+    ],
+    "NJ Maddinson": [
+      "maddinson",
+      "maddinson nj",
+      "n maddinson",
+      "nj",
+      "nj maddinson"
+    ],
+    "NJ Rimmington": [
+      "n rimmington",
+      "nj",
+      "nj rimmington",
+      "rimmington",
+      "rimmington nj"
+    ],
+    "NK Patel": [
+      "n patel",
+      "nk",
+      "nk patel",
+      "patel",
+      "patel nk"
+    ],
+    "NL McCullum": [
+      "mccullum",
+      "mccullum nl",
+      "n mccullum",
+      "nl",
+      "nl mccullum"
+    ],
+    "NLTC Perera": [
+      "n perera",
+      "nltc",
+      "nltc perera",
+      "perera",
+      "perera nltc"
+    ],
+    "NM Coulter-Nile": [
+      "coulter-nile",
+      "coulter-nile nm",
+      "n coulter-nile",
+      "nm",
+      "nm coulter-nile"
+    ],
+    "NS Naik": [
+      "n naik",
+      "naik",
+      "naik ns",
+      "ns",
+      "ns naik"
+    ],
+    "NT Ellis": [
+      "ellis",
+      "ellis nt",
+      "n ellis",
+      "nt",
+      "nt ellis"
+    ],
+    "NV Ojha": [
+      "n ojha",
+      "nv",
+      "nv ojha",
+      "ojha",
+      "ojha nv"
+    ],
+    "Naman Dhir": [
+      "dhir",
+      "dhir naman",
+      "n dhir",
+      "naman",
+      "naman dhir"
+    ],
+    "Navdeep Saini": [
+      "n saini",
+      "navdeep",
+      "navdeep saini",
+      "saini",
+      "saini navdeep"
+    ],
+    "Naveen-ul-Haq": [
+      "naveen-ul-haq"
+    ],
+    "Nithish Kumar Reddy": [
+      "kumar",
+      "n reddy",
+      "nithish",
+      "nithish kumar reddy",
+      "nithish reddy",
+      "reddy",
+      "reddy nithish"
+    ],
+    "Noor Ahmad": [
+      "ahmad",
+      "ahmad noor",
+      "n ahmad",
+      "noor",
+      "noor ahmad"
+    ],
+    "O Thomas": [
+      "o",
+      "o thomas",
+      "thomas",
+      "thomas o"
+    ],
+    "OA Shah": [
+      "o shah",
+      "oa",
+      "oa shah",
+      "shah",
+      "shah oa"
+    ],
+    "OC McCoy": [
+      "mccoy",
+      "mccoy oc",
+      "o mccoy",
+      "oc",
+      "oc mccoy"
+    ],
+    "OF Smith": [
+      "o smith",
+      "of",
+      "of smith",
+      "smith",
+      "smith of"
+    ],
+    "P Amarnath": [
+      "amarnath",
+      "amarnath p",
+      "p",
+      "p amarnath"
+    ],
+    "P Awana": [
+      "awana",
+      "awana p",
+      "p",
+      "p awana"
+    ],
+    "P Chopra": [
+      "chopra",
+      "chopra p",
+      "p",
+      "p chopra"
+    ],
+    "P Dogra": [
+      "dogra",
+      "dogra p",
+      "p",
+      "p dogra"
+    ],
+    "P Dubey": [
+      "dubey",
+      "dubey p",
+      "p",
+      "p dubey"
+    ],
+    "P Kumar": [
+      "kumar",
+      "kumar p",
+      "p",
+      "p kumar"
+    ],
+    "P Negi": [
+      "negi",
+      "negi p",
+      "p",
+      "p negi"
+    ],
+    "P Parameswaran": [
+      "p",
+      "p parameswaran",
+      "parameswaran",
+      "parameswaran p"
+    ],
+    "P Prasanth": [
+      "p",
+      "p prasanth",
+      "prasanth",
+      "prasanth p"
+    ],
+    "P Ray Barman": [
+      "barman",
+      "barman p",
+      "p",
+      "p barman",
+      "p ray barman",
+      "ray"
+    ],
+    "P Sahu": [
+      "p",
+      "p sahu",
+      "sahu",
+      "sahu p"
+    ],
+    "P Simran Singh": [
+      "p",
+      "p simran singh",
+      "p singh",
+      "simran",
+      "singh",
+      "singh p"
+    ],
+    "P Suyal": [
+      "p",
+      "p suyal",
+      "suyal",
+      "suyal p"
+    ],
+    "PA Patel": [
+      "p patel",
+      "pa",
+      "pa patel",
+      "patel",
+      "patel pa"
+    ],
+    "PA Reddy": [
+      "p reddy",
+      "pa",
+      "pa reddy",
+      "reddy",
+      "reddy pa"
+    ],
+    "PBB Rajapaksa": [
+      "p rajapaksa",
+      "pbb",
+      "pbb rajapaksa",
+      "rajapaksa",
+      "rajapaksa pbb"
+    ],
+    "PC Valthaty": [
+      "p valthaty",
+      "pc",
+      "pc valthaty",
+      "valthaty",
+      "valthaty pc"
+    ],
+    "PD Collingwood": [
+      "collingwood",
+      "collingwood pd",
+      "p collingwood",
+      "pd",
+      "pd collingwood"
+    ],
+    "PD Salt": [
+      "p salt",
+      "pd",
+      "pd salt",
+      "salt",
+      "salt pd"
+    ],
+    "PH Solanki": [
+      "p solanki",
+      "ph",
+      "ph solanki",
+      "solanki",
+      "solanki ph"
+    ],
+    "PHKD Mendis": [
+      "mendis",
+      "mendis phkd",
+      "p mendis",
+      "phkd",
+      "phkd mendis"
+    ],
+    "PJ Cummins": [
+      "cummins",
+      "cummins pj",
+      "p cummins",
+      "pj",
+      "pj cummins"
+    ],
+    "PJ Sangwan": [
+      "p sangwan",
+      "pj",
+      "pj sangwan",
+      "sangwan",
+      "sangwan pj"
+    ],
+    "PK Garg": [
+      "garg",
+      "garg pk",
+      "p garg",
+      "pk",
+      "pk garg"
+    ],
+    "PM Sarvesh Kumar": [
+      "kumar",
+      "kumar pm",
+      "p kumar",
+      "pm",
+      "pm kumar",
+      "pm sarvesh kumar",
+      "sarvesh"
+    ],
+    "PN Mankad": [
+      "mankad",
+      "mankad pn",
+      "p mankad",
+      "pn",
+      "pn mankad"
+    ],
+    "PP Chawla": [
+      "chawla",
+      "chawla pp",
+      "p chawla",
+      "pp",
+      "pp chawla"
+    ],
+    "PP Ojha": [
+      "ojha",
+      "ojha pp",
+      "p ojha",
+      "pp",
+      "pp ojha"
+    ],
+    "PP Shaw": [
+      "p shaw",
+      "pp",
+      "pp shaw",
+      "shaw",
+      "shaw pp"
+    ],
+    "PR Shah": [
+      "p shah",
+      "pr",
+      "pr shah",
+      "shah",
+      "shah pr"
+    ],
+    "PSP Handscomb": [
+      "handscomb",
+      "handscomb psp",
+      "p handscomb",
+      "psp",
+      "psp handscomb"
+    ],
+    "PV Tambe": [
+      "p tambe",
+      "pv",
+      "pv tambe",
+      "tambe",
+      "tambe pv"
+    ],
+    "PVD Chameera": [
+      "chameera",
+      "chameera pvd",
+      "p chameera",
+      "pvd",
+      "pvd chameera"
+    ],
+    "PVSN Raju": [
+      "p raju",
+      "pvsn",
+      "pvsn raju",
+      "raju",
+      "raju pvsn"
+    ],
+    "PWA Mulder": [
+      "mulder",
+      "mulder pwa",
+      "p mulder",
+      "pwa",
+      "pwa mulder"
+    ],
+    "PWH de Silva": [
+      "de",
+      "p silva",
+      "pwh",
+      "pwh de silva",
+      "pwh silva",
+      "silva",
+      "silva pwh"
+    ],
+    "Pankaj Singh": [
+      "p singh",
+      "pankaj",
+      "pankaj singh",
+      "singh",
+      "singh pankaj"
+    ],
+    "Parvez Rasool": [
+      "p rasool",
+      "parvez",
+      "parvez rasool",
+      "rasool",
+      "rasool parvez"
+    ],
+    "Prince Yadav": [
+      "p yadav",
+      "prince",
+      "prince yadav",
+      "yadav",
+      "yadav prince"
+    ],
+    "Priyansh Arya": [
+      "arya",
+      "arya priyansh",
+      "p arya",
+      "priyansh",
+      "priyansh arya"
+    ],
+    "Q de Kock": [
+      "de",
+      "kock",
+      "kock q",
+      "q",
+      "q de kock",
+      "q kock"
+    ],
+    "R Ashwin": [
+      "ash",
+      "ashwin",
+      "ashwin r",
+      "r",
+      "r ashwin"
+    ],
+    "R Bhatia": [
+      "bhatia",
+      "bhatia r",
+      "r",
+      "r bhatia"
+    ],
+    "R Bishnoi": [
+      "bishnoi",
+      "bishnoi r",
+      "r",
+      "r bishnoi"
+    ],
+    "R Dhawan": [
+      "dhawan",
+      "dhawan r",
+      "gabbar",
+      "r",
+      "r dhawan",
+      "sd"
+    ],
+    "R Dravid": [
+      "dravid",
+      "dravid r",
+      "r",
+      "r dravid"
+    ],
+    "R Goyal": [
+      "goyal",
+      "goyal r",
+      "r",
+      "r goyal"
+    ],
+    "R McLaren": [
+      "mclaren",
+      "mclaren r",
+      "r",
+      "r mclaren"
+    ],
+    "R Minz": [
+      "minz",
+      "minz r",
+      "r",
+      "r minz"
+    ],
+    "R Ninan": [
+      "ninan",
+      "ninan r",
+      "r",
+      "r ninan"
+    ],
+    "R Parag": [
+      "parag",
+      "parag r",
+      "r",
+      "r parag"
+    ],
+    "R Powell": [
+      "powell",
+      "powell r",
+      "r",
+      "r powell"
+    ],
+    "R Rampaul": [
+      "r",
+      "r rampaul",
+      "rampaul",
+      "rampaul r"
+    ],
+    "R Ravindra": [
+      "r",
+      "r ravindra",
+      "ravindra",
+      "ravindra r"
+    ],
+    "R Sai Kishore": [
+      "kishore",
+      "kishore r",
+      "r",
+      "r kishore",
+      "r sai kishore",
+      "sai"
+    ],
+    "R Sanjay Yadav": [
+      "r",
+      "r sanjay yadav",
+      "r yadav",
+      "sanjay",
+      "yadav",
+      "yadav r"
+    ],
+    "R Sathish": [
+      "r",
+      "r sathish",
+      "sathish",
+      "sathish r"
+    ],
+    "R Sharma": [
+      "r",
+      "r sharma",
+      "sharma",
+      "sharma r"
+    ],
+    "R Shepherd": [
+      "r",
+      "r shepherd",
+      "shepherd",
+      "shepherd r"
+    ],
+    "R Shukla": [
+      "r",
+      "r shukla",
+      "shukla",
+      "shukla r"
+    ],
+    "R Tewatia": [
+      "r",
+      "r tewatia",
+      "tewatia",
+      "tewatia r"
+    ],
+    "R Vinay Kumar": [
+      "kumar",
+      "kumar r",
+      "r",
+      "r kumar",
+      "r vinay kumar",
+      "vinay"
+    ],
+    "RA Bawa": [
+      "bawa",
+      "bawa ra",
+      "r bawa",
+      "ra",
+      "ra bawa"
     ],
     "RA Jadeja": [
       "jadeja",
@@ -248,105 +3757,778 @@
       "rj jadeja",
       "sir jadeja"
     ],
-    "AB de Villiers": [
-      "a de villiers",
-      "ab",
-      "ab d v",
-      "ab de v",
-      "ab de velliers",
-      "ab de vil",
-      "ab de villa",
-      "ab de villier",
-      "ab de villiers",
-      "ab dev",
-      "ab devilers",
-      "ab deville",
-      "ab devillers",
-      "ab devilliers",
-      "ab div",
-      "ab dv",
-      "abd",
-      "adb",
-      "de v",
-      "de villa",
-      "de villier",
-      "de villiers",
-      "villiers",
-      "villiers ab"
+    "RA Shaikh": [
+      "r shaikh",
+      "ra",
+      "ra shaikh",
+      "shaikh",
+      "shaikh ra"
     ],
-    "DA Warner": [
-      "d w",
-      "d warner",
-      "da w",
-      "da warner",
-      "dav w",
-      "dav warner",
-      "dave warner",
-      "david w",
-      "david warmer",
-      "david warner",
-      "david warnor",
-      "davied warner",
-      "davit",
-      "davit warner",
-      "davud",
-      "davud warner",
-      "davud warnor",
-      "davvid",
-      "warner",
-      "warner d",
-      "warner da",
-      "warner david",
-      "warner davit"
+    "RA Tripathi": [
+      "r tripathi",
+      "ra",
+      "ra tripathi",
+      "tripathi",
+      "tripathi ra"
+    ],
+    "RD Chahar": [
+      "chahar",
+      "chahar rd",
+      "r chahar",
+      "rd",
+      "rd chahar"
+    ],
+    "RD Gaikwad": [
+      "gaikwad",
+      "gaikwad rd",
+      "r gaikwad",
+      "rd",
+      "rd gaikwad"
+    ],
+    "RD Rickelton": [
+      "r rickelton",
+      "rd",
+      "rd rickelton",
+      "rickelton",
+      "rickelton rd"
+    ],
+    "RE Levi": [
+      "levi",
+      "levi re",
+      "r levi",
+      "re",
+      "re levi"
+    ],
+    "RE van der Merwe": [
+      "der",
+      "merwe",
+      "merwe re",
+      "r merwe",
+      "re",
+      "re merwe",
+      "re van der merwe",
+      "van"
+    ],
+    "RG More": [
+      "more",
+      "more rg",
+      "r more",
+      "rg",
+      "rg more"
+    ],
+    "RG Sharma": [
+      "hitman",
+      "r sharma",
+      "rg sharma",
+      "ro hit",
+      "ro sharma",
+      "roheit",
+      "roheit sharma",
+      "rohhit",
+      "rohhit sharma",
+      "rohit",
+      "rohit s",
+      "rohit sharm",
+      "rohit sharma",
+      "rohit sharma ji",
+      "rohit sharmaa",
+      "rohit sharmas",
+      "rohit sharme",
+      "rohit sharmer",
+      "rohit shrama",
+      "roht",
+      "rs",
+      "sharma rohit",
+      "the wall"
+    ],
+    "RJ Gleeson": [
+      "gleeson",
+      "gleeson rj",
+      "r gleeson",
+      "rj",
+      "rj gleeson"
+    ],
+    "RJ Harris": [
+      "harris",
+      "harris rj",
+      "r harris",
+      "rj",
+      "rj harris"
+    ],
+    "RJ Peterson": [
+      "peterson",
+      "peterson rj",
+      "r peterson",
+      "rj",
+      "rj peterson"
+    ],
+    "RJ Quiney": [
+      "quiney",
+      "quiney rj",
+      "r quiney",
+      "rj",
+      "rj quiney"
+    ],
+    "RJW Topley": [
+      "r topley",
+      "rjw",
+      "rjw topley",
+      "topley",
+      "topley rjw"
+    ],
+    "RK Bhui": [
+      "bhui",
+      "bhui rk",
+      "r bhui",
+      "rk",
+      "rk bhui"
+    ],
+    "RK Singh": [
+      "r singh",
+      "rk",
+      "rk singh",
+      "singh",
+      "singh rk"
+    ],
+    "RM Patidar": [
+      "patidar",
+      "patidar rm",
+      "r patidar",
+      "rm",
+      "rm patidar"
+    ],
+    "RN ten Doeschate": [
+      "doeschate",
+      "doeschate rn",
+      "r doeschate",
+      "rn",
+      "rn doeschate",
+      "rn ten doeschate",
+      "ten"
+    ],
+    "RP Meredith": [
+      "meredith",
+      "meredith rp",
+      "r meredith",
+      "rp",
+      "rp meredith"
+    ],
+    "RP Singh": [
+      "r singh",
+      "rp",
+      "rp singh",
+      "singh",
+      "singh rp"
+    ],
+    "RR Bhatkal": [
+      "bhatkal",
+      "bhatkal rr",
+      "r bhatkal",
+      "rr",
+      "rr bhatkal"
+    ],
+    "RR Bose": [
+      "bose",
+      "bose rr",
+      "r bose",
+      "rr",
+      "rr bose"
+    ],
+    "RR Pant": [
+      "pant",
+      "pant rishabh",
+      "r pant",
+      "rishaab pant",
+      "rishab",
+      "rishab p",
+      "rishab pant",
+      "rishabh",
+      "rishabh p",
+      "rishabh pandt",
+      "rishabh pant",
+      "rishabh panth",
+      "rishabh pantha",
+      "rishabh pants",
+      "rishabh pent",
+      "rishabh pont",
+      "rishabh rant",
+      "rishabpant",
+      "rishbah pant",
+      "rishbh pant",
+      "rr pant",
+      "rr panta"
+    ],
+    "RR Powar": [
+      "powar",
+      "powar rr",
+      "r powar",
+      "rr",
+      "rr powar"
+    ],
+    "RR Raje": [
+      "r raje",
+      "raje",
+      "raje rr",
+      "rr",
+      "rr raje"
+    ],
+    "RR Rossouw": [
+      "r rossouw",
+      "rossouw",
+      "rossouw rr",
+      "rr",
+      "rr rossouw"
+    ],
+    "RR Sarwan": [
+      "r sarwan",
+      "rr",
+      "rr sarwan",
+      "sarwan",
+      "sarwan rr"
+    ],
+    "RS Bopara": [
+      "bopara",
+      "bopara rs",
+      "r bopara",
+      "rs",
+      "rs bopara"
+    ],
+    "RS Gavaskar": [
+      "gavaskar",
+      "gavaskar rs",
+      "r gavaskar",
+      "rs",
+      "rs gavaskar"
+    ],
+    "RS Hangargekar": [
+      "hangargekar",
+      "hangargekar rs",
+      "r hangargekar",
+      "rs",
+      "rs hangargekar"
+    ],
+    "RS Sodhi": [
+      "r sodhi",
+      "rs",
+      "rs sodhi",
+      "sodhi",
+      "sodhi rs"
+    ],
+    "RT Ponting": [
+      "ponting",
+      "ponting rt",
+      "r ponting",
+      "rt",
+      "rt ponting"
+    ],
+    "RV Gomez": [
+      "gomez",
+      "gomez rv",
+      "r gomez",
+      "rv",
+      "rv gomez"
+    ],
+    "RV Patel": [
+      "patel",
+      "patel rv",
+      "r patel",
+      "rv",
+      "rv patel"
+    ],
+    "RV Uthappa": [
+      "r uthappa",
+      "rv",
+      "rv uthappa",
+      "uthappa",
+      "uthappa rv"
+    ],
+    "RW Price": [
+      "price",
+      "price rw",
+      "r price",
+      "rw",
+      "rw price"
+    ],
+    "Rahmanullah Gurbaz": [
+      "gurbaz",
+      "gurbaz rahmanullah",
+      "r gurbaz",
+      "rahmanullah",
+      "rahmanullah gurbaz"
+    ],
+    "Ramandeep Singh": [
+      "r singh",
+      "ramandeep",
+      "ramandeep singh",
+      "singh",
+      "singh ramandeep"
+    ],
+    "Rashid Khan": [
+      "khan",
+      "khan rashid",
+      "r khan",
+      "rashid",
+      "rashid khan"
+    ],
+    "Rasikh Salam": [
+      "r salam",
+      "rasikh",
+      "rasikh salam",
+      "salam",
+      "salam rasikh"
+    ],
+    "Ravi Bishnoi": [
+      "bishnoi",
+      "bishnoi ravi",
+      "r bishnoi",
+      "ravi",
+      "ravi bishnoi"
+    ],
+    "S Anirudha": [
+      "anirudha",
+      "anirudha s",
+      "s",
+      "s anirudha"
+    ],
+    "S Aravind": [
+      "aravind",
+      "aravind s",
+      "s",
+      "s aravind"
+    ],
+    "S Badree": [
+      "badree",
+      "badree s",
+      "s",
+      "s badree"
+    ],
+    "S Badrinath": [
+      "badrinath",
+      "badrinath s",
+      "s",
+      "s badrinath"
+    ],
+    "S Chanderpaul": [
+      "chanderpaul",
+      "chanderpaul s",
+      "s",
+      "s chanderpaul"
     ],
     "S Dhawan": [
-      "dhawan",
-      "dhawan shik",
-      "dhawan shikhar",
-      "dhawan sikhar",
-      "s d",
-      "s dhawan",
-      "shik",
-      "shik dhawan",
-      "shikar dhawan",
       "shikhar",
-      "shikhar d",
-      "shikhar dawan",
-      "shikhar dh",
-      "shikhar dha",
-      "shikhar dhaawan",
+      "dhawan",
       "shikhar dhawan",
-      "shikhar dhowa",
-      "shikhar dhwan",
-      "shikhar sh",
-      "shikhar sha",
-      "shikher",
-      "shikher dhawan",
-      "sikhar",
-      "sikhar dhawan"
+      "shikhar dhavan",
+      "shikar",
+      "shikar dhawan",
+      "s dhawan",
+      "s d",
+      "sd",
+      "gabbar",
+      "the wall",
+      "dhawan shikhar",
+      "shikhar d"
+    ],
+    "S Dube": [
+      "dube",
+      "dube s",
+      "s",
+      "s dube"
+    ],
+    "S Gopal": [
+      "gopal",
+      "gopal s",
+      "s",
+      "s gopal"
+    ],
+    "S Joseph": [
+      "joseph",
+      "joseph s",
+      "s",
+      "s joseph"
+    ],
+    "S Kaul": [
+      "kaul",
+      "kaul s",
+      "s",
+      "s kaul"
+    ],
+    "S Kaushik": [
+      "kaushik",
+      "kaushik s",
+      "s",
+      "s kaushik"
+    ],
+    "S Ladda": [
+      "ladda",
+      "ladda s",
+      "s",
+      "s ladda"
+    ],
+    "S Lamichhane": [
+      "lamichhane",
+      "lamichhane s",
+      "s",
+      "s lamichhane"
+    ],
+    "S Midhun": [
+      "midhun",
+      "midhun s",
+      "s",
+      "s midhun"
+    ],
+    "S Nadeem": [
+      "nadeem",
+      "nadeem s",
+      "s",
+      "s nadeem"
+    ],
+    "S Narwal": [
+      "narwal",
+      "narwal s",
+      "s",
+      "s narwal"
+    ],
+    "S Rana": [
+      "rana",
+      "rana s",
+      "s",
+      "s rana"
+    ],
+    "S Randiv": [
+      "randiv",
+      "randiv s",
+      "s",
+      "s randiv"
+    ],
+    "S Sandeep Warrier": [
+      "s",
+      "s sandeep warrier",
+      "s warrier",
+      "sandeep",
+      "warrier",
+      "warrier s"
+    ],
+    "S Sohal": [
+      "s",
+      "s sohal",
+      "sohal",
+      "sohal s"
+    ],
+    "S Sreesanth": [
+      "s",
+      "s sreesanth",
+      "sreesanth",
+      "sreesanth s"
+    ],
+    "S Sriram": [
+      "s",
+      "s sriram",
+      "sriram",
+      "sriram s"
+    ],
+    "S Tyagi": [
+      "s",
+      "s tyagi",
+      "tyagi",
+      "tyagi s"
+    ],
+    "S Vidyut": [
+      "s",
+      "s vidyut",
+      "vidyut",
+      "vidyut s"
+    ],
+    "SA Abbott": [
+      "abbott",
+      "abbott sa",
+      "s abbott",
+      "sa",
+      "sa abbott"
+    ],
+    "SA Asnodkar": [
+      "asnodkar",
+      "asnodkar sa",
+      "s asnodkar",
+      "sa",
+      "sa asnodkar"
+    ],
+    "SA Yadav": [
+      "s yadav",
+      "sa yada",
+      "sa yadav",
+      "sky",
+      "sky surya",
+      "sky yada",
+      "sky yadav",
+      "skyh",
+      "skyyadav",
+      "surya",
+      "surya kl",
+      "surya kumaar",
+      "surya kumar",
+      "surya kumar yadav",
+      "surya yadav",
+      "surya yadavv",
+      "suryakumaar",
+      "suryakumar",
+      "suryakumar sa",
+      "suryakumar yada",
+      "suryakumar yadav",
+      "suryakumer",
+      "yadav",
+      "yadav surya"
+    ],
+    "SB Bangar": [
+      "bangar",
+      "bangar sb",
+      "s bangar",
+      "sb",
+      "sb bangar"
+    ],
+    "SB Dubey": [
+      "dubey",
+      "dubey sb",
+      "s dubey",
+      "sb",
+      "sb dubey"
+    ],
+    "SB Jakati": [
+      "jakati",
+      "jakati sb",
+      "s jakati",
+      "sb",
+      "sb jakati"
+    ],
+    "SB Joshi": [
+      "joshi",
+      "joshi sb",
+      "s joshi",
+      "sb",
+      "sb joshi"
+    ],
+    "SB Styris": [
+      "s styris",
+      "sb",
+      "sb styris",
+      "styris",
+      "styris sb"
+    ],
+    "SB Wagh": [
+      "s wagh",
+      "sb",
+      "sb wagh",
+      "wagh",
+      "wagh sb"
+    ],
+    "SC Ganguly": [
+      "ganguly",
+      "ganguly sc",
+      "s ganguly",
+      "sc",
+      "sc ganguly"
+    ],
+    "SC Kuggeleijn": [
+      "kuggeleijn",
+      "kuggeleijn sc",
+      "s kuggeleijn",
+      "sc",
+      "sc kuggeleijn"
+    ],
+    "SD Chitnis": [
+      "chitnis",
+      "chitnis sd",
+      "s chitnis",
+      "sd",
+      "sd chitnis"
+    ],
+    "SD Hope": [
+      "hope",
+      "hope sd",
+      "s hope",
+      "sd",
+      "sd hope"
+    ],
+    "SD Lad": [
+      "lad",
+      "lad sd",
+      "s lad",
+      "sd",
+      "sd lad"
+    ],
+    "SE Bond": [
+      "bond",
+      "bond se",
+      "s bond",
+      "se",
+      "se bond"
+    ],
+    "SE Marsh": [
+      "marsh",
+      "marsh se",
+      "s marsh",
+      "se",
+      "se marsh"
+    ],
+    "SE Rutherford": [
+      "rutherford",
+      "rutherford se",
+      "s rutherford",
+      "se",
+      "se rutherford"
+    ],
+    "SH Johnson": [
+      "johnson",
+      "johnson sh",
+      "s johnson",
+      "sh",
+      "sh johnson"
+    ],
+    "SJ Srivastava": [
+      "s srivastava",
+      "sj",
+      "sj srivastava",
+      "srivastava",
+      "srivastava sj"
     ],
     "SK Raina": [
-      "raina",
-      "raina suresh",
-      "raina sursh",
-      "s raina",
-      "shuresh raina",
-      "sk raina",
-      "sr",
-      "suraish raina",
-      "surash",
-      "surash raina",
-      "suresh",
-      "suresh r",
-      "suresh ra",
-      "suresh raana",
-      "suresh rain",
       "suresh raina",
-      "suresh rainaa",
-      "suresh rana",
-      "suresh rei",
-      "suresh reina",
-      "suressh"
+      "raina",
+      "sk raina",
+      "s raina",
+      "suresh",
+      "raina suresh",
+      "sureshraina",
+      "cherry",
+      "mr ipsilon",
+      "raina sk"
+    ],
+    "SK Rasheed": [
+      "rasheed",
+      "rasheed sk",
+      "s rasheed",
+      "sk",
+      "sk rasheed"
+    ],
+    "SK Trivedi": [
+      "s trivedi",
+      "sk",
+      "sk trivedi",
+      "trivedi",
+      "trivedi sk"
+    ],
+    "SK Warne": [
+      "s warne",
+      "sk",
+      "sk warne",
+      "warne",
+      "warne sk"
+    ],
+    "SL Malinga": [
+      "malinga",
+      "malinga sl",
+      "s malinga",
+      "sl",
+      "sl malinga"
+    ],
+    "SM Boland": [
+      "boland",
+      "boland sm",
+      "s boland",
+      "sm",
+      "sm boland"
+    ],
+    "SM Curran": [
+      "curran",
+      "curran sm",
+      "s curran",
+      "sm",
+      "sm curran"
+    ],
+    "SM Harwood": [
+      "harwood",
+      "harwood sm",
+      "s harwood",
+      "sm",
+      "sm harwood"
+    ],
+    "SM Katich": [
+      "katich",
+      "katich sm",
+      "s katich",
+      "sm",
+      "sm katich"
+    ],
+    "SM Pollock": [
+      "pollock",
+      "pollock sm",
+      "s pollock",
+      "sm",
+      "sm pollock"
+    ],
+    "SMSM Senanayake": [
+      "s senanayake",
+      "senanayake",
+      "senanayake smsm",
+      "smsm",
+      "smsm senanayake"
+    ],
+    "SN Khan": [
+      "khan",
+      "khan sn",
+      "s khan",
+      "sn",
+      "sn khan"
+    ],
+    "SN Thakur": [
+      "s thakur",
+      "sn",
+      "sn thakur",
+      "thakur",
+      "thakur sn"
+    ],
+    "SO Hetmyer": [
+      "hetmyer",
+      "hetmyer so",
+      "s hetmyer",
+      "so",
+      "so hetmyer"
+    ],
+    "SP Fleming": [
+      "fleming",
+      "fleming sp",
+      "s fleming",
+      "sp",
+      "sp fleming"
+    ],
+    "SP Goswami": [
+      "goswami",
+      "goswami sp",
+      "s goswami",
+      "sp",
+      "sp goswami"
+    ],
+    "SP Jackson": [
+      "jackson",
+      "jackson sp",
+      "s jackson",
+      "sp",
+      "sp jackson"
+    ],
+    "SP Narine": [
+      "mystery man",
+      "narine",
+      "narine sp",
+      "s narine",
+      "sp",
+      "sp narine"
+    ],
+    "SPD Smith": [
+      "s smith",
+      "smith",
+      "smith spd",
+      "spd",
+      "spd smith"
     ],
     "SR Tendulkar": [
       "sachin",
@@ -370,89 +4552,903 @@
       "master blaster",
       "srt"
     ],
-    "DA Warner": [
-      "david warner",
-      "warner",
-      "warner david",
-      "warner da",
-      "warner d",
-      "da warner",
-      "d warner",
-      "warner d",
-      "big show",
-      "davey",
-      "dave warner",
-      "warner davey"
+    "SR Watson": [
+      "s watson",
+      "sr",
+      "sr watson",
+      "watson",
+      "watson sr"
     ],
-    "AB de Villiers": [
-      "ab devilliers",
-      "ab de villiers",
-      "ab deviller",
-      "ab deville",
-      "ab de v",
-      "ab",
-      "abd",
-      "de villiers",
-      "devilliers",
-      "ab develier",
-      "mr 360",
-      "mr360",
-      "ab de vee",
-      "abd viliiers"
+    "SS Agarwal": [
+      "agarwal",
+      "agarwal ss",
+      "s agarwal",
+      "ss",
+      "ss agarwal"
     ],
-    "S Dhawan": [
-      "shikhar",
-      "dhawan",
-      "shikhar dhawan",
-      "shikhar dhavan",
-      "shikar",
-      "shikar dhawan",
-      "s dhawan",
-      "s d",
-      "sd",
-      "gabbar",
-      "the wall",
-      "dhawan shikhar",
-      "shikhar d"
+    "SS Cottrell": [
+      "cottrell",
+      "cottrell ss",
+      "s cottrell",
+      "ss",
+      "ss cottrell"
     ],
-    "SK Raina": [
-      "suresh raina",
-      "raina",
-      "sk raina",
-      "s raina",
-      "suresh",
-      "raina suresh",
-      "sureshraina",
-      "cherry",
-      "mr ipsilon",
-      "raina sk"
+    "SS Iyer": [
+      "iyer",
+      "iyer ss",
+      "s iyer",
+      "ss",
+      "ss iyer"
     ],
-    "Yusuf Pathan": [
-      "yusuf pathan",
-      "yusuf",
+    "SS Mundhe": [
+      "mundhe",
+      "mundhe ss",
+      "s mundhe",
+      "ss",
+      "ss mundhe"
+    ],
+    "SS Prabhudessai": [
+      "prabhudessai",
+      "prabhudessai ss",
+      "s prabhudessai",
+      "ss",
+      "ss prabhudessai"
+    ],
+    "SS Sarkar": [
+      "s sarkar",
+      "sarkar",
+      "sarkar ss",
+      "ss",
+      "ss sarkar"
+    ],
+    "SS Shaikh": [
+      "s shaikh",
+      "shaikh",
+      "shaikh ss",
+      "ss",
+      "ss shaikh"
+    ],
+    "SS Tiwary": [
+      "s tiwary",
+      "ss",
+      "ss tiwary",
+      "tiwary",
+      "tiwary ss"
+    ],
+    "SSB Magala": [
+      "magala",
+      "magala ssb",
+      "s magala",
+      "ssb",
+      "ssb magala"
+    ],
+    "ST Jayasuriya": [
+      "jayasuriya",
+      "jayasuriya st",
+      "s jayasuriya",
+      "st",
+      "st jayasuriya"
+    ],
+    "STR Binny": [
+      "binny",
+      "binny str",
+      "s binny",
+      "str",
+      "str binny"
+    ],
+    "SV Samson": [
+      "s samson",
+      "samson",
+      "samson sv",
+      "sv",
+      "sv samson"
+    ],
+    "SW Billings": [
+      "billings",
+      "billings sw",
+      "s billings",
+      "sw",
+      "sw billings"
+    ],
+    "SW Tait": [
+      "s tait",
+      "sw",
+      "sw tait",
+      "tait",
+      "tait sw"
+    ],
+    "SZ Mulani": [
+      "mulani",
+      "mulani sz",
+      "s mulani",
+      "sz",
+      "sz mulani"
+    ],
+    "Sachin Baby": [
+      "baby",
+      "baby sachin",
+      "s baby",
+      "sachin",
+      "sachin baby"
+    ],
+    "Salman Butt": [
+      "butt",
+      "butt salman",
+      "s butt",
+      "salman",
+      "salman butt"
+    ],
+    "Sameer Rizvi": [
+      "rizvi",
+      "rizvi sameer",
+      "s rizvi",
+      "sameer",
+      "sameer rizvi"
+    ],
+    "Sandeep Sharma": [
+      "s sharma",
+      "sandeep",
+      "sandeep sharma",
+      "sharma",
+      "sharma sandeep"
+    ],
+    "Sanvir Singh": [
+      "s singh",
+      "sanvir",
+      "sanvir singh",
+      "singh",
+      "singh sanvir"
+    ],
+    "Saurav Chauhan": [
+      "chauhan",
+      "chauhan saurav",
+      "s chauhan",
+      "saurav",
+      "saurav chauhan"
+    ],
+    "Sediqullah Atal": [
+      "atal",
+      "atal sediqullah",
+      "s atal",
+      "sediqullah",
+      "sediqullah atal"
+    ],
+    "Shahbaz Ahmed": [
+      "ahmed",
+      "ahmed shahbaz",
+      "s ahmed",
+      "shahbaz",
+      "shahbaz ahmed"
+    ],
+    "Shahid Afridi": [
+      "afridi",
+      "afridi shahid",
+      "s afridi",
+      "shahid",
+      "shahid afridi"
+    ],
+    "Shakib Al Hasan": [
+      "al",
+      "hasan",
+      "hasan shakib",
+      "s hasan",
+      "shakib",
+      "shakib al hasan",
+      "shakib hasan"
+    ],
+    "Shashank Singh": [
+      "s singh",
+      "shashank",
+      "shashank singh",
+      "singh",
+      "singh shashank"
+    ],
+    "Shivam Mavi": [
+      "mavi",
+      "mavi shivam",
+      "s mavi",
+      "shivam",
+      "shivam mavi"
+    ],
+    "Shivam Sharma": [
+      "s sharma",
+      "sharma",
+      "sharma shivam",
+      "shivam",
+      "shivam sharma"
+    ],
+    "Shivam Singh": [
+      "s singh",
+      "shivam",
+      "shivam singh",
+      "singh",
+      "singh shivam"
+    ],
+    "Shoaib Ahmed": [
+      "ahmed",
+      "ahmed shoaib",
+      "s ahmed",
+      "shoaib",
+      "shoaib ahmed"
+    ],
+    "Shoaib Akhtar": [
+      "akhtar",
+      "akhtar shoaib",
+      "s akhtar",
+      "shoaib",
+      "shoaib akhtar"
+    ],
+    "Shoaib Malik": [
+      "malik",
+      "malik shoaib",
+      "s malik",
+      "shoaib",
+      "shoaib malik"
+    ],
+    "Shubman Gill": [
+      "gill",
+      "gill shubman",
+      "s gill",
+      "shubman",
+      "shubman gill"
+    ],
+    "Sikandar Raza": [
+      "raza",
+      "raza sikandar",
+      "s raza",
+      "sikandar",
+      "sikandar raza"
+    ],
+    "Simarjeet Singh": [
+      "s singh",
+      "simarjeet",
+      "simarjeet singh",
+      "singh",
+      "singh simarjeet"
+    ],
+    "Sohail Tanvir": [
+      "s tanvir",
+      "sohail",
+      "sohail tanvir",
+      "tanvir",
+      "tanvir sohail"
+    ],
+    "Sumit Kumar": [
+      "kumar",
+      "kumar sumit",
+      "s kumar",
+      "sumit",
+      "sumit kumar"
+    ],
+    "Sunny Gupta": [
+      "gupta",
+      "gupta sunny",
+      "s gupta",
+      "sunny",
+      "sunny gupta"
+    ],
+    "Sunny Singh": [
+      "s singh",
+      "singh",
+      "singh sunny",
+      "sunny",
+      "sunny singh"
+    ],
+    "Suryansh Shedge": [
+      "s shedge",
+      "shedge",
+      "shedge suryansh",
+      "suryansh",
+      "suryansh shedge"
+    ],
+    "Suyash Sharma": [
+      "s sharma",
+      "sharma",
+      "sharma suyash",
+      "suyash",
+      "suyash sharma"
+    ],
+    "Swapnil Singh": [
+      "s singh",
+      "singh",
+      "singh swapnil",
+      "swapnil",
+      "swapnil singh"
+    ],
+    "T Banton": [
+      "banton",
+      "banton t",
+      "t",
+      "t banton"
+    ],
+    "T Henderson": [
+      "henderson",
+      "henderson t",
+      "t",
+      "t henderson"
+    ],
+    "T Kohler-Cadmore": [
+      "kohler-cadmore",
+      "kohler-cadmore t",
+      "t",
+      "t kohler-cadmore"
+    ],
+    "T Kohli": [
+      "chikoo",
+      "king kohli",
+      "kohli",
+      "kohli t",
+      "t",
+      "t kohli",
+      "veer",
+      "vk"
+    ],
+    "T Natarajan": [
+      "natarajan",
+      "natarajan t",
+      "t",
+      "t natarajan"
+    ],
+    "T Shamsi": [
+      "shamsi",
+      "shamsi t",
+      "t",
+      "t shamsi"
+    ],
+    "T Stubbs": [
+      "stubbs",
+      "stubbs t",
+      "t",
+      "t stubbs"
+    ],
+    "T Taibu": [
+      "t",
+      "t taibu",
+      "taibu",
+      "taibu t"
+    ],
+    "T Thushara": [
+      "t",
+      "t thushara",
+      "thushara",
+      "thushara t"
+    ],
+    "TA Boult": [
+      "boult",
+      "boult ta",
+      "t boult",
+      "ta",
+      "ta boult"
+    ],
+    "TD Paine": [
+      "paine",
+      "paine td",
+      "t paine",
+      "td",
+      "td paine"
+    ],
+    "TG Southee": [
+      "southee",
+      "southee tg",
+      "t southee",
+      "tg",
+      "tg southee"
+    ],
+    "TH David": [
+      "david",
+      "david th",
+      "t david",
+      "th",
+      "th david"
+    ],
+    "TK Curran": [
+      "curran",
+      "curran tk",
+      "t curran",
+      "tk",
+      "tk curran"
+    ],
+    "TL Seifert": [
+      "seifert",
+      "seifert tl",
+      "t seifert",
+      "tl",
+      "tl seifert"
+    ],
+    "TL Suman": [
+      "suman",
+      "suman tl",
+      "t suman",
+      "tl",
+      "tl suman"
+    ],
+    "TM Dilshan": [
+      "dilshan",
+      "dilshan tm",
+      "t dilshan",
+      "tm",
+      "tm dilshan"
+    ],
+    "TM Head": [
+      "head",
+      "head tm",
+      "t head",
+      "tm",
+      "tm head"
+    ],
+    "TM Srivastava": [
+      "srivastava",
+      "srivastava tm",
+      "t srivastava",
+      "tm",
+      "tm srivastava"
+    ],
+    "TP Sudhindra": [
+      "sudhindra",
+      "sudhindra tp",
+      "t sudhindra",
+      "tp",
+      "tp sudhindra"
+    ],
+    "TR Birt": [
+      "birt",
+      "birt tr",
+      "t birt",
+      "tr",
+      "tr birt"
+    ],
+    "TS Mills": [
+      "mills",
+      "mills ts",
+      "t mills",
+      "ts",
+      "ts mills"
+    ],
+    "TU Deshpande": [
+      "deshpande",
+      "deshpande tu",
+      "t deshpande",
+      "tu",
+      "tu deshpande"
+    ],
+    "Tanush Kotian": [
+      "kotian",
+      "kotian tanush",
+      "t kotian",
+      "tanush",
+      "tanush kotian"
+    ],
+    "Tejas Baroka": [
+      "baroka",
+      "baroka tejas",
+      "t baroka",
+      "tejas",
+      "tejas baroka"
+    ],
+    "Tilak Varma": [
+      "t varma",
+      "tilak",
+      "tilak varma",
+      "varma",
+      "varma tilak"
+    ],
+    "U Kaul": [
+      "kaul",
+      "kaul u",
+      "u",
+      "u kaul"
+    ],
+    "UA Birla": [
+      "birla",
+      "birla ua",
+      "u birla",
+      "ua",
+      "ua birla"
+    ],
+    "UBT Chand": [
+      "chand",
+      "chand ubt",
+      "u chand",
+      "ubt",
+      "ubt chand"
+    ],
+    "UT Khawaja": [
+      "khawaja",
+      "khawaja ut",
+      "u khawaja",
+      "ut",
+      "ut khawaja"
+    ],
+    "UT Yadav": [
+      "u yadav",
+      "ut",
+      "ut yadav",
+      "yadav",
+      "yadav ut"
+    ],
+    "Umar Gul": [
+      "gul",
+      "gul umar",
+      "u gul",
+      "umar",
+      "umar gul"
+    ],
+    "Umran Malik": [
+      "malik",
+      "malik umran",
+      "u malik",
+      "umran",
+      "umran malik"
+    ],
+    "Urvil Patel": [
+      "patel",
+      "patel urvil",
+      "u patel",
+      "urvil",
+      "urvil patel"
+    ],
+    "V Kaverappa": [
+      "kaverappa",
+      "kaverappa v",
+      "v",
+      "v kaverappa"
+    ],
+    "V Kohli": [
+      "coholli",
+      "king kohli",
+      "kohli",
+      "kohli v",
+      "kohli viraat",
+      "kohli virat",
+      "v k",
+      "v kohli",
+      "veerat",
+      "viraat",
+      "viraat kohli",
+      "viraat koli",
+      "virat",
+      "virat cohhli",
+      "virat kholi",
+      "virat kohl",
+      "virat kohli",
+      "virat kohli ji",
+      "virat koli",
+      "virrat kohli",
+      "vk",
+      "vkohli"
+    ],
+    "V Nigam": [
+      "nigam",
+      "nigam v",
+      "v",
+      "v nigam"
+    ],
+    "V Pratap Singh": [
+      "pratap",
+      "singh",
+      "singh v",
+      "v",
+      "v pratap singh",
+      "v singh"
+    ],
+    "V Puthur": [
+      "puthur",
+      "puthur v",
+      "v",
+      "v puthur"
+    ],
+    "V Sehwag": [
+      "sehwag",
+      "sehwag v",
+      "v",
+      "v sehwag"
+    ],
+    "V Shankar": [
+      "shankar",
+      "shankar v",
+      "v",
+      "v shankar"
+    ],
+    "V Suryavanshi": [
+      "suryavanshi",
+      "suryavanshi v",
+      "v",
+      "v suryavanshi"
+    ],
+    "V Viyaskanth": [
+      "v",
+      "v viyaskanth",
+      "viyaskanth",
+      "viyaskanth v"
+    ],
+    "VG Arora": [
+      "arora",
+      "arora vg",
+      "v arora",
+      "vg",
+      "vg arora"
+    ],
+    "VH Zol": [
+      "v zol",
+      "vh",
+      "vh zol",
+      "zol",
+      "zol vh"
+    ],
+    "VR Aaron": [
+      "aaron",
+      "aaron vr",
+      "v aaron",
+      "vr",
+      "vr aaron"
+    ],
+    "VR Iyer": [
+      "iyer",
+      "iyer vr",
+      "v iyer",
+      "vr",
+      "vr iyer"
+    ],
+    "VRV Singh": [
+      "singh",
+      "singh vrv",
+      "v singh",
+      "vrv",
+      "vrv singh"
+    ],
+    "VS Malik": [
+      "malik",
+      "malik vs",
+      "v malik",
+      "vs",
+      "vs malik"
+    ],
+    "VS Yeligati": [
+      "v yeligati",
+      "vs",
+      "vs yeligati",
+      "yeligati",
+      "yeligati vs"
+    ],
+    "VVS Laxman": [
+      "laxman",
+      "laxman vvs",
+      "v laxman",
+      "vvs",
+      "vvs laxman"
+    ],
+    "VY Mahesh": [
+      "mahesh",
+      "mahesh vy",
+      "v mahesh",
+      "vy",
+      "vy mahesh"
+    ],
+    "Vijaykumar Vyshak": [
+      "v vyshak",
+      "vijaykumar",
+      "vijaykumar vyshak",
+      "vyshak",
+      "vyshak vijaykumar"
+    ],
+    "Virat Singh": [
+      "singh",
+      "singh virat",
+      "v singh",
+      "virat",
+      "virat singh"
+    ],
+    "Vishnu Vinod": [
+      "v vinod",
+      "vinod",
+      "vinod vishnu",
+      "vishnu",
+      "vishnu vinod"
+    ],
+    "Vivrant Sharma": [
+      "sharma",
+      "sharma vivrant",
+      "v sharma",
+      "vivrant",
+      "vivrant sharma"
+    ],
+    "W Jaffer": [
+      "jaffer",
+      "jaffer w",
+      "w",
+      "w jaffer"
+    ],
+    "W O'Rourke": [
+      "o'rourke",
+      "o'rourke w",
+      "w",
+      "w o'rourke"
+    ],
+    "WA Mota": [
+      "mota",
+      "mota wa",
+      "w mota",
+      "wa",
+      "wa mota"
+    ],
+    "WD Parnell": [
+      "parnell",
+      "parnell wd",
+      "w parnell",
+      "wd",
+      "wd parnell"
+    ],
+    "WG Jacks": [
+      "jacks",
+      "jacks wg",
+      "w jacks",
+      "wg",
+      "wg jacks"
+    ],
+    "WP Saha": [
+      "saha",
+      "saha wp",
+      "w saha",
+      "wp",
+      "wp saha"
+    ],
+    "WPUJC Vaas": [
+      "vaas",
+      "vaas wpujc",
+      "w vaas",
+      "wpujc",
+      "wpujc vaas"
+    ],
+    "Washington Sundar": [
+      "sundar",
+      "sundar washington",
+      "w sundar",
+      "washington",
+      "washington sundar"
+    ],
+    "X Thalaivan Sargunam": [
+      "sargunam",
+      "sargunam x",
+      "thalaivan",
+      "x",
+      "x sargunam",
+      "x thalaivan sargunam"
+    ],
+    "XC Bartlett": [
+      "bartlett",
+      "bartlett xc",
+      "x bartlett",
+      "xc",
+      "xc bartlett"
+    ],
+    "Y Gnaneswara Rao": [
+      "gnaneswara",
+      "rao",
+      "rao y",
+      "y",
+      "y gnaneswara rao",
+      "y rao"
+    ],
+    "Y Nagar": [
+      "nagar",
+      "nagar y",
+      "y",
+      "y nagar"
+    ],
+    "Y Prithvi Raj": [
+      "prithvi",
+      "raj",
+      "raj y",
+      "y",
+      "y prithvi raj",
+      "y raj"
+    ],
+    "Y Venugopal Rao": [
+      "rao",
+      "rao y",
+      "venugopal",
+      "y",
+      "y rao",
+      "y venugopal rao"
+    ],
+    "YA Abdulla": [
+      "abdulla",
+      "abdulla ya",
+      "y abdulla",
+      "ya",
+      "ya abdulla"
+    ],
+    "YBK Jaiswal": [
+      "jaiswal",
+      "jaiswal ybk",
+      "y jaiswal",
+      "ybk",
+      "ybk jaiswal"
+    ],
+    "YK Pathan": [
       "pathan",
-      "yusuf p",
-      "yusuff pathan",
-      "pathan yusuf",
-      "ypathan",
-      "yp"
+      "pathan yk",
+      "y pathan",
+      "yk",
+      "yk pathan"
     ],
-    "MS Dhoni": [
-      "ms dhoni",
-      "m s dhoni",
-      "msd",
-      "dhoni",
-      "dhoni ms",
-      "mahendra",
-      "mahendra dhoni",
-      "mahendra singh",
-      "mahendra singh dhoni",
-      "ms d",
-      "m dhoni",
-      "dhoni captain",
-      "dhony",
-      "dhoney",
-      "msd dhoni"
+    "YS Chahal": [
+      "chahal",
+      "chahal ys",
+      "mystery",
+      "y chahal",
+      "ys",
+      "ys chahal",
+      "yuz"
+    ],
+    "YV Dhull": [
+      "dhull",
+      "dhull yv",
+      "y dhull",
+      "yv",
+      "yv dhull"
+    ],
+    "YV Takawale": [
+      "takawale",
+      "takawale yv",
+      "y takawale",
+      "yv",
+      "yv takawale"
+    ],
+    "Yash Dayal": [
+      "dayal",
+      "dayal yash",
+      "y dayal",
+      "yash",
+      "yash dayal"
+    ],
+    "Yash Thakur": [
+      "thakur",
+      "thakur yash",
+      "y thakur",
+      "yash",
+      "yash thakur"
+    ],
+    "Yashpal Singh": [
+      "singh",
+      "singh yashpal",
+      "y singh",
+      "yashpal",
+      "yashpal singh"
+    ],
+    "Younis Khan": [
+      "khan",
+      "khan younis",
+      "y khan",
+      "younis",
+      "younis khan"
+    ],
+    "Yudhvir Singh": [
+      "singh",
+      "singh yudhvir",
+      "y singh",
+      "yudhvir",
+      "yudhvir singh"
+    ],
+    "Yuvraj Singh": [
+      "singh",
+      "singh yuvraj",
+      "y singh",
+      "yuvraj",
+      "yuvraj singh"
+    ],
+    "Z Khan": [
+      "khan",
+      "khan z",
+      "z",
+      "z khan"
+    ],
+    "Zeeshan Ansari": [
+      "ansari",
+      "ansari zeeshan",
+      "z ansari",
+      "zeeshan",
+      "zeeshan ansari"
     ]
   }
 }
