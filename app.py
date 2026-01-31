@@ -85,7 +85,11 @@ st.set_page_config(
     page_title="IPL Analytics AI",
     page_icon="🏏",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto",  # Auto-collapse on mobile
+    menu_items={
+        "Get Help": "https://github.com",
+        "About": "# IPL Analytics AI\nMobile-friendly cricket analytics powered by AI"
+    }
 )
 
 # Custom styling - CricMetric-inspired with muted colors
@@ -260,6 +264,143 @@ st.markdown("""
         padding: 12px 16px;
         border-radius: 6px;
         border-left: 4px solid #e65100;
+    }
+    
+    /* ===== MOBILE RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .main {
+            padding-top: 0.5rem !important;
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+        
+        /* Mobile-friendly font sizes */
+        h1 {
+            font-size: 24px !important;
+            margin-bottom: 12px !important;
+        }
+        
+        h2 {
+            font-size: 18px !important;
+            margin-top: 12px !important;
+            margin-bottom: 10px !important;
+            padding-bottom: 8px !important;
+        }
+        
+        h3, h4 {
+            font-size: 16px !important;
+        }
+        
+        /* Card padding for mobile */
+        .stat-card {
+            padding: 12px !important;
+            margin-bottom: 8px !important;
+            border-left: 3px solid #556b82 !important;
+        }
+        
+        .stat-card-title {
+            font-size: 11px !important;
+            margin-bottom: 6px !important;
+        }
+        
+        .stat-card-value {
+            font-size: 20px !important;
+            margin-bottom: 2px !important;
+        }
+        
+        .stat-card-subtitle {
+            font-size: 11px !important;
+        }
+        
+        /* Mobile button sizing */
+        .stButton > button {
+            width: 100% !important;
+            padding: 10px 12px !important;
+            font-size: 14px !important;
+            border-radius: 5px !important;
+            margin-bottom: 8px !important;
+        }
+        
+        /* Input fields */
+        .stTextInput input,
+        .stSelectbox select,
+        .stTextArea textarea {
+            font-size: 16px !important;
+            padding: 10px !important;
+            border-radius: 5px !important;
+        }
+        
+        /* Tables - horizontal scroll on mobile */
+        .stDataFrame {
+            font-size: 12px !important;
+            overflow-x: auto !important;
+        }
+        
+        /* Sidebar adjustments */
+        .stSidebar {
+            width: 100% !important;
+        }
+        
+        /* H2H container */
+        .h2h-container {
+            padding: 12px !important;
+            margin-top: 10px !important;
+        }
+        
+        .h2h-player-card {
+            padding: 12px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .h2h-player-name {
+            font-size: 14px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        /* Text styling */
+        p {
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Success/warning boxes */
+        .success, .warning {
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+        }
+        
+        /* Metric spacing */
+        .stMetric {
+            padding: 10px !important;
+            margin-bottom: 8px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .main {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+        
+        h1 {
+            font-size: 20px !important;
+        }
+        
+        h2 {
+            font-size: 16px !important;
+        }
+        
+        .stat-card {
+            padding: 10px !important;
+        }
+        
+        .stat-card-value {
+            font-size: 18px !important;
+        }
+        
+        .stDataFrame {
+            font-size: 11px !important;
+        }
     }
     
     </style>

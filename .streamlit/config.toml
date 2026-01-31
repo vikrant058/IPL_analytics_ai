@@ -8,7 +8,19 @@ font = "sans serif"
 [server]
 maxUploadSize = 200
 enableXsrfProtection = true
+headless = true
+port = 8501
+enableCORS = true
+allowRunOnSave = true
 
 [client]
 showErrorDetails = false
 toolbarMode = "auto"
+showSidebarNavigation = true
+
+[logger]
+level = "info"
+
+[browser]
+gatherUsageStats = false
+
