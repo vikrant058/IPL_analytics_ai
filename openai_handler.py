@@ -391,15 +391,25 @@ class CricketChatbot:
         if detected_record_type:
             # Determine if this is a player-specific record or overall record
             # Player-specific patterns: "kohli highest score", "bumrah's record", "sachin fastest century"
-            # Overall patterns: "highest score in IPL", "most runs ever", "best figures"
+            # Overall patterns: "highest score in IPL", "most runs ever", "best figures", "highest player total"
             
             is_player_specific = False
             player1 = None
             
-            # Skip player resolution if query clearly asks for overall/team records
+            # Skip player resolution if query is asking for overall/ranking-style records
+            # "highest player total", "highest player score", "most runs" = overall records
+            # "kohli highest score" = player-specific record
             has_overall_keywords = any(word in query_lower for word in 
-                ["in ipl", "in the ipl", "overall", "team", "total", "batsman", "bowler", 
+                ["in ipl", "in the ipl", "overall", "team", "batsman", "bowler", 
                  "in a match", "in cricket", "in iplt20", "in tournament", "ever", "all time"])
+            
+            # Check if query starts with a record keyword without a specific player name
+            # "highest player total", "most runs", "best bowling figures" = overall records
+            # These start with the record phrase, not a player name
+            record_start_phrases = ["highest player", "highest individual", "most runs", "most wickets", 
+                                   "most sixes", "most fours", "best bowling", "fastest fifty", "fastest century",
+                                   "lowest score", "highest team"]
+            is_ranking_style = any(query_lower.startswith(phrase) for phrase in record_start_phrases)
             
             # Check for explicit player mentions with possessive or direct patterns
             if "'s " in query_lower or " by " in query_lower or " of " in query_lower or "in career" in query_lower:
@@ -408,8 +418,8 @@ class CricketChatbot:
                 if player1:
                     is_player_specific = True
             
-            # Check for direct player name mentions (without overall keywords)
-            elif not has_overall_keywords:
+            # Check for direct player name mentions (without overall keywords and not ranking-style)
+            elif not has_overall_keywords and not is_ranking_style:
                 # Query like "kohli highest score" - might be player-specific
                 player1 = self._resolve_player_name(query)
                 if player1:
