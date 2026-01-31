@@ -97,6 +97,9 @@ class CricketChatbot:
             if aliases_file.exists():
                 with open(aliases_file, 'r') as f:
                     data = json.load(f)
+                
+                # Store canonical aliases for later use
+                self._canonical_aliases = data.get("aliases", {})
                     
                 # Build reverse mapping: alias -> canonical name
                 alias_map = {}
@@ -108,6 +111,7 @@ class CricketChatbot:
         except Exception as e:
             print(f"Warning: Could not load player aliases: {e}")
         
+        self._canonical_aliases = {}
         return {}
     
     def _build_team_aliases(self) -> Dict[str, str]:
@@ -142,10 +146,19 @@ class CricketChatbot:
         """Intelligently resolve player name from query using aliases and fuzzy matching"""
         query_lower = query_text.lower()
         
-        # Check for exact aliases first
+        # Check for longest-match-first to avoid matching "a" in "a zampa" when looking for "kohli"
+        # This prevents short aliases from incorrectly matching longer queries
+        matches = []
         for alias, full_name in self.player_aliases.items():
             if alias in query_lower:
-                return full_name
+                # Count how many aliases this player has (as a tiebreaker - more aliases = more popular)
+                player_alias_count = len(self._canonical_aliases.get(full_name, []))
+                matches.append((alias, full_name, len(alias), player_alias_count))
+        
+        if matches:
+            # Sort by: 1) alias length (longest first), 2) player alias count (more aliases = more popular)
+            matches.sort(key=lambda x: (-x[2], -x[3]))
+            return matches[0][1]  # Return the canonical name of the best matching alias
         
         # Check for partial matches in all players
         for player in self.all_players:
