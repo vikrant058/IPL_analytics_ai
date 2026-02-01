@@ -83,7 +83,7 @@ st.markdown("""
         background: white !important;
         color: #666 !important;
         font-size: 18px !important;
-        transition: all 0.3s ease !important;
+        transition: all 0.2s ease !important;
         padding: 8px 0 !important;
         cursor: pointer !important;
         display: flex !important;
@@ -92,16 +92,49 @@ st.markdown("""
         align-items: center !important;
         margin: 0 !important;
         box-sizing: border-box !important;
+        border-radius: 0 !important;
+        font-weight: 500 !important;
     }
     
     .bottom-nav-container .nav-btn:hover {
-        background-color: #f8f9fa !important;
+        background-color: #f5f6f7 !important;
         color: #2c3e50 !important;
+        border-bottom: 3px solid #556b82 !important;
     }
     
     .bottom-nav-container .nav-btn:active {
         background-color: #e8eaed !important;
         color: #2c3e50 !important;
+        border-bottom: 3px solid #2c3e50 !important;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .bottom-nav-container .nav-btn {
+            font-size: 14px !important;
+            height: 65px !important;
+        }
+        
+        .main {
+            padding-bottom: 95px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .bottom-nav-container .nav-btn {
+            font-size: 12px !important;
+            height: 60px !important;
+            padding: 4px 0 !important;
+        }
+        
+        .bottom-nav-container {
+            height: 60px !important;
+            padding: 2px 0 !important;
+        }
+        
+        .main {
+            padding-bottom: 80px !important;
+        }
     }
     
     /* Typography */
@@ -340,40 +373,45 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-nav_html = """
-<div class="bottom-nav-container">
-    <button class="nav-btn" onclick="window.location.hash='cricbot'">🤖 Cricbot</button>
-    <button class="nav-btn" onclick="window.location.hash='profiles'">👤 Profiles</button>
-    <button class="nav-btn" onclick="window.location.hash='h2h'">⚔️ H2H</button>
-    <button class="nav-btn" onclick="window.location.hash='form'">📈 Form</button>
-</div>
+# Get current page from session state (default to cricbot)
+current_page = st.session_state.get("current_page", "cricbot")
+
+# JavaScript to handle smooth transitions and prevent Streamlit default behavior
+nav_script = f"""
 <script>
-    // Handle navigation via hash
-    function handleNavigation() {
-        const hash = window.location.hash.slice(1) || 'cricbot';
-        const pages = ['cricbot', 'profiles', 'h2h', 'form'];
-        
-        if (pages.includes(hash)) {
-            // Send message to Streamlit
-            window.parent.postMessage({
-                type: 'streamlit:setComponentValue',
-                value: hash
-            }, '*');
-        }
-    }
-    
-    window.addEventListener('hashchange', handleNavigation);
-    handleNavigation();
+    document.addEventListener('DOMContentLoaded', function() {{
+        // Handle button clicks
+        const buttons = document.querySelectorAll('.nav-btn');
+        buttons.forEach(btn => {{
+            btn.addEventListener('click', function(e) {{
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                // Update parent window location to trigger rerun
+                parent.location.hash = page;
+                // Also dispatch custom event for Streamlit
+                window.dispatchEvent(new CustomEvent('page-change', {{ detail: {{ page: page }} }}));
+            }});
+        }});
+    }});
 </script>
+"""
+
+# Bottom navigation bar with proper responsive styling
+nav_html = f"""
+<div class="bottom-nav-container">
+    <button class="nav-btn" data-page="cricbot">🤖 Cricbot</button>
+    <button class="nav-btn" data-page="profiles">👤 Profiles</button>
+    <button class="nav-btn" data-page="h2h">⚔️ H2H</button>
+    <button class="nav-btn" data-page="form">📈 Form</button>
+</div>
+{nav_script}
 """
 
 st.markdown(nav_html, unsafe_allow_html=True)
 
-# Handle hash-based navigation
-hash_page = st.query_params.get("page", ["cricbot"])[0] if "page" in st.query_params else "cricbot"
-
-# Alternative: Use columns with proper container logic
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns([1, 1, 1, 1], gap="small")
+# Create invisible buttons for navigation (only Streamlit can see these)
+st.markdown('<div style="display: none;">', unsafe_allow_html=True)
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
     if st.button("🤖 Cricbot", key="btn_cricbot", use_container_width=True):
@@ -394,3 +432,5 @@ with nav_col4:
     if st.button("📈 Form", key="btn_form", use_container_width=True):
         st.session_state.current_page = "form"
         st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
