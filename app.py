@@ -196,6 +196,13 @@ loader, stats_engine, ai_engine = load_data()
 if "current_page" not in st.session_state:
     st.session_state.current_page = "cricbot"
 
+# Check URL query parameters for page navigation
+query_params = st.query_params
+if "page" in query_params:
+    requested_page = query_params.get("page", "cricbot")
+    if requested_page in ["cricbot", "profiles", "h2h", "form"]:
+        st.session_state.current_page = requested_page
+
 # Header
 st.markdown("""
     <div style="text-align: center; padding: 10px 0 20px 0;">
@@ -373,44 +380,14 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-# Check localStorage for page changes via JavaScript
+# Create bottom navigation with URL-based page switching
 nav_html = """
 <div class="bottom-nav-container">
-    <button class="nav-btn" onclick="handleNavClick('cricbot')">🤖 Cricbot</button>
-    <button class="nav-btn" onclick="handleNavClick('profiles')">👤 Profiles</button>
-    <button class="nav-btn" onclick="handleNavClick('h2h')">⚔️ H2H</button>
-    <button class="nav-btn" onclick="handleNavClick('form')">📈 Form</button>
+    <button class="nav-btn" onclick="window.location.href='?page=cricbot'">🤖 Cricbot</button>
+    <button class="nav-btn" onclick="window.location.href='?page=profiles'">👤 Profiles</button>
+    <button class="nav-btn" onclick="window.location.href='?page=h2h'">⚔️ H2H</button>
+    <button class="nav-btn" onclick="window.location.href='?page=form'">📈 Form</button>
 </div>
-<script>
-function handleNavClick(page) {
-    // Store the page in sessionStorage
-    sessionStorage.setItem('streamlit_nav_page', page);
-    // Force page reload to trigger Streamlit rerun
-    window.location.reload();
-}
-</script>
 """
 
 st.markdown(nav_html, unsafe_allow_html=True)
-
-# Check if navigation was triggered via JavaScript
-if "nav_page" not in st.session_state:
-    st.session_state.nav_page = None
-
-# Use client to detect page change
-try:
-    import streamlit.components.v1 as components
-    # Inject JavaScript to read sessionStorage and communicate with Streamlit
-    check_nav_script = """
-    <script>
-        const page = sessionStorage.getItem('streamlit_nav_page');
-        if (page) {
-            sessionStorage.removeItem('streamlit_nav_page');
-            // Trigger a custom event that Streamlit can listen to
-            window.dispatchEvent(new CustomEvent('streamlit_page_change', { detail: { page: page } }));
-        }
-    </script>
-    """
-    st.markdown(check_nav_script, unsafe_allow_html=True)
-except:
-    pass
