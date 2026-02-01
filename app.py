@@ -50,42 +50,68 @@ st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 140px;
+        padding-bottom: 120px;
     }
     
     /* Fixed Bottom Navigation Bar */
     .bottom-nav-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 100px;
-        background: white;
-        border-top: 2px solid #e8eaed;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 999;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        width: 100%;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 90px !important;
+        background: white !important;
+        border-top: 2px solid #e8eaed !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        z-index: 9999 !important;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     
-    /* Streamlit buttons in bottom nav */
-    .bottom-nav-container [data-testid="baseButton-secondary"] {
-        height: 100px;
-        width: 100%;
+    /* Target the column divs inside nav container */
+    .bottom-nav-container > div {
+        flex: 1 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        height: 90px !important;
+        padding: 0 !important;
+        width: 25% !important;
+    }
+    
+    /* Style all buttons in bottom nav */
+    .bottom-nav-container button {
+        height: 90px !important;
+        width: 100% !important;
         border: none !important;
         background: white !important;
         color: #888 !important;
         border-top: 3px solid transparent !important;
-        font-size: 16px !important;
+        font-size: 14px !important;
         transition: all 0.3s ease !important;
-        padding: 0 !important;
+        padding: 10px 5px !important;
+        cursor: pointer !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
     
-    .bottom-nav-container [data-testid="baseButton-secondary"]:hover {
+    .bottom-nav-container button:hover {
         background-color: #f8f9fa !important;
         color: #2c3e50 !important;
+        border-top-color: #556b82 !important;
+    }
+    
+    .bottom-nav-container button:active {
+        background-color: #e8eaed !important;
+        color: #2c3e50 !important;
+        border-top-color: #556b82 !important;
     }
     
     /* Typography */
