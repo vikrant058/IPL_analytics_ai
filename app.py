@@ -158,13 +158,14 @@ if st.session_state.show_output:
         st.markdown("""
         <style>
             .back-btn-container button {
-                height: 28px !important;
-                padding: 4px 8px !important;
-                font-size: 12px !important;
+                height: 24px !important;
+                width: 30px !important;
+                padding: 2px 4px !important;
+                font-size: 16px !important;
             }
         </style>
         """, unsafe_allow_html=True)
-        if st.button("← Back", key="back_btn", use_container_width=True):
+        if st.button("←", key="back_btn"):
             st.session_state.show_output = False
             st.rerun()
 
