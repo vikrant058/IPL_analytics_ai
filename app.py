@@ -289,7 +289,19 @@ with tab_form:
         st.markdown(f"**Recent Form - {player}**")
         recent = stats_engine.get_last_n_matches(player, n=10)
         
-        if recent is not None and not recent.empty:
-            st.dataframe(recent, use_container_width=True)
+        # Handle both DataFrame and list returns
+        if recent is not None:
+            if isinstance(recent, list):
+                if len(recent) > 0:
+                    st.dataframe(recent, use_container_width=True)
+                else:
+                    st.info("No recent match data available.")
+            elif hasattr(recent, 'empty'):
+                if not recent.empty:
+                    st.dataframe(recent, use_container_width=True)
+                else:
+                    st.info("No recent match data available.")
+            else:
+                st.dataframe(recent, use_container_width=True)
         else:
             st.info("No recent match data available.")
