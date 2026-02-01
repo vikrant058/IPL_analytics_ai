@@ -108,19 +108,6 @@ st.markdown("""
         border-bottom: 3px solid #2c3e50 !important;
     }
     
-    /* Hide the Streamlit buttons completely */
-    [data-testid="baseButton-secondary"] {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        width: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: 0 !important;
-        position: absolute !important;
-        pointer-events: none !important;
-    }
-    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .bottom-nav-container .nav-btn {
@@ -386,64 +373,44 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-# Create 4 invisible columns for button triggers (functional but hidden)
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
-
-with nav_col1:
-    if st.button("C", key="nav_btn_1", use_container_width=True):
-        st.session_state.current_page = "cricbot"
-        st.rerun()
-
-with nav_col2:
-    if st.button("P", key="nav_btn_2", use_container_width=True):
-        st.session_state.current_page = "profiles"
-        st.rerun()
-
-with nav_col3:
-    if st.button("H", key="nav_btn_3", use_container_width=True):
-        st.session_state.current_page = "h2h"
-        st.rerun()
-
-with nav_col4:
-    if st.button("F", key="nav_btn_4", use_container_width=True):
-        st.session_state.current_page = "form"
-        st.rerun()
-
-# Render the visible HTML navigation bar with JavaScript integration
+# Check localStorage for page changes via JavaScript
 nav_html = """
 <div class="bottom-nav-container">
-    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_1\\\"]')?.click()">🤖 Cricbot</button>
-    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_2\\\"]')?.click()">👤 Profiles</button>
-    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_3\\\"]')?.click()">⚔️ H2H</button>
-    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_4\\\"]')?.click()">📈 Form</button>
+    <button class="nav-btn" onclick="handleNavClick('cricbot')">🤖 Cricbot</button>
+    <button class="nav-btn" onclick="handleNavClick('profiles')">👤 Profiles</button>
+    <button class="nav-btn" onclick="handleNavClick('h2h')">⚔️ H2H</button>
+    <button class="nav-btn" onclick="handleNavClick('form')">📈 Form</button>
 </div>
 <script>
-    // Find buttons by content and trigger navigation
-    document.addEventListener('DOMContentLoaded', function() {
-        const navBtns = document.querySelectorAll('.nav-btn');
-        const streamlitBtns = document.querySelectorAll('[data-testid="baseButton-secondary"]');
-        
-        if (navBtns.length > 0 && streamlitBtns.length >= 4) {
-            // Map nav button clicks to Streamlit button clicks
-            navBtns[0].addEventListener('click', function(e) {
-                e.preventDefault();
-                streamlitBtns[0]?.click();
-            });
-            navBtns[1].addEventListener('click', function(e) {
-                e.preventDefault();
-                streamlitBtns[1]?.click();
-            });
-            navBtns[2].addEventListener('click', function(e) {
-                e.preventDefault();
-                streamlitBtns[2]?.click();
-            });
-            navBtns[3].addEventListener('click', function(e) {
-                e.preventDefault();
-                streamlitBtns[3]?.click();
-            });
-        }
-    });
+function handleNavClick(page) {
+    // Store the page in sessionStorage
+    sessionStorage.setItem('streamlit_nav_page', page);
+    // Force page reload to trigger Streamlit rerun
+    window.location.reload();
+}
 </script>
 """
 
 st.markdown(nav_html, unsafe_allow_html=True)
+
+# Check if navigation was triggered via JavaScript
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = None
+
+# Use client to detect page change
+try:
+    import streamlit.components.v1 as components
+    # Inject JavaScript to read sessionStorage and communicate with Streamlit
+    check_nav_script = """
+    <script>
+        const page = sessionStorage.getItem('streamlit_nav_page');
+        if (page) {
+            sessionStorage.removeItem('streamlit_nav_page');
+            // Trigger a custom event that Streamlit can listen to
+            window.dispatchEvent(new CustomEvent('streamlit_page_change', { detail: { page: page } }));
+        }
+    </script>
+    """
+    st.markdown(check_nav_script, unsafe_allow_html=True)
+except:
+    pass
