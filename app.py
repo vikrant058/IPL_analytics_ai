@@ -108,6 +108,15 @@ st.markdown("""
         border-bottom: 3px solid #2c3e50 !important;
     }
     
+    /* Hide empty navigation buttons (functional but invisible) */
+    [data-testid="column"] > div > [data-testid="baseButton-secondary"] {
+        opacity: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        pointer-events: none !important;
+    }
+    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .bottom-nav-container .nav-btn {
@@ -373,64 +382,64 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-# Get current page from session state (default to cricbot)
-current_page = st.session_state.get("current_page", "cricbot")
-
-# JavaScript to handle smooth transitions and prevent Streamlit default behavior
-nav_script = f"""
+# JavaScript to handle navigation via data attributes
+nav_script = """
 <script>
-    document.addEventListener('DOMContentLoaded', function() {{
-        // Handle button clicks
+    // Handle navigation button clicks
+    document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.nav-btn');
-        buttons.forEach(btn => {{
-            btn.addEventListener('click', function(e) {{
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 const page = this.getAttribute('data-page');
-                // Update parent window location to trigger rerun
-                parent.location.hash = page;
-                // Also dispatch custom event for Streamlit
-                window.dispatchEvent(new CustomEvent('page-change', {{ detail: {{ page: page }} }}));
-            }});
-        }});
-    }});
+                
+                // Use Streamlit API to update session state
+                const message = {
+                    type: 'streamlit:setComponentValue',
+                    value: page
+                };
+                
+                // Post message to parent window (Streamlit iframe)
+                window.parent.postMessage(message, '*');
+            });
+        });
+    });
 </script>
 """
 
 # Bottom navigation bar with proper responsive styling
-nav_html = f"""
+nav_html = """
 <div class="bottom-nav-container">
     <button class="nav-btn" data-page="cricbot">🤖 Cricbot</button>
     <button class="nav-btn" data-page="profiles">👤 Profiles</button>
     <button class="nav-btn" data-page="h2h">⚔️ H2H</button>
     <button class="nav-btn" data-page="form">📈 Form</button>
 </div>
-{nav_script}
-"""
+""" + nav_script
 
 st.markdown(nav_html, unsafe_allow_html=True)
 
-# Create invisible buttons for navigation (only Streamlit can see these)
-st.markdown('<div style="display: none;">', unsafe_allow_html=True)
+# Handle navigation via columns that are invisible but functional
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
+# These buttons are invisible but handle the actual navigation logic
 with nav_col1:
-    if st.button("🤖 Cricbot", key="btn_cricbot", use_container_width=True):
+    if st.button("", key="nav_cricbot", use_container_width=True, help="Cricbot"):
         st.session_state.current_page = "cricbot"
         st.rerun()
 
 with nav_col2:
-    if st.button("👤 Profiles", key="btn_profiles", use_container_width=True):
+    if st.button("", key="nav_profiles", use_container_width=True, help="Profiles"):
         st.session_state.current_page = "profiles"
         st.rerun()
 
 with nav_col3:
-    if st.button("⚔️ H2H", key="btn_h2h", use_container_width=True):
+    if st.button("", key="nav_h2h", use_container_width=True, help="H2H"):
         st.session_state.current_page = "h2h"
         st.rerun()
 
 with nav_col4:
-    if st.button("📈 Form", key="btn_form", use_container_width=True):
+    if st.button("", key="nav_form", use_container_width=True, help="Form"):
         st.session_state.current_page = "form"
         st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
