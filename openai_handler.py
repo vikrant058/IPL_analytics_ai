@@ -2203,7 +2203,7 @@ EXAMPLES:
                 }
             ).values
             
-            if season_stats:
+            if len(season_stats) > 0:
                 response += f"**📅 Recent Performance (Last 3 Seasons)**\n"
                 sorted_seasons = sorted(season_stats, key=lambda x: x['season'], reverse=True)[:3]
                 for season_data in sorted_seasons:
