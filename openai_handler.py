@@ -1050,6 +1050,13 @@ EXAMPLES:
                 if opposition_team:
                     return self._get_team_stats_response(opposition_team, metric=ranking_metric)
                 else:
+                    # Special handling for "who won ipl YYYY" queries
+                    import re
+                    year_match = re.search(r'who won ipl (\d{4})', query.lower())
+                    if year_match:
+                        year = int(year_match.group(1))
+                        return self._get_ipl_winner_response(year)
+                    
                     # Team metric detected but name not resolved - use GPT to extract team name
                     team_from_query = self._resolve_team_name(query) or self._extract_team_name_with_gpt(query)
                     if team_from_query:
@@ -2186,6 +2193,18 @@ EXAMPLES:
             response += f"**🏆 IPL Titles**\n"
             response += f"- IPL Championships Won: **{ipl_titles}**\n\n"
             
+            # Get win/loss trends by season
+            final_matches = self.matches_df[
+                (self.matches_df['team1'] == found_team) | (self.matches_df['team2'] == found_team)
+            ]
+            season_stats = final_matches.groupby('season').apply(
+                lambda x: {
+                    'season': x['season'].iloc[0],
+                    'matches': len(x),
+                    'wins': len(x[x['winner'] == found_team])
+                }
+            ).values
+            
             # Ranking comparison
             all_teams = self.all_teams
             team_stats_list = []
@@ -2199,15 +2218,6 @@ EXAMPLES:
             
             response += f"**📊 Rankings**\n"
             response += f"- Overall Rank (by Win %): **#{rank}** out of {len(team_stats_list)} teams\n\n"
-            
-            # Get win/loss trends by season
-            season_stats = final_matches.groupby('season').apply(
-                lambda x: {
-                    'season': x['season'].iloc[0],
-                    'matches': len(x),
-                    'wins': len(x[x['winner'] == found_team])
-                }
-            ).values
             
             if len(season_stats) > 0:
                 response += f"**📅 Recent Performance (Last 3 Seasons)**\n"
@@ -2224,4 +2234,29 @@ EXAMPLES:
             return response
         
         except Exception as e:
-            return f"❌ Error getting team stats: {str(e)}"
+            return f"❌ Error getting team stats: {str(e)}"    
+    def _get_ipl_winner_response(self, year: int) -> str:
+        """Get IPL champion for a specific year"""
+        try:
+            # Find matches in that season
+            season_matches = self.matches_df[self.matches_df['season'] == year]
+            
+            if len(season_matches) == 0:
+                return f"❌ No IPL data found for year {year}. IPL started in 2008."
+            
+            # Get the last match of the season (highest match ID) - this is the final
+            final_match = season_matches.loc[season_matches['id'].idxmax()]
+            winner = final_match['winner']
+            
+            if not winner or pd.isna(winner):
+                return f"❌ Could not determine winner for IPL {year}."
+            
+            response = f"**🏆 IPL {year} Champion: {winner}**\n\n"
+            response += f"- Final Match: {final_match.get('team1', 'TBD')} vs {final_match.get('team2', 'TBD')}\n"
+            response += f"- Winner: **{winner}**\n"
+            response += f"- Venue: {final_match.get('venue', 'Unknown')}\n"
+            
+            return response
+        
+        except Exception as e:
+            return f"❌ Error getting IPL winner for {year}: {str(e)}"
