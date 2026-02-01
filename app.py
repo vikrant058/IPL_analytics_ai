@@ -45,89 +45,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Modern styling with fixed bottom navigation
+# Modern styling with Streamlit tabs
 st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 100px;
-    }
-    
-    /* Fixed Bottom Navigation Bar - Style Streamlit buttons */
-    .stBottom {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 99999 !important;
-    }
-    
-    /* Target the last set of columns (navigation) */
-    [data-testid="stVerticalBlock"] > div:last-child > [data-testid="stHorizontalBlock"] {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        height: 80px !important;
-        background: white !important;
-        border-top: 2px solid #e8eaed !important;
-        z-index: 99999 !important;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
-        padding: 5px 0 !important;
-        margin: 0 !important;
-        display: flex !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-    }
-    
-    /* Style navigation buttons */
-    [data-testid="stVerticalBlock"] > div:last-child [data-testid="baseButton-secondary"] {
-        height: 70px !important;
-        width: 100% !important;
-        border: none !important;
-        background: white !important;
-        color: #666 !important;
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        border-radius: 0 !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    [data-testid="stVerticalBlock"] > div:last-child [data-testid="baseButton-secondary"]:hover {
-        background-color: #f5f6f7 !important;
-        color: #2c3e50 !important;
-        border-bottom: 3px solid #556b82 !important;
-    }
-    
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .bottom-nav-container .nav-btn {
-            font-size: 14px !important;
-            height: 65px !important;
-        }
-        
-        .main {
-            padding-bottom: 95px !important;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .bottom-nav-container .nav-btn {
-            font-size: 12px !important;
-            height: 60px !important;
-            padding: 4px 0 !important;
-        }
-        
-        .bottom-nav-container {
-            height: 60px !important;
-            padding: 2px 0 !important;
-        }
-        
-        .main {
-            padding-bottom: 80px !important;
-        }
+        padding-bottom: 0;
     }
     
     /* Typography */
@@ -199,11 +122,17 @@ st.markdown("""
 
 st.divider()
 
-# Display current page based on session state
-page = st.session_state.current_page
+# ============ MULTI-PAGE NAVIGATION USING STREAMLIT TABS ============
+# Use Streamlit's built-in tabs for proper navigation
+tab_cricbot, tab_profiles, tab_h2h, tab_form = st.tabs([
+    "🤖 Cricbot",
+    "👤 Profiles", 
+    "⚔️ H2H",
+    "📈 Form"
+])
 
 # ============ CRICBOT PAGE ============
-if page == "cricbot":
+with tab_cricbot:
     st.markdown("### 🤖 Cricbot - Your Cricket Assistant")
     st.markdown("*Ask me anything about IPL cricket*")
     st.markdown("")
@@ -243,7 +172,7 @@ OPENAI_API_KEY=sk-proj-your-key-here
             st.error(f"❌ Error: {str(e)[:100]}")
 
 # ============ PLAYER PROFILES PAGE ============
-elif page == "profiles":
+with tab_profiles:
     st.markdown("### 👤 Player Profiles")
     st.markdown("*Browse IPL player and team data*")
     st.markdown("")
@@ -315,7 +244,7 @@ elif page == "profiles":
             st.dataframe(team_df, use_container_width=True, hide_index=True)
 
 # ============ HEAD-TO-HEAD PAGE ============
-elif page == "h2h":
+with tab_h2h:
     st.markdown("### ⚔️ Player H2H Comparison")
     st.markdown("*Compare any two players*")
     st.markdown("")
@@ -345,7 +274,7 @@ elif page == "h2h":
                 st.info("Comparison data processing...")
 
 # ============ PLAYER FORM PAGE ============
-elif page == "form":
+with tab_form:
     st.markdown("### 📈 Player Form & Trends")
     st.markdown("*Track player performance over recent matches*")
     st.markdown("")
@@ -364,37 +293,3 @@ elif page == "form":
             st.dataframe(recent, use_container_width=True)
         else:
             st.info("No recent match data available.")
-
-# ============ FIXED BOTTOM NAVIGATION BAR ============
-# Add custom CSS to hide the columns and show buttons at bottom
-st.markdown("""
-<style>
-    /* Add spacing to push nav to bottom */
-    div.stVerticalBlock:last-of-type {
-        padding-bottom: 10px;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Create navigation buttons with callbacks
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4, gap="small")
-
-with nav_col1:
-    if st.button("🤖 Cricbot", key="nav_1", use_container_width=True):
-        st.session_state.current_page = "cricbot"
-        st.rerun()
-
-with nav_col2:
-    if st.button("👤 Profiles", key="nav_2", use_container_width=True):
-        st.session_state.current_page = "profiles"
-        st.rerun()
-
-with nav_col3:
-    if st.button("⚔️ H2H", key="nav_3", use_container_width=True):
-        st.session_state.current_page = "h2h"
-        st.rerun()
-
-with nav_col4:
-    if st.button("📈 Form", key="nav_4", use_container_width=True):
-        st.session_state.current_page = "form"
-        st.rerun()
