@@ -50,7 +50,7 @@ st.markdown("""
     <style>
     .main {
         padding-top: 0.5rem;
-        padding-bottom: 120px;
+        padding-bottom: 100px;
     }
     
     /* Fixed Bottom Navigation Bar */
@@ -59,59 +59,49 @@ st.markdown("""
         bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: 90px !important;
+        height: 80px !important;
         background: white !important;
         border-top: 2px solid #e8eaed !important;
         display: flex !important;
         justify-content: space-around !important;
         align-items: center !important;
-        z-index: 9999 !important;
+        z-index: 99999 !important;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
-        width: 100% !important;
+        width: 100vw !important;
         gap: 0 !important;
-        padding: 0 !important;
+        padding: 5px 0 !important;
         margin: 0 !important;
+        top: auto !important;
     }
     
-    /* Target the column divs inside nav container */
-    .bottom-nav-container > div {
+    /* Style HTML nav buttons */
+    .bottom-nav-container .nav-btn {
         flex: 1 !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        height: 90px !important;
-        padding: 0 !important;
-        width: 25% !important;
-    }
-    
-    /* Style all buttons in bottom nav */
-    .bottom-nav-container button {
-        height: 90px !important;
+        height: 70px !important;
         width: 100% !important;
         border: none !important;
         background: white !important;
-        color: #888 !important;
-        border-top: 3px solid transparent !important;
-        font-size: 14px !important;
+        color: #666 !important;
+        font-size: 18px !important;
         transition: all 0.3s ease !important;
-        padding: 10px 5px !important;
+        padding: 8px 0 !important;
         cursor: pointer !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
     
-    .bottom-nav-container button:hover {
+    .bottom-nav-container .nav-btn:hover {
         background-color: #f8f9fa !important;
         color: #2c3e50 !important;
-        border-top-color: #556b82 !important;
     }
     
-    .bottom-nav-container button:active {
+    .bottom-nav-container .nav-btn:active {
         background-color: #e8eaed !important;
         color: #2c3e50 !important;
-        border-top-color: #556b82 !important;
     }
     
     /* Typography */
@@ -350,9 +340,40 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-st.markdown('<div class="bottom-nav-container">', unsafe_allow_html=True)
+nav_html = """
+<div class="bottom-nav-container">
+    <button class="nav-btn" onclick="window.location.hash='cricbot'">🤖 Cricbot</button>
+    <button class="nav-btn" onclick="window.location.hash='profiles'">👤 Profiles</button>
+    <button class="nav-btn" onclick="window.location.hash='h2h'">⚔️ H2H</button>
+    <button class="nav-btn" onclick="window.location.hash='form'">📈 Form</button>
+</div>
+<script>
+    // Handle navigation via hash
+    function handleNavigation() {
+        const hash = window.location.hash.slice(1) || 'cricbot';
+        const pages = ['cricbot', 'profiles', 'h2h', 'form'];
+        
+        if (pages.includes(hash)) {
+            // Send message to Streamlit
+            window.parent.postMessage({
+                type: 'streamlit:setComponentValue',
+                value: hash
+            }, '*');
+        }
+    }
+    
+    window.addEventListener('hashchange', handleNavigation);
+    handleNavigation();
+</script>
+"""
 
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
+st.markdown(nav_html, unsafe_allow_html=True)
+
+# Handle hash-based navigation
+hash_page = st.query_params.get("page", ["cricbot"])[0] if "page" in st.query_params else "cricbot"
+
+# Alternative: Use columns with proper container logic
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns([1, 1, 1, 1], gap="small")
 
 with nav_col1:
     if st.button("🤖 Cricbot", key="btn_cricbot", use_container_width=True):
@@ -373,5 +394,3 @@ with nav_col4:
     if st.button("📈 Form", key="btn_form", use_container_width=True):
         st.session_state.current_page = "form"
         st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
