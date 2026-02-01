@@ -133,6 +133,39 @@ def load_data():
     matches, deliveries = loader.preprocess_data()
     return loader, StatsEngine(matches, deliveries), AIEngine(matches, deliveries)
 
+@st.cache_resource
+def init_chatbot(api_key):
+    """Initialize chatbot once and cache it"""
+    loader_cached, _, _ = load_data()
+    return CricketChatbot(loader_cached.matches_df, loader_cached.deliveries_df, api_key)
+
+@st.cache_data
+def get_all_players_and_teams():
+    """Cache player and team lists"""
+    loader_cached, _, _ = load_data()
+    all_batters = loader_cached.deliveries_df['batter'].unique()
+    all_bowlers = loader_cached.deliveries_df['bowler'].unique()
+    all_players = sorted(set(all_batters).union(set(all_bowlers)))
+    all_teams_raw = sorted(set(
+        list(loader_cached.matches_df['team1'].unique()) + 
+        list(loader_cached.matches_df['team2'].unique())
+    ))
+    
+    # Normalize team names to avoid duplicates
+    normalized_teams = []
+    seen = set()
+    for team in all_teams_raw:
+        if team == 'Royal Challengers Bangalore':
+            normalized_team = 'Royal Challengers Bengaluru'
+        else:
+            normalized_team = team
+        
+        if normalized_team not in seen:
+            normalized_teams.append(normalized_team)
+            seen.add(normalized_team)
+    
+    return all_players, sorted(normalized_teams)
+
 loader, stats_engine, ai_engine = load_data()
 
 # Initialize session state for page navigation
@@ -196,7 +229,8 @@ OPENAI_API_KEY=sk-proj-your-key-here
 ```""")
     else:
         try:
-            chatbot = CricketChatbot(loader.matches_df, loader.deliveries_df, api_key)
+            # Use cached chatbot instance
+            chatbot = init_chatbot(api_key)
             
             col1, col2 = st.columns([4, 1])
             with col1:
@@ -227,28 +261,8 @@ with tab_profiles:
     st.markdown("*Browse IPL player and team data*")
     st.markdown("")
     
-    all_batters = loader.deliveries_df['batter'].unique()
-    all_bowlers = loader.deliveries_df['bowler'].unique()
-    all_players = sorted(set(all_batters).union(set(all_bowlers)))
-    all_teams = sorted(set(
-        list(loader.matches_df['team1'].unique()) + 
-        list(loader.matches_df['team2'].unique())
-    ))
-    
-    # Normalize team names to avoid duplicates (Royal Challengers Bangalore -> Royal Challengers Bengaluru)
-    normalized_teams = []
-    seen = set()
-    for team in all_teams:
-        if team == 'Royal Challengers Bangalore':
-            normalized_team = 'Royal Challengers Bengaluru'
-        else:
-            normalized_team = team
-        
-        if normalized_team not in seen:
-            normalized_teams.append(normalized_team)
-            seen.add(normalized_team)
-    
-    all_teams = sorted(normalized_teams)
+    # Use cached player and team data
+    all_players, all_teams = get_all_players_and_teams()
     
     prof_type = st.radio("Select Type", ["🏏 Players", "🏆 Teams"], horizontal=True, key="prof_type")
     st.divider()
@@ -352,9 +366,8 @@ with tab_h2h:
     st.markdown("*Compare any two players*")
     st.markdown("")
     
-    all_batters = loader.deliveries_df['batter'].unique()
-    all_bowlers = loader.deliveries_df['bowler'].unique()
-    all_players = sorted(set(all_batters).union(set(all_bowlers)))
+    # Use cached player data
+    all_players, _ = get_all_players_and_teams()
     
     col1, col2 = st.columns(2)
     
@@ -383,9 +396,8 @@ with tab_form:
     st.markdown("*Track player performance over recent matches*")
     st.markdown("")
     
-    all_batters = loader.deliveries_df['batter'].unique()
-    all_bowlers = loader.deliveries_df['bowler'].unique()
-    all_players = sorted(set(all_batters).union(set(all_bowlers)))
+    # Use cached player data
+    all_players, _ = get_all_players_and_teams()
     
     player = st.selectbox("Select Player", all_players, key="trend_player")
     
