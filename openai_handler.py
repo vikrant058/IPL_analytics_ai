@@ -192,6 +192,32 @@ class CricketChatbot:
         
         return None
     
+    def _extract_team_name_with_gpt(self, query: str) -> Optional[str]:
+        """Extract team name from query using GPT when pattern matching fails"""
+        try:
+            prompt = f"""Extract the IPL team name from this query. Respond with ONLY the team name or null.
+
+Query: "{query}"
+
+Valid teams: {', '.join(self.all_teams)}
+
+Respond with just the team name (e.g., "Chennai Super Kings") or null if no team mentioned."""
+            
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_tokens=50
+            )
+            
+            team_name = response.choices[0].message.content.strip()
+            if team_name.lower() != 'null' and team_name:
+                # Try to canonicalize the team name
+                return self._get_canonical_team_name(team_name)
+            return None
+        except Exception:
+            return None
+    
     def _extract_filter_keywords(self, query: str) -> Dict:
         """
         Extract ALL filter keywords from query text using comprehensive pattern matching.
@@ -575,32 +601,32 @@ class CricketChatbot:
             # Try to resolve a team name from the query
             team_name = self._resolve_team_name(query)
             
-            if team_name or detected_team_metric == 'best_team':
-                # This is a team-level query
-                return {
-                    "player1": None,
-                    "player2": None,
-                    "venue": None,
-                    "seasons": None,
-                    "bowler_type": None,
-                    "match_phase": None,
-                    "match_situation": None,
-                    "opposition_team": team_name,
-                    "batter_role": None,
-                    "vs_conditions": None,
-                    "ground": None,
-                    "handedness": None,
-                    "inning": None,
-                    "match_type": None,
-                    "time_period": None,
-                    "record_type": None,
-                    "comparison_type": None,
-                    "ranking_metric": detected_team_metric if detected_team_metric == 'best_team' else None,
-                    "player_list": None,
-                    "form_filter": None,
-                    "query_type": "team_stats",
-                    "interpretation": f"Team stats for {team_name}" if team_name else f"Team statistics - {detected_team_metric.replace('_', ' ')}"
-                }
+            # Always return team_stats query type if team metric is detected
+            # Even if team_name is None, we'll handle it in get_response
+            return {
+                "player1": None,
+                "player2": None,
+                "venue": None,
+                "seasons": None,
+                "bowler_type": None,
+                "match_phase": None,
+                "match_situation": None,
+                "opposition_team": team_name,
+                "batter_role": None,
+                "vs_conditions": None,
+                "ground": None,
+                "handedness": None,
+                "inning": None,
+                "match_type": None,
+                "time_period": None,
+                "record_type": None,
+                "comparison_type": None,
+                "ranking_metric": detected_team_metric if detected_team_metric == 'best_team' else None,
+                "player_list": None,
+                "form_filter": None,
+                "query_type": "team_stats",
+                "interpretation": f"Team stats for {team_name}" if team_name else f"Team statistics - {detected_team_metric.replace('_', ' ')}"
+            }
         
         # Check if this is a "player last N matches/innings" query (trends)
         time_period_match = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
@@ -1019,8 +1045,17 @@ EXAMPLES:
                 return self._get_predictions_response(opposition_team=opposition_team, 
                                                       match_phase=match_phase)
             
-            elif query_type == 'team_stats' and opposition_team:
-                return self._get_team_stats_response(opposition_team, metric=ranking_metric)
+            elif query_type == 'team_stats':
+                # Handle team stats queries - resolve team name if not already done
+                if opposition_team:
+                    return self._get_team_stats_response(opposition_team, metric=ranking_metric)
+                else:
+                    # Team metric detected but name not resolved - use GPT to extract team name
+                    team_from_query = self._resolve_team_name(query) or self._extract_team_name_with_gpt(query)
+                    if team_from_query:
+                        return self._get_team_stats_response(team_from_query, metric=ranking_metric)
+                    else:
+                        return "❌ I detected a team statistics question, but couldn't identify which team. Please specify the team name (e.g., CSK, MI, RCB, KKR, DC, SRH, RR, GT, LSG, PBKS)"
             
             elif query_type == 'team_comparison' and opposition_team:
                 return self._get_team_stats_response(opposition_team)
