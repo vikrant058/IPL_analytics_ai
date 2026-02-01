@@ -214,10 +214,16 @@ class StatsEngine:
             bat_balls = 0
             dismissed = False
             
-            for _, deliv in deliv_group.iterrows():
+            deliv_list = list(deliv_group.iterrows())
+            for idx, (_, deliv) in enumerate(deliv_list):
                 bat_runs += deliv['batsman_runs']
                 bat_balls += 1
-                if deliv['is_wicket'] == 1:
+            
+            # Check ONLY the LAST delivery to determine if dismissed
+            # A batter is out only if the last delivery has is_wicket == 1
+            if len(deliv_list) > 0:
+                last_deliv = deliv_list[-1][1]
+                if last_deliv['is_wicket'] == 1:
                     dismissed = True
             
             # Determine batting team for this inning
@@ -290,10 +296,16 @@ class StatsEngine:
             bat_balls = 0
             dismissed = False
             if len(bat_deliv) > 0:
-                for _, deliv in bat_deliv.iterrows():
+                bat_deliv_list = list(bat_deliv.iterrows())
+                for _, deliv in bat_deliv_list:
                     bat_runs += deliv['batsman_runs']
                     bat_balls += 1
-                    if deliv['is_wicket'] == 1:
+                
+                # Check ONLY the LAST delivery to determine if dismissed
+                # A batter is out only if the last delivery has is_wicket == 1
+                if len(bat_deliv_list) > 0:
+                    last_deliv = bat_deliv_list[-1][1]
+                    if last_deliv['is_wicket'] == 1:
                         dismissed = True
             
             # Calculate bowling figures if bowled
@@ -307,15 +319,26 @@ class StatsEngine:
                     if deliv['is_wicket'] == 1:
                         bowl_wickets += 1
             
-            # Determine opposition team (either team1 or team2)
-            bat_team1 = self.deliveries_df[self.deliveries_df['match_id'] == match_id]['batting_team'].iloc[0] if len(self.deliveries_df[self.deliveries_df['match_id'] == match_id]) > 0 else match_info['team1']
-            opposition_team = match_info['team2'] if bat_team1 == match_info['team1'] else match_info['team1']
+            # Determine the team player batted for (from player's own batting deliveries if available)
+            batting_team = 'N/A'
+            opposition_team = 'N/A'
+            
+            if len(bat_deliv) > 0:
+                # Get the batting team from the player's own deliveries
+                batting_team = bat_deliv.iloc[0]['batting_team']
+                # Opposition is the other team
+                opposition_team = match_info['team2'] if batting_team == match_info['team1'] else match_info['team1']
+            elif len(bowl_deliv) > 0:
+                # If player only bowled (didn't bat), get the bowling team from deliveries
+                bowling_team = bowl_deliv.iloc[0]['bowling_team']
+                opposition_team = bowling_team
+                batting_team = match_info['team2'] if bowling_team == match_info['team1'] else match_info['team1']
             
             results.append({
                 'match_id': match_id,
                 'date': match_info['date'] if 'date' in match_info else 'N/A',
                 'season': match_info['season'] if 'season' in match_info else 'N/A',
-                'batting_team': bat_team1,
+                'batting_team': batting_team,
                 'opposition': opposition_team,
                 'batting': {
                     'runs': bat_runs,
