@@ -406,21 +406,159 @@ with tab_form:
         recent = stats_engine.get_last_n_matches(player, n=10)
         
         # Handle both DataFrame and list returns
-        if recent is not None:
+        if recent is not None and (isinstance(recent, list) and len(recent) > 0 or (hasattr(recent, 'empty') and not recent.empty)):
             if isinstance(recent, list):
-                if len(recent) > 0:
-                    st.dataframe(recent, use_container_width=True)
-                    st.session_state.show_output = True
-                else:
-                    st.info("No recent match data available.")
-            elif hasattr(recent, 'empty'):
-                if not recent.empty:
-                    st.dataframe(recent, use_container_width=True)
-                    st.session_state.show_output = True
-                else:
-                    st.info("No recent match data available.")
+                matches_data = recent
             else:
-                st.dataframe(recent, use_container_width=True)
+                matches_data = recent.to_dict('records') if hasattr(recent, 'to_dict') else recent
+            
+            if matches_data:
+                # Extract data for visualizations
+                dates = [m.get('date', 'N/A') for m in matches_data]
+                batting_runs = [m.get('batting', {}).get('runs', 0) for m in matches_data]
+                bowling_wickets = [m.get('bowling', {}).get('wickets', 0) for m in matches_data]
+                batting_balls = [m.get('batting', {}).get('balls', 0) for m in matches_data]
+                dismissals = [1 if m.get('batting', {}).get('dismissed', False) else 0 for m in matches_data]
+                
+                # Calculate metrics
+                total_runs = sum(batting_runs)
+                total_balls = sum(batting_balls)
+                total_wickets = sum(bowling_wickets)
+                out_count = sum(dismissals)
+                not_out_count = len([x for x in dismissals if x == 0])
+                avg_runs = total_runs / len(batting_runs) if batting_runs else 0
+                strike_rate = (total_runs / total_balls * 100) if total_balls > 0 else 0
+                
+                # Form status
+                if avg_runs >= 30:
+                    form_status = "🔥 Excellent Form"
+                    form_color = "green"
+                elif avg_runs >= 20:
+                    form_status = "✅ Good Form"
+                    form_color = "blue"
+                elif avg_runs >= 10:
+                    form_status = "⚠️ Average Form"
+                    form_color = "orange"
+                else:
+                    form_status = "❌ Poor Form"
+                    form_color = "red"
+                
+                # Display key metrics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Avg Runs (Last 10)", f"{avg_runs:.1f}")
+                with col2:
+                    st.metric("Total Runs", f"{total_runs}")
+                with col3:
+                    st.metric("Strike Rate", f"{strike_rate:.1f}%")
+                with col4:
+                    st.metric("Form Status", form_status)
+                
+                st.divider()
+                
+                # Visualizations
+                col_chart1, col_chart2 = st.columns(2)
+                
+                # Chart 1: Runs trend
+                with col_chart1:
+                    st.markdown("#### 📊 Runs Trend (Last 10 Matches)")
+                    import plotly.graph_objects as go
+                    fig_runs = go.Figure()
+                    fig_runs.add_trace(go.Scatter(
+                        x=list(range(len(batting_runs))),
+                        y=batting_runs,
+                        mode='lines+markers',
+                        name='Runs',
+                        line=dict(color='#1f77b4', width=3),
+                        marker=dict(size=8),
+                        hovertemplate='Match %{x+1}: %{y} runs<extra></extra>'
+                    ))
+                    fig_runs.add_hline(y=avg_runs, line_dash="dash", line_color="green", 
+                                      annotation_text=f"Avg: {avg_runs:.1f}", annotation_position="right")
+                    fig_runs.update_layout(
+                        title="",
+                        xaxis_title="Match (Most Recent →)",
+                        yaxis_title="Runs Scored",
+                        hovermode='x unified',
+                        height=350,
+                        margin=dict(l=0, r=0, t=0, b=0)
+                    )
+                    st.plotly_chart(fig_runs, use_container_width=True)
+                
+                # Chart 2: Out vs Not Out pie
+                with col_chart2:
+                    st.markdown("#### 🎯 Dismissal Status (Last 10)")
+                    fig_pie = go.Figure(data=[go.Pie(
+                        labels=['Out', 'Not Out'],
+                        values=[out_count, not_out_count],
+                        marker=dict(colors=['#ff7f0e', '#2ca02c']),
+                        hovertemplate='<b>%{label}</b><br>%{value} matches<extra></extra>'
+                    )])
+                    fig_pie.update_layout(
+                        title="",
+                        height=350,
+                        margin=dict(l=0, r=0, t=0, b=0)
+                    )
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                
+                st.divider()
+                
+                # Additional charts for bowlers
+                if total_wickets > 0:
+                    col_chart3, col_chart4 = st.columns(2)
+                    
+                    with col_chart3:
+                        st.markdown("#### 🎳 Bowling Wickets Trend")
+                        fig_wkts = go.Figure()
+                        fig_wkts.add_trace(go.Bar(
+                            x=list(range(len(bowling_wickets))),
+                            y=bowling_wickets,
+                            name='Wickets',
+                            marker=dict(color='#d62728'),
+                            hovertemplate='Match %{x+1}: %{y} wickets<extra></extra>'
+                        ))
+                        fig_wkts.update_layout(
+                            title="",
+                            xaxis_title="Match (Most Recent →)",
+                            yaxis_title="Wickets",
+                            height=350,
+                            margin=dict(l=0, r=0, t=0, b=0),
+                            showlegend=False
+                        )
+                        st.plotly_chart(fig_wkts, use_container_width=True)
+                    
+                    with col_chart4:
+                        st.markdown("#### 📈 Bowling Stats Summary")
+                        st.metric("Total Wickets (Last 10)", total_wickets)
+                        avg_wickets = total_wickets / len(bowling_wickets) if bowling_wickets else 0
+                        st.metric("Avg Wickets/Match", f"{avg_wickets:.2f}")
+                        
+                        total_bowl_runs = sum([m.get('bowling', {}).get('runs', 0) for m in matches_data])
+                        total_bowl_balls = sum([m.get('bowling', {}).get('balls', 0) for m in matches_data])
+                        economy = (total_bowl_runs / (total_bowl_balls / 6)) if total_bowl_balls > 0 else 0
+                        st.metric("Economy Rate", f"{economy:.2f}")
+                
+                st.divider()
+                
+                # Detailed match-by-match table
+                st.markdown("#### 📋 Match-by-Match Details")
+                
+                detailed_data = []
+                for i, match in enumerate(matches_data):
+                    detailed_data.append({
+                        'Match': i + 1,
+                        'Date': match.get('date', 'N/A'),
+                        'vs': match.get('opposition', 'N/A'),
+                        'Runs': match.get('batting', {}).get('runs', 0),
+                        'Balls': match.get('batting', {}).get('balls', 0),
+                        'SR': f"{(match.get('batting', {}).get('runs', 0) / match.get('batting', {}).get('balls', 1) * 100):.1f}" if match.get('batting', {}).get('balls', 0) > 0 else '-',
+                        'Status': '❌ Out' if match.get('batting', {}).get('dismissed', False) else '✅ Not Out',
+                        'Wickets': match.get('bowling', {}).get('wickets', 0),
+                        'Runs Conceded': match.get('bowling', {}).get('runs', 0)
+                    })
+                
+                df_details = pd.DataFrame(detailed_data)
+                st.dataframe(df_details, use_container_width=True, hide_index=True)
                 st.session_state.show_output = True
         else:
             st.info("No recent match data available.")
