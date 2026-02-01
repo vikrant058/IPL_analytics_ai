@@ -580,14 +580,14 @@ Respond with just the team name (e.g., "Chennai Super Kings") or null if no team
             }
         
         # ===== CHECK FOR TEAM-LEVEL QUERIES =====
-        # Detect team statistics queries like "how many matches has CSK played"
+        # Detect team statistics queries like "how many matches has CSK played" or "who won ipl 2024"
         team_level_keywords = {
             'matches_played': ['how many matches', 'total matches', 'matches played', 'played matches', 'total games'],
             'wins': ['total wins', 'how many wins', 'wins by', 'win count'],
             'losses': ['total losses', 'how many losses', 'losses by', 'loss count'],
             'win_percentage': ['win percentage', 'win rate', 'winning percentage', 'win %'],
             'titles': ['ipl titles', 'won titles', 'championship wins', 'how many titles', 'total titles'],
-            'best_team': ['best team', 'team with most', 'most wins', 'most titles', 'highest win percentage'],
+            'best_team': ['best team', 'team with most', 'most wins', 'most titles', 'highest win percentage', 'who won ipl'],
         }
         
         # Try to identify team-level query
@@ -2169,13 +2169,19 @@ EXAMPLES:
             response += f"- Total Losses: **{losses}**\n"
             response += f"- Win Percentage: **{win_pct:.2f}%**\n\n"
             
-            # Get IPL titles (wins in final matches) - approximate from dataset
-            final_matches = self.matches_df[
-                (self.matches_df['team1'] == found_team) | (self.matches_df['team2'] == found_team)
-            ]
-            # Count matches in IPL finals (only 1 match per season for finals)
-            season_winners = final_matches[final_matches['winner'] == found_team].groupby('season').size()
-            ipl_titles = len(season_winners)
+            # Get IPL titles - count championship wins (final match of each season)
+            # Find the final match of each season (last match ID for that season)
+            ipl_titles = 0
+            all_seasons = self.matches_df['season'].unique()
+            
+            for season in all_seasons:
+                season_matches = self.matches_df[self.matches_df['season'] == season]
+                if len(season_matches) > 0:
+                    # Get the last match of the season (highest match ID)
+                    final_match = season_matches.loc[season_matches['id'].idxmax()]
+                    # Check if our team won this final match
+                    if final_match['winner'] == found_team:
+                        ipl_titles += 1
             
             response += f"**🏆 IPL Titles**\n"
             response += f"- IPL Championships Won: **{ipl_titles}**\n\n"
