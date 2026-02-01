@@ -553,7 +553,7 @@ Respond with just the team name (e.g., "Chennai Super Kings") or null if no team
             'strike_rate': ['strike rate', 'sr'],
             'average': ['average', 'batting avg'],
             'wickets': ['wickets', 'wicket taker', 'bowler'],
-            'runs': ['runs', 'run scorer', 'run scorers', 'most scored'],
+            'runs': ['runs', 'run scorer', 'run scorers', 'most scored', 'scorer', 'scorers', 'top scorer'],
             'sixes': ['sixes'],
         }
         
