@@ -53,6 +53,14 @@ st.markdown("""
         padding-bottom: 0;
     }
     
+    /* Tab styling for better sizing */
+    button[data-baseweb="tab"] {
+        font-size: 16px !important;
+        padding: 12px 24px !important;
+        font-weight: 600 !important;
+        width: 100% !important;
+    }
+    
     /* Typography */
     h1 {
         color: #2c3e50;
@@ -73,11 +81,25 @@ st.markdown("""
         color: #2c3e50;
         border: 1px solid #d0d1d3;
         transition: all 0.2s ease;
+        width: 100% !important;
+        padding: 10px 20px !important;
+        font-size: 14px !important;
     }
     
     .stButton > button:hover {
         background-color: #e0e1e3;
         border-color: #556b82;
+    }
+    
+    /* Radio buttons */
+    .stRadio > label {
+        font-size: 14px !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Selectbox */
+    .stSelectbox {
+        width: 100% !important;
     }
     
     /* Mobile responsive */
@@ -93,6 +115,11 @@ st.markdown("""
         
         h2 {
             font-size: 18px !important;
+        }
+        
+        button[data-baseweb="tab"] {
+            font-size: 13px !important;
+            padding: 8px 12px !important;
         }
     }
     </style>
@@ -112,6 +139,13 @@ loader, stats_engine, ai_engine = load_data()
 if "current_page" not in st.session_state:
     st.session_state.current_page = "cricbot"
 
+# Initialize navigation history for back button
+if "page_history" not in st.session_state:
+    st.session_state.page_history = ["cricbot"]
+
+if "last_page" not in st.session_state:
+    st.session_state.last_page = None
+
 # Header
 st.markdown("""
     <div style="text-align: center; padding: 10px 0 20px 0;">
@@ -119,6 +153,15 @@ st.markdown("""
         <p style="margin: 0; color: #888; font-size: 13px;">Cricket Intelligence Powered by AI</p>
     </div>
 """, unsafe_allow_html=True)
+
+# Back button row
+col_back, col_spacer = st.columns([1, 5])
+with col_back:
+    if st.button("← Back", key="back_btn", use_container_width=True):
+        if len(st.session_state.page_history) > 1:
+            st.session_state.page_history.pop()
+            st.session_state.current_page = st.session_state.page_history[-1]
+            st.rerun()
 
 st.divider()
 
