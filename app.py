@@ -140,11 +140,8 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "cricbot"
 
 # Initialize navigation history for back button
-if "page_history" not in st.session_state:
-    st.session_state.page_history = ["cricbot"]
-
-if "last_page" not in st.session_state:
-    st.session_state.last_page = None
+if "show_output" not in st.session_state:
+    st.session_state.show_output = False
 
 # Header
 st.markdown("""
@@ -154,13 +151,21 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Back button row
-col_back, col_spacer = st.columns([1, 5])
-with col_back:
-    if st.button("← Back", key="back_btn", use_container_width=True):
-        if len(st.session_state.page_history) > 1:
-            st.session_state.page_history.pop()
-            st.session_state.current_page = st.session_state.page_history[-1]
+# Show back button only when output is displayed (small version)
+if st.session_state.show_output:
+    col_back, col_spacer = st.columns([0.15, 5])
+    with col_back:
+        st.markdown("""
+        <style>
+            .back-btn-container button {
+                height: 28px !important;
+                padding: 4px 8px !important;
+                font-size: 12px !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        if st.button("← Back", key="back_btn", use_container_width=True):
+            st.session_state.show_output = False
             st.rerun()
 
 st.divider()
@@ -210,6 +215,7 @@ OPENAI_API_KEY=sk-proj-your-key-here
                 with st.spinner("🔍 Analyzing..."):
                     response = chatbot.get_response(user_query)
                 st.markdown(response)
+                st.session_state.show_output = True
                 
         except Exception as e:
             st.error(f"❌ Error: {str(e)[:100]}")
@@ -254,6 +260,7 @@ with tab_profiles:
                         ]
                     })
                     st.dataframe(batting_df, use_container_width=True, hide_index=True)
+                    st.session_state.show_output = True
             
             if stats.get('bowling'):
                 with col2:
@@ -270,6 +277,7 @@ with tab_profiles:
                         ]
                     })
                     st.dataframe(bowling_df, use_container_width=True, hide_index=True)
+                    st.session_state.show_output = True
     
     else:  # Teams
         team = st.selectbox("Select Team", all_teams, key="sel_team")
@@ -285,6 +293,7 @@ with tab_profiles:
                 ]
             })
             st.dataframe(team_df, use_container_width=True, hide_index=True)
+            st.session_state.show_output = True
 
 # ============ HEAD-TO-HEAD PAGE ============
 with tab_h2h:
@@ -315,6 +324,7 @@ with tab_h2h:
                 st.markdown(result['analysis'])
             else:
                 st.info("Comparison data processing...")
+            st.session_state.show_output = True
 
 # ============ PLAYER FORM PAGE ============
 with tab_form:
@@ -337,14 +347,17 @@ with tab_form:
             if isinstance(recent, list):
                 if len(recent) > 0:
                     st.dataframe(recent, use_container_width=True)
+                    st.session_state.show_output = True
                 else:
                     st.info("No recent match data available.")
             elif hasattr(recent, 'empty'):
                 if not recent.empty:
                     st.dataframe(recent, use_container_width=True)
+                    st.session_state.show_output = True
                 else:
                     st.info("No recent match data available.")
             else:
                 st.dataframe(recent, use_container_width=True)
+                st.session_state.show_output = True
         else:
             st.info("No recent match data available.")
