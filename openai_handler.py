@@ -130,26 +130,27 @@ class CricketChatbot:
         return {}
     
     def _build_team_aliases(self) -> Dict[str, str]:
-        """Load team aliases from player_aliases.json"""
+        """Load team aliases from team_aliases.json"""
         try:
-            aliases_file = Path(__file__).resolve().parent / "player_aliases.json"
+            # Try to load from team_aliases.json first
+            aliases_file = Path(__file__).resolve().parent / "team_aliases.json"
             if aliases_file.exists():
                 with open(aliases_file, 'r') as f:
                     data = json.load(f)
-                    
+                
                 # Build reverse mapping: alias -> canonical name
-                # The first element in the alias_list is the full team name
                 alias_map = {}
-                for key, alias_list in data.get("teams", {}).items():
-                    # First item in alias_list should be the full team name
-                    if alias_list and len(alias_list) > 0:
-                        full_name = alias_list[0]  # e.g., "Mumbai Indians"
+                # team_aliases.json has structure: {"aliases": {"Team Name": [aliases...]}}
+                team_data = data.get("aliases", data)  # Handle both formats
+                
+                for team_name, alias_list in team_data.items():
+                    # alias_list is a list of aliases for this team
+                    if isinstance(alias_list, list) and len(alias_list) > 0:
+                        # Canonical name is the key itself (e.g., "Chennai Super Kings")
+                        full_name = team_name
                         # Map all aliases to the full team name
                         for alias in alias_list:
                             alias_map[alias.lower()] = full_name
-                    else:
-                        # Fallback: use the key as the full name
-                        alias_map[key.lower()] = key
                 
                 return alias_map
         except Exception as e:
@@ -673,6 +674,66 @@ Respond with just the team name (e.g., "Chennai Super Kings") or null if no team
                     "interpretation": f"Trends for {player1} in last {number} {period_type}"
                 }
         
+        # ===== CHECK IF QUERY IS JUST A TEAM NAME =====
+        # This handles queries like "CSK", "KKR", "Mumbai Indians", etc.
+        # IMPORTANT: Check team BEFORE player to avoid false positives
+        team_name = self._resolve_team_name(query)
+        if team_name:
+            # We found a team match
+            # Only treat as team query if:
+            # 1. No player found, OR
+            # 2. Query looks like a team-only search (short query, contains team abbreviation, etc.)
+            
+            player1 = self._resolve_player_name(query)
+            
+            # Determine if this should be treated as team or player
+            # Team abbreviations: CSK, MI, RCB, KKR, DC, SRH, RR, GT, LSG, PBKS (2-4 letters)
+            # Short queries like "CSK", "KKR" are definitely team searches
+            query_is_short = len(query.strip()) <= 6
+            
+            # Check if query is a clear team abbreviation or full team name
+            query_lower_stripped = query.lower().strip()
+            is_team_abbreviation = query_lower_stripped in ['csk', 'mi', 'rcb', 'kkr', 'dc', 'srh', 'rr', 'gt', 'lsg', 'pbks']
+            
+            # Check if query exactly matches team name
+            is_exact_team_match = any(query_lower_stripped == t.lower().strip() or 
+                                     query_lower_stripped == t.lower().split()[0] 
+                                     for t in self.all_teams)
+            
+            # If query is very short, has no spaces, or is an exact team match, it's a team query
+            is_likely_team_search = (
+                is_team_abbreviation or  # Clear team abbreviation
+                (not ' ' in query and query_is_short) or  # No spaces and short
+                (is_exact_team_match and not player1)  # Exact team match and no player found
+            )
+            
+            if is_likely_team_search:
+                # This is a team summary query
+                return {
+                    "player1": None,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": None,
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": team_name,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": None,
+                    "record_type": None,
+                    "comparison_type": None,
+                    "ranking_metric": "team_summary",  # Special metric for team summary
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "team_stats",
+                    "interpretation": f"Team summary for {team_name}"
+                }
+        
         # OPTIMIZATION: Try to resolve a simple player stats query without GPT
         # This handles queries like "sachin stats", "kohli", "bumrah performance", etc.
         player1 = self._resolve_player_name(query)
@@ -1059,7 +1120,11 @@ EXAMPLES:
             elif query_type == 'team_stats':
                 # Handle team stats queries - resolve team name if not already done
                 if opposition_team:
-                    return self._get_team_stats_response(opposition_team, metric=ranking_metric)
+                    # Check if this is a team summary query (team_summary metric)
+                    if ranking_metric == 'team_summary':
+                        return self._get_team_summary_response(opposition_team)
+                    else:
+                        return self._get_team_stats_response(opposition_team, metric=ranking_metric)
                 else:
                     # Special handling for "who won ipl YYYY" or "who won ipl season XX" queries
                     import re
@@ -2139,6 +2204,134 @@ EXAMPLES:
         
         except Exception as e:
             return f"Error generating predictions: {str(e)}"
+    
+    def _get_team_summary_response(self, team: str) -> str:
+        """Get comprehensive team profile/summary (like a team card)"""
+        try:
+            # Find team with fuzzy matching
+            found_team = self.stats_engine.find_team(team)
+            if not found_team:
+                return f"❌ Team '{team}' not found in IPL dataset."
+            
+            stats = self.stats_engine.get_team_stats(found_team)
+            
+            if not stats or 'error' in stats:
+                return f"❌ Team '{found_team}' not found in IPL dataset."
+            
+            wins = stats.get('wins', 0)
+            matches = stats.get('matches', 0)
+            losses = matches - wins
+            win_pct = stats.get('win_percentage', 0)
+            
+            # Normalize team name for display
+            display_team = self._normalize_team_name(found_team)
+            
+            response = f"**🏆 {display_team} - Team Profile**\n\n"
+            
+            # Core statistics - Main metrics
+            response += "**📊 Overall Performance**\n"
+            response += f"- **Total Matches**: {matches}\n"
+            response += f"- **Wins**: {wins}\n"
+            response += f"- **Losses**: {losses}\n"
+            response += f"- **Win Percentage**: {win_pct:.2f}%\n\n"
+            
+            # Get IPL titles - count championship wins (final match of each season)
+            ipl_titles = 0
+            all_seasons = self.matches_df['season'].unique()
+            championship_years = []
+            
+            for season in all_seasons:
+                season_matches = self.matches_df[self.matches_df['season'] == season]
+                if len(season_matches) > 0:
+                    # Get the last match of the season (highest match date for finals)
+                    season_matches_copy = season_matches.copy()
+                    season_matches_copy['date'] = pd.to_datetime(season_matches_copy['date'])
+                    final_match = season_matches_copy.loc[season_matches_copy['date'].idxmax()]
+                    # Check if our team won this final match
+                    if final_match['winner'] == found_team:
+                        ipl_titles += 1
+                        championship_years.append(season)
+            
+            response += f"**🏅 IPL Championships**\n"
+            response += f"- **Total Titles Won**: {ipl_titles}\n"
+            if championship_years:
+                response += f"- **Championship Years**: {', '.join(str(y) for y in sorted(championship_years))}\n\n"
+            else:
+                response += "\n"
+            
+            # Get win/loss trends by season
+            team_matches = self.matches_df[
+                (self.matches_df['team1'] == found_team) | (self.matches_df['team2'] == found_team)
+            ]
+            
+            # Season performance
+            season_stats = []
+            for season in sorted(self.matches_df['season'].unique()):
+                season_matches = team_matches[team_matches['season'] == season]
+                if len(season_matches) > 0:
+                    season_wins = len(season_matches[season_matches['winner'] == found_team])
+                    season_matches_count = len(season_matches)
+                    season_stats.append({
+                        'season': season,
+                        'matches': season_matches_count,
+                        'wins': season_wins,
+                        'win_pct': (season_wins / season_matches_count * 100) if season_matches_count > 0 else 0
+                    })
+            
+            # Ranking comparison
+            all_teams = self.all_teams
+            team_stats_list = []
+            for team_name in all_teams:
+                t_stats = self.stats_engine.get_team_stats(team_name)
+                if t_stats and 'error' not in t_stats:
+                    team_stats_list.append(t_stats)
+            
+            team_stats_list.sort(key=lambda x: x.get('win_percentage', 0), reverse=True)
+            rank = next((i+1 for i, t in enumerate(team_stats_list) if t['team'] == found_team), 0)
+            
+            response += f"**📈 Rankings & Position**\n"
+            response += f"- **Overall Rank**: #{rank} out of {len(team_stats_list)} teams (by Win %)\n\n"
+            
+            # Recent performance
+            if len(season_stats) > 0:
+                response += f"**📅 Recent Performance**\n"
+                # Show last 5 seasons
+                recent_seasons = sorted(season_stats, key=lambda x: x['season'], reverse=True)[:5]
+                for season_data in recent_seasons:
+                    s = season_data['season']
+                    m = season_data['matches']
+                    w = season_data['wins']
+                    pct = season_data['win_pct']
+                    response += f"- **{s}**: {w}W-{m-w}L from {m} matches ({pct:.1f}%)\n"
+                response += "\n"
+            
+            # Home vs Away performance
+            home_matches = team_matches[team_matches['team1'] == found_team]
+            away_matches = team_matches[team_matches['team2'] == found_team]
+            
+            if len(home_matches) > 0 or len(away_matches) > 0:
+                home_wins = len(home_matches[home_matches['winner'] == found_team])
+                home_total = len(home_matches)
+                away_wins = len(away_matches[away_matches['winner'] == found_team])
+                away_total = len(away_matches)
+                
+                response += f"**🏟️ Home vs Away**\n"
+                if home_total > 0:
+                    response += f"- **Home**: {home_wins}/{home_total} wins ({home_wins/home_total*100:.1f}%)\n"
+                if away_total > 0:
+                    response += f"- **Away**: {away_wins}/{away_total} wins ({away_wins/away_total*100:.1f}%)\n"
+                response += "\n"
+            
+            # Key stats
+            response += f"**💡 Key Stats**\n"
+            response += f"- Data Source: IPL dataset with {len(self.matches_df)} matches\n"
+            response += f"- Seasons Played: {len(season_stats)}\n"
+            response += f"- Total Deliveries Analyzed: {len(self.deliveries_df)} (via team players)\n"
+            
+            return response
+        
+        except Exception as e:
+            return f"❌ Error getting team summary: {str(e)}"
     
     def _get_team_stats_response(self, team: str, metric: str = None) -> str:
         """Get comprehensive team statistics"""

@@ -202,14 +202,14 @@ OPENAI_API_KEY=sk-proj-your-key-here
             with col1:
                 user_query = st.text_input(
                     "Your query:",
-                    placeholder="e.g., 'kohli statistics' or 'bumrah vs csk'",
+                    placeholder="e.g., 'CSK' • 'kohli' • 'kohli vs bumrah' • 'top scorers 2024'",
                     key="chatbot_input",
                     label_visibility="collapsed"
                 )
             with col2:
                 search_btn = st.button("Search", key="search_btn", use_container_width=True)
             
-            st.info("💡 **Try asking**: Player stats • Records & Rankings • Head-to-Head • Recent Form • Team Performance • Specific Filters")
+            st.info("💡 **Try asking**: Team (CSK, MI) • Player (Kohli, Bumrah) • Stats • Records • Rankings • Head-to-Head • Recent Form • Team Performance")
             
             if search_btn and user_query:
                 st.divider()
