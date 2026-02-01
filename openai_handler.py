@@ -54,6 +54,17 @@ class CricketChatbot:
         self.VALID_BOWLER_TYPES = ['fast_bowler', 'spin_bowler', 'left_arm', 'right_arm', 'pacer', 'spinner', 'pace']
         self.VALID_BATTER_ROLES = ['opener', 'middle_order', 'lower_order', 'finisher']
         self.VALID_VS_CONDITIONS = ['vs_pace', 'vs_spin', 'vs_left_arm', 'vs_right_arm']
+        
+        # Team name normalization mapping
+        self.team_name_mapping = {
+            'Royal Challengers Bangalore': 'Royal Challengers Bengaluru'
+        }
+    
+    def _normalize_team_name(self, team_name: str) -> str:
+        """Normalize team name for consistent display"""
+        if not team_name or pd.isna(team_name):
+            return team_name
+        return self.team_name_mapping.get(team_name, team_name)
     
     def _validate_filter(self, filter_name: str, filter_value: Optional[str]) -> bool:
         """Validate that filter values are recognized"""
@@ -1050,12 +1061,21 @@ EXAMPLES:
                 if opposition_team:
                     return self._get_team_stats_response(opposition_team, metric=ranking_metric)
                 else:
-                    # Special handling for "who won ipl YYYY" queries
+                    # Special handling for "who won ipl YYYY" or "who won ipl season XX" queries
                     import re
                     year_match = re.search(r'who won ipl (\d{4})', query.lower())
                     if year_match:
                         year = int(year_match.group(1))
                         return self._get_ipl_winner_response(year)
+                    
+                    season_match = re.search(r'who won ipl season (\d+)', query.lower())
+                    if season_match:
+                        season_num = int(season_match.group(1))
+                        year = self._season_number_to_year(season_num)
+                        if year:
+                            return self._get_ipl_winner_response(year)
+                        else:
+                            return f"❌ Invalid IPL season number. Valid seasons are 1-18 (2008-2025)."
                     
                     # Team metric detected but name not resolved - use GPT to extract team name
                     team_from_query = self._resolve_team_name(query) or self._extract_team_name_with_gpt(query)
@@ -2147,7 +2167,9 @@ EXAMPLES:
                     matches = stats.get('matches', 0)
                     losses = matches - wins
                     win_pct = stats.get('win_percentage', 0)
-                    response += f"| {i} | **{stats['team']}** | {matches} | {wins} | {losses} | {win_pct:.1f}% |\n"
+                    # Normalize team name for display
+                    normalized_team = self._normalize_team_name(stats['team'])
+                    response += f"| {i} | **{normalized_team}** | {matches} | {wins} | {losses} | {win_pct:.1f}% |\n"
                 
                 response += "\n📊 **Top Performer**: " + team_stats_list[0]['team'] + f" with {team_stats_list[0]['win_percentage']:.1f}% win rate"
                 return response
@@ -2167,7 +2189,9 @@ EXAMPLES:
             losses = matches - wins
             win_pct = stats.get('win_percentage', 0)
             
-            response = f"**🏏 Team Statistics: {found_team}**\n\n"
+            # Normalize team name for display
+            display_team = self._normalize_team_name(found_team)
+            response = f"**🏏 Team Statistics: {display_team}**\n\n"
             
             # Core statistics
             response += f"**📈 Overall Performance**\n"
@@ -2234,36 +2258,73 @@ EXAMPLES:
             return response
         
         except Exception as e:
-            return f"❌ Error getting team stats: {str(e)}"    
+            return f"❌ Error getting team stats: {str(e)}"
+    
+    def _season_number_to_year(self, season_num: int) -> Optional[int]:
+        """Convert IPL season number to year (1=2008, 2=2009, ..., 18=2025)"""
+        season_to_year = {
+            1: 2008, 2: 2009, 3: 2010, 4: 2011, 5: 2012, 6: 2013,
+            7: 2014, 8: 2015, 9: 2016, 10: 2017, 11: 2018, 12: 2019,
+            13: 2020, 14: 2021, 15: 2022, 16: 2023, 17: 2024, 18: 2025
+        }
+        return season_to_year.get(season_num)
+    
+    def _year_to_season_number(self, year: int) -> Optional[int]:
+        """Convert IPL year to season number (1=2008, 2=2009, ..., 18=2025)"""
+        season_mapping = {
+            2007: 1, 2008: 1,  # IPL 1 was 2007/08
+            2009: 2, 2010: 3,  # 2010 is stored as 2009/10, but first year extraction gives 2009
+            2011: 4, 2012: 5, 2013: 6,
+            2014: 7, 2015: 8, 2016: 9, 2017: 10, 2018: 11, 2019: 12,
+            2020: 13, 2021: 14, 2022: 15, 2023: 16, 2024: 17, 2025: 18
+        }
+        return season_mapping.get(year)
+    
     def _get_ipl_winner_response(self, year: int) -> str:
         """Get IPL champion for a specific year"""
         try:
-            # Try direct match first
-            season_matches = self.matches_df[self.matches_df['season'] == year]
+            season_matches = None
             
-            # If not found, try as string
-            if len(season_matches) == 0:
+            # Special handling for specific years
+            if year == 2008:
+                # IPL 1 is stored as '2007/08'
+                season_matches = self.matches_df[self.matches_df['season'] == '2007/08']
+            elif year == 2009:
+                # IPL 2 is stored as '2009' (not '2009/10' which is 2010)
+                season_matches = self.matches_df[self.matches_df['season'] == '2009']
+            elif year == 2010:
+                # IPL 3 is stored as '2009/10'
+                season_matches = self.matches_df[self.matches_df['season'] == '2009/10']
+            elif year == 2020:
+                # IPL 13 is stored as '2020/21'
+                season_matches = self.matches_df[self.matches_df['season'] == '2020/21']
+            else:
+                # For other years, match directly
                 season_matches = self.matches_df[self.matches_df['season'] == str(year)]
-            
-            # If still not found, try extracting year from season column (for formats like "IPL 2008")
-            if len(season_matches) == 0 and hasattr(self.matches_df['season'].iloc[0], 'find'):
-                season_matches = self.matches_df[self.matches_df['season'].astype(str).str.contains(str(year))]
             
             if len(season_matches) == 0:
                 # Get available seasons
                 available_seasons = sorted(self.matches_df['season'].unique())
-                season_str = ", ".join([str(s) for s in available_seasons[-5:]])  # Show last 5
+                season_str = ", ".join([str(s) for s in available_seasons])
                 return f"❌ No IPL data found for {year}. Available seasons: {season_str}"
             
-            # Get the last match of the season (highest match ID) - this is the final
-            final_match = season_matches.loc[season_matches['id'].idxmax()]
+            # Get the last match of the season by DATE (not ID, as IDs can be out of order)
+            # Convert date column to datetime for proper comparison
+            season_matches_copy = season_matches.copy()
+            season_matches_copy['date'] = pd.to_datetime(season_matches_copy['date'])
+            final_match = season_matches_copy.loc[season_matches_copy['date'].idxmax()]
             winner = final_match['winner']
             
             if not winner or pd.isna(winner):
                 return f"❌ Could not determine winner for IPL {year}."
             
+            # Normalize team names for display
+            winner = self._normalize_team_name(winner)
+            team1 = self._normalize_team_name(final_match.get('team1', 'TBD'))
+            team2 = self._normalize_team_name(final_match.get('team2', 'TBD'))
+            
             response = f"**🏆 IPL {year} Champion: {winner}**\n\n"
-            response += f"- Final Match: {final_match.get('team1', 'TBD')} vs {final_match.get('team2', 'TBD')}\n"
+            response += f"- Final Match: {team1} vs {team2}\n"
             response += f"- Winner: **{winner}**\n"
             response += f"- Venue: {final_match.get('venue', 'Unknown')}\n"
             

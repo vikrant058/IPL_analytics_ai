@@ -235,6 +235,21 @@ with tab_profiles:
         list(loader.matches_df['team2'].unique())
     ))
     
+    # Normalize team names to avoid duplicates (Royal Challengers Bangalore -> Royal Challengers Bengaluru)
+    normalized_teams = []
+    seen = set()
+    for team in all_teams:
+        if team == 'Royal Challengers Bangalore':
+            normalized_team = 'Royal Challengers Bengaluru'
+        else:
+            normalized_team = team
+        
+        if normalized_team not in seen:
+            normalized_teams.append(normalized_team)
+            seen.add(normalized_team)
+    
+    all_teams = sorted(normalized_teams)
+    
     prof_type = st.radio("Select Type", ["🏏 Players", "🏆 Teams"], horizontal=True, key="prof_type")
     st.divider()
     
@@ -243,42 +258,77 @@ with tab_profiles:
         if player:
             stats = stats_engine.get_player_stats(player)
             
-            col1, col2 = st.columns(2)
+            # Display comprehensive player stats like Cricinfo
+            st.markdown(f"### 🏏 {player} - Complete Career Stats")
             
             if stats.get('batting'):
+                batting = stats['batting']
+                st.markdown("#### 📊 **Batting Statistics**")
+                
+                # Main stats in two columns
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.markdown("**Batting Stats**")
-                    batting = stats['batting']
-                    batting_df = pd.DataFrame({
-                        'Stat': ['Matches', 'Runs', 'Average', 'Strike Rate', '50s', '100s'],
-                        'Value': [
-                            batting.get('matches', 0),
-                            batting.get('runs', 0),
-                            f"{batting.get('average', 0):.2f}",
-                            f"{batting.get('strike_rate', 0):.2f}",
-                            batting.get('fifties', 0),
-                            batting.get('centuries', 0),
-                        ]
-                    })
-                    st.dataframe(batting_df, use_container_width=True, hide_index=True)
-                    st.session_state.show_output = True
+                    st.metric("Matches", batting.get('matches', 0))
+                with col2:
+                    st.metric("Runs", batting.get('runs', 0))
+                with col3:
+                    st.metric("Average", f"{batting.get('average', 0):.2f}")
+                with col4:
+                    st.metric("Strike Rate", f"{batting.get('strike_rate', 0):.2f}")
+                
+                st.divider()
+                
+                # Detailed batting table
+                batting_df = pd.DataFrame({
+                    'Metric': ['Innings', 'Highest Score', 'Centuries', 'Fifties', 'Fours', 'Sixes', 'Dot Balls', 'Dot Ball %'],
+                    'Value': [
+                        batting.get('innings', 0),
+                        batting.get('highest_score', 0),
+                        batting.get('centuries', 0),
+                        batting.get('fifties', 0),
+                        batting.get('fours', 0),
+                        batting.get('sixes', 0),
+                        batting.get('dot_balls', 0),
+                        f"{batting.get('dot_ball_percentage', 0):.1f}%"
+                    ]
+                })
+                st.dataframe(batting_df, use_container_width=True, hide_index=True)
+                st.session_state.show_output = True
             
             if stats.get('bowling'):
+                bowling = stats['bowling']
+                st.markdown("#### 🎯 **Bowling Statistics**")
+                
+                # Main stats in four columns
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Matches", bowling.get('matches', 0))
                 with col2:
-                    st.markdown("**Bowling Stats**")
-                    bowling = stats['bowling']
-                    bowling_df = pd.DataFrame({
-                        'Stat': ['Matches', 'Wickets', 'Economy', 'Average', 'Best'],
-                        'Value': [
-                            bowling.get('matches', 0),
-                            bowling.get('wickets', 0),
-                            f"{bowling.get('economy', 0):.2f}",
-                            f"{bowling.get('average', 0):.2f}",
-                            bowling.get('best_figures', '—'),
-                        ]
-                    })
-                    st.dataframe(bowling_df, use_container_width=True, hide_index=True)
-                    st.session_state.show_output = True
+                    st.metric("Wickets", bowling.get('wickets', 0))
+                with col3:
+                    st.metric("Economy", f"{bowling.get('economy', 0):.2f}")
+                with col4:
+                    st.metric("Average", f"{bowling.get('average', 0):.2f}")
+                
+                st.divider()
+                
+                # Detailed bowling table
+                bowling_df = pd.DataFrame({
+                    'Metric': ['Innings', 'Runs Conceded', 'Balls Bowled', 'Overs', 'Best Figures', '4-Wicket Hauls', 'Maiden Overs', 'Dot Balls', 'Dot Ball %'],
+                    'Value': [
+                        bowling.get('innings', 0),
+                        bowling.get('runs_conceded', 0),
+                        bowling.get('balls', 0),
+                        f"{bowling.get('overs', 0):.1f}",
+                        bowling.get('best_figures', '—'),
+                        bowling.get('four_wickets', 0),
+                        bowling.get('maiden_overs', 0),
+                        bowling.get('dot_balls', 0),
+                        f"{bowling.get('dot_ball_percentage', 0):.1f}%"
+                    ]
+                })
+                st.dataframe(bowling_df, use_container_width=True, hide_index=True)
+                st.session_state.show_output = True
     
     else:  # Teams
         team = st.selectbox("Select Team", all_teams, key="sel_team")
