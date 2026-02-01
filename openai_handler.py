@@ -553,6 +553,55 @@ class CricketChatbot:
                 "interpretation": f"Top {detected_ranking_metric.replace('_', ' ')} in IPL"
             }
         
+        # ===== CHECK FOR TEAM-LEVEL QUERIES =====
+        # Detect team statistics queries like "how many matches has CSK played"
+        team_level_keywords = {
+            'matches_played': ['how many matches', 'total matches', 'matches played', 'played matches', 'total games'],
+            'wins': ['total wins', 'how many wins', 'wins by', 'win count'],
+            'losses': ['total losses', 'how many losses', 'losses by', 'loss count'],
+            'win_percentage': ['win percentage', 'win rate', 'winning percentage', 'win %'],
+            'titles': ['ipl titles', 'won titles', 'championship wins', 'how many titles', 'total titles'],
+            'best_team': ['best team', 'team with most', 'most wins', 'most titles', 'highest win percentage'],
+        }
+        
+        # Try to identify team-level query
+        detected_team_metric = None
+        for metric, keywords in team_level_keywords.items():
+            if any(kw in query_lower for kw in keywords):
+                detected_team_metric = metric
+                break
+        
+        if detected_team_metric:
+            # Try to resolve a team name from the query
+            team_name = self._resolve_team_name(query)
+            
+            if team_name or detected_team_metric == 'best_team':
+                # This is a team-level query
+                return {
+                    "player1": None,
+                    "player2": None,
+                    "venue": None,
+                    "seasons": None,
+                    "bowler_type": None,
+                    "match_phase": None,
+                    "match_situation": None,
+                    "opposition_team": team_name,
+                    "batter_role": None,
+                    "vs_conditions": None,
+                    "ground": None,
+                    "handedness": None,
+                    "inning": None,
+                    "match_type": None,
+                    "time_period": None,
+                    "record_type": None,
+                    "comparison_type": None,
+                    "ranking_metric": detected_team_metric if detected_team_metric == 'best_team' else None,
+                    "player_list": None,
+                    "form_filter": None,
+                    "query_type": "team_stats",
+                    "interpretation": f"Team stats for {team_name}" if team_name else f"Team statistics - {detected_team_metric.replace('_', ' ')}"
+                }
+        
         # Check if this is a "player last N matches/innings" query (trends)
         time_period_match = re.search(r'last\s+(\d+)\s+(match(?:es)?|innings?|games?)', query_lower)
         if time_period_match:
@@ -901,10 +950,10 @@ EXAMPLES:
         query_type = parsed.get('query_type')
         
         # Validation: Ensure query has cricket-relevant entity
-        has_cricket_entity = player1 or player2 or venue or opposition_team or ranking_metric or record_type
+        has_cricket_entity = player1 or player2 or venue or opposition_team or ranking_metric or record_type or query_type == 'team_stats'
         
         if not has_cricket_entity:
-            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers'\n- 'bumrah at wankhede'\n- 'who should bat for CSK'"
+            return f"🏏 I understood you're asking about: {parsed['interpretation']}\n\n**Please ask something specific about IPL cricket:**\n- 'kohli vs bumrah in powerplay'\n- 'kohli's recent form'\n- 'top 10 run scorers'\n- 'bumrah at wankhede'\n- 'how many matches has CSK played'"
         
         try:
             # Determine query type if not set correctly or set to 'general'
@@ -969,6 +1018,9 @@ EXAMPLES:
             elif query_type == 'predictions':
                 return self._get_predictions_response(opposition_team=opposition_team, 
                                                       match_phase=match_phase)
+            
+            elif query_type == 'team_stats' and opposition_team:
+                return self._get_team_stats_response(opposition_team, metric=ranking_metric)
             
             elif query_type == 'team_comparison' and opposition_team:
                 return self._get_team_stats_response(opposition_team)
@@ -2026,27 +2078,109 @@ EXAMPLES:
         except Exception as e:
             return f"Error generating predictions: {str(e)}"
     
-    def _get_team_stats_response(self, team: str) -> str:
-        """Get team statistics"""
+    def _get_team_stats_response(self, team: str, metric: str = None) -> str:
+        """Get comprehensive team statistics"""
         
         try:
+            # Handle "best_team" queries (comparing all teams)
+            if metric == 'best_team':
+                # Get stats for all teams and rank them
+                all_teams = self.all_teams
+                team_stats_list = []
+                
+                for team_name in all_teams:
+                    stats = self.stats_engine.get_team_stats(team_name)
+                    if stats and 'error' not in stats:
+                        team_stats_list.append(stats)
+                
+                # Sort by win percentage
+                team_stats_list.sort(key=lambda x: x.get('win_percentage', 0), reverse=True)
+                
+                response = "**🏆 IPL Team Rankings (by Win Percentage)**\n\n"
+                response += "| Rank | Team | Matches | Wins | Losses | Win % |\n"
+                response += "|------|------|---------|------|--------|-------|\n"
+                
+                for i, stats in enumerate(team_stats_list[:5], 1):
+                    wins = stats.get('wins', 0)
+                    matches = stats.get('matches', 0)
+                    losses = matches - wins
+                    win_pct = stats.get('win_percentage', 0)
+                    response += f"| {i} | **{stats['team']}** | {matches} | {wins} | {losses} | {win_pct:.1f}% |\n"
+                
+                response += "\n📊 **Top Performer**: " + team_stats_list[0]['team'] + f" with {team_stats_list[0]['win_percentage']:.1f}% win rate"
+                return response
+            
             # Find team with fuzzy matching
             found_team = self.stats_engine.find_team(team)
             if not found_team:
-                return f"Team '{team}' not found in IPL dataset."
+                return f"❌ Team '{team}' not found in IPL dataset."
             
             stats = self.stats_engine.get_team_stats(found_team)
             
             if not stats or 'error' in stats:
-                return f"Team '{found_team}' not found in IPL dataset."
+                return f"❌ Team '{found_team}' not found in IPL dataset."
             
-            response = f"**Team Profile: {found_team}**\n\n"
-            response += f"🏆 **Performance**\n"
-            response += f"- Total Matches: {stats.get('matches', 0)}\n"
-            response += f"- Wins: {stats.get('wins', 0)}\n"
-            response += f"- Win Rate: {stats.get('win_percentage', 0):.1f}%\n"
+            wins = stats.get('wins', 0)
+            matches = stats.get('matches', 0)
+            losses = matches - wins
+            win_pct = stats.get('win_percentage', 0)
+            
+            response = f"**🏏 Team Statistics: {found_team}**\n\n"
+            
+            # Core statistics
+            response += f"**📈 Overall Performance**\n"
+            response += f"- Total Matches Played: **{matches}**\n"
+            response += f"- Total Wins: **{wins}**\n"
+            response += f"- Total Losses: **{losses}**\n"
+            response += f"- Win Percentage: **{win_pct:.2f}%**\n\n"
+            
+            # Get IPL titles (wins in final matches) - approximate from dataset
+            final_matches = self.matches_df[
+                (self.matches_df['team1'] == found_team) | (self.matches_df['team2'] == found_team)
+            ]
+            # Count matches in IPL finals (only 1 match per season for finals)
+            season_winners = final_matches[final_matches['winner'] == found_team].groupby('season').size()
+            ipl_titles = len(season_winners)
+            
+            response += f"**🏆 IPL Titles**\n"
+            response += f"- IPL Championships Won: **{ipl_titles}**\n\n"
+            
+            # Ranking comparison
+            all_teams = self.all_teams
+            team_stats_list = []
+            for team_name in all_teams:
+                t_stats = self.stats_engine.get_team_stats(team_name)
+                if t_stats and 'error' not in t_stats:
+                    team_stats_list.append(t_stats)
+            
+            team_stats_list.sort(key=lambda x: x.get('win_percentage', 0), reverse=True)
+            rank = next((i+1 for i, t in enumerate(team_stats_list) if t['team'] == found_team), 0)
+            
+            response += f"**📊 Rankings**\n"
+            response += f"- Overall Rank (by Win %): **#{rank}** out of {len(team_stats_list)} teams\n\n"
+            
+            # Get win/loss trends by season
+            season_stats = final_matches.groupby('season').apply(
+                lambda x: {
+                    'season': x['season'].iloc[0],
+                    'matches': len(x),
+                    'wins': len(x[x['winner'] == found_team])
+                }
+            ).values
+            
+            if season_stats:
+                response += f"**📅 Recent Performance (Last 3 Seasons)**\n"
+                sorted_seasons = sorted(season_stats, key=lambda x: x['season'], reverse=True)[:3]
+                for season_data in sorted_seasons:
+                    s = season_data['season']
+                    m = season_data['matches']
+                    w = season_data['wins']
+                    response += f"- Season {s}: {w} wins from {m} matches ({w/m*100 if m > 0 else 0:.1f}%)\n"
+                response += "\n"
+            
+            response += f"💡 **Data Source**: IPL dataset with {len(self.matches_df)} matches analyzed"
             
             return response
         
         except Exception as e:
-            return f"Error getting team stats: {str(e)}"
+            return f"❌ Error getting team stats: {str(e)}"
