@@ -2238,11 +2238,22 @@ EXAMPLES:
     def _get_ipl_winner_response(self, year: int) -> str:
         """Get IPL champion for a specific year"""
         try:
-            # Find matches in that season
+            # Try direct match first
             season_matches = self.matches_df[self.matches_df['season'] == year]
             
+            # If not found, try as string
             if len(season_matches) == 0:
-                return f"❌ No IPL data found for year {year}. IPL started in 2008."
+                season_matches = self.matches_df[self.matches_df['season'] == str(year)]
+            
+            # If still not found, try extracting year from season column (for formats like "IPL 2008")
+            if len(season_matches) == 0 and hasattr(self.matches_df['season'].iloc[0], 'find'):
+                season_matches = self.matches_df[self.matches_df['season'].astype(str).str.contains(str(year))]
+            
+            if len(season_matches) == 0:
+                # Get available seasons
+                available_seasons = sorted(self.matches_df['season'].unique())
+                season_str = ", ".join([str(s) for s in available_seasons[-5:]])  # Show last 5
+                return f"❌ No IPL data found for {year}. Available seasons: {season_str}"
             
             # Get the last match of the season (highest match ID) - this is the final
             final_match = season_matches.loc[season_matches['id'].idxmax()]
