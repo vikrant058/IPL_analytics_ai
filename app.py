@@ -108,12 +108,16 @@ st.markdown("""
         border-bottom: 3px solid #2c3e50 !important;
     }
     
-    /* Hide empty navigation buttons (functional but invisible) */
-    [data-testid="column"] > div > [data-testid="baseButton-secondary"] {
-        opacity: 0 !important;
+    /* Hide the Streamlit buttons completely */
+    [data-testid="baseButton-secondary"] {
+        display: none !important;
+        visibility: hidden !important;
         height: 0 !important;
+        width: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
+        border: 0 !important;
+        position: absolute !important;
         pointer-events: none !important;
     }
     
@@ -382,64 +386,64 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-# JavaScript to handle navigation via data attributes
-nav_script = """
-<script>
-    // Handle navigation button clicks
-    document.addEventListener('DOMContentLoaded', function() {
-        const buttons = document.querySelectorAll('.nav-btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const page = this.getAttribute('data-page');
-                
-                // Use Streamlit API to update session state
-                const message = {
-                    type: 'streamlit:setComponentValue',
-                    value: page
-                };
-                
-                // Post message to parent window (Streamlit iframe)
-                window.parent.postMessage(message, '*');
-            });
-        });
-    });
-</script>
-"""
-
-# Bottom navigation bar with proper responsive styling
-nav_html = """
-<div class="bottom-nav-container">
-    <button class="nav-btn" data-page="cricbot">🤖 Cricbot</button>
-    <button class="nav-btn" data-page="profiles">👤 Profiles</button>
-    <button class="nav-btn" data-page="h2h">⚔️ H2H</button>
-    <button class="nav-btn" data-page="form">📈 Form</button>
-</div>
-""" + nav_script
-
-st.markdown(nav_html, unsafe_allow_html=True)
-
-# Handle navigation via columns that are invisible but functional
+# Create 4 invisible columns for button triggers (functional but hidden)
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
-# These buttons are invisible but handle the actual navigation logic
 with nav_col1:
-    if st.button("", key="nav_cricbot", use_container_width=True, help="Cricbot"):
+    if st.button("C", key="nav_btn_1", use_container_width=True):
         st.session_state.current_page = "cricbot"
         st.rerun()
 
 with nav_col2:
-    if st.button("", key="nav_profiles", use_container_width=True, help="Profiles"):
+    if st.button("P", key="nav_btn_2", use_container_width=True):
         st.session_state.current_page = "profiles"
         st.rerun()
 
 with nav_col3:
-    if st.button("", key="nav_h2h", use_container_width=True, help="H2H"):
+    if st.button("H", key="nav_btn_3", use_container_width=True):
         st.session_state.current_page = "h2h"
         st.rerun()
 
 with nav_col4:
-    if st.button("", key="nav_form", use_container_width=True, help="Form"):
+    if st.button("F", key="nav_btn_4", use_container_width=True):
         st.session_state.current_page = "form"
         st.rerun()
+
+# Render the visible HTML navigation bar with JavaScript integration
+nav_html = """
+<div class="bottom-nav-container">
+    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_1\\\"]')?.click()">🤖 Cricbot</button>
+    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_2\\\"]')?.click()">👤 Profiles</button>
+    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_3\\\"]')?.click()">⚔️ H2H</button>
+    <button class="nav-btn" onclick="document.querySelector('[data-testid=\\\"baseButton-secondary\\\"][key=\\\"nav_btn_4\\\"]')?.click()">📈 Form</button>
+</div>
+<script>
+    // Find buttons by content and trigger navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const streamlitBtns = document.querySelectorAll('[data-testid="baseButton-secondary"]');
+        
+        if (navBtns.length > 0 && streamlitBtns.length >= 4) {
+            // Map nav button clicks to Streamlit button clicks
+            navBtns[0].addEventListener('click', function(e) {
+                e.preventDefault();
+                streamlitBtns[0]?.click();
+            });
+            navBtns[1].addEventListener('click', function(e) {
+                e.preventDefault();
+                streamlitBtns[1]?.click();
+            });
+            navBtns[2].addEventListener('click', function(e) {
+                e.preventDefault();
+                streamlitBtns[2]?.click();
+            });
+            navBtns[3].addEventListener('click', function(e) {
+                e.preventDefault();
+                streamlitBtns[3]?.click();
+            });
+        }
+    });
+</script>
+"""
+
+st.markdown(nav_html, unsafe_allow_html=True)
