@@ -53,61 +53,54 @@ st.markdown("""
         padding-bottom: 100px;
     }
     
-    /* Fixed Bottom Navigation Bar */
-    .bottom-nav-container {
+    /* Fixed Bottom Navigation Bar - Style Streamlit buttons */
+    .stBottom {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
+        z-index: 99999 !important;
+    }
+    
+    /* Target the last set of columns (navigation) */
+    [data-testid="stVerticalBlock"] > div:last-child > [data-testid="stHorizontalBlock"] {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
         height: 80px !important;
         background: white !important;
         border-top: 2px solid #e8eaed !important;
+        z-index: 99999 !important;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+        padding: 5px 0 !important;
+        margin: 0 !important;
         display: flex !important;
         justify-content: space-around !important;
         align-items: center !important;
-        z-index: 99999 !important;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
-        width: 100vw !important;
-        gap: 0 !important;
-        padding: 5px 0 !important;
-        margin: 0 !important;
-        top: auto !important;
     }
     
-    /* Style HTML nav buttons */
-    .bottom-nav-container .nav-btn {
-        flex: 1 !important;
+    /* Style navigation buttons */
+    [data-testid="stVerticalBlock"] > div:last-child [data-testid="baseButton-secondary"] {
         height: 70px !important;
         width: 100% !important;
         border: none !important;
         background: white !important;
         color: #666 !important;
-        font-size: 18px !important;
-        transition: all 0.2s ease !important;
-        padding: 8px 0 !important;
-        cursor: pointer !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        margin: 0 !important;
-        box-sizing: border-box !important;
-        border-radius: 0 !important;
+        font-size: 16px !important;
         font-weight: 500 !important;
+        border-radius: 0 !important;
+        transition: all 0.2s ease !important;
     }
     
-    .bottom-nav-container .nav-btn:hover {
+    [data-testid="stVerticalBlock"] > div:last-child [data-testid="baseButton-secondary"]:hover {
         background-color: #f5f6f7 !important;
         color: #2c3e50 !important;
         border-bottom: 3px solid #556b82 !important;
     }
     
-    .bottom-nav-container .nav-btn:active {
-        background-color: #e8eaed !important;
-        color: #2c3e50 !important;
-        border-bottom: 3px solid #2c3e50 !important;
-    }
-    
+
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .bottom-nav-container .nav-btn {
@@ -195,13 +188,6 @@ loader, stats_engine, ai_engine = load_data()
 # Initialize session state for page navigation
 if "current_page" not in st.session_state:
     st.session_state.current_page = "cricbot"
-
-# Check URL query parameters for page navigation
-query_params = st.query_params
-if "page" in query_params:
-    requested_page = query_params.get("page", "cricbot")
-    if requested_page in ["cricbot", "profiles", "h2h", "form"]:
-        st.session_state.current_page = requested_page
 
 # Header
 st.markdown("""
@@ -380,14 +366,35 @@ elif page == "form":
             st.info("No recent match data available.")
 
 # ============ FIXED BOTTOM NAVIGATION BAR ============
-# Create bottom navigation with URL-based page switching
-nav_html = """
-<div class="bottom-nav-container">
-    <button class="nav-btn" onclick="window.location.href='?page=cricbot'">🤖 Cricbot</button>
-    <button class="nav-btn" onclick="window.location.href='?page=profiles'">👤 Profiles</button>
-    <button class="nav-btn" onclick="window.location.href='?page=h2h'">⚔️ H2H</button>
-    <button class="nav-btn" onclick="window.location.href='?page=form'">📈 Form</button>
-</div>
-"""
+# Add custom CSS to hide the columns and show buttons at bottom
+st.markdown("""
+<style>
+    /* Add spacing to push nav to bottom */
+    div.stVerticalBlock:last-of-type {
+        padding-bottom: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-st.markdown(nav_html, unsafe_allow_html=True)
+# Create navigation buttons with callbacks
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4, gap="small")
+
+with nav_col1:
+    if st.button("🤖 Cricbot", key="nav_1", use_container_width=True):
+        st.session_state.current_page = "cricbot"
+        st.rerun()
+
+with nav_col2:
+    if st.button("👤 Profiles", key="nav_2", use_container_width=True):
+        st.session_state.current_page = "profiles"
+        st.rerun()
+
+with nav_col3:
+    if st.button("⚔️ H2H", key="nav_3", use_container_width=True):
+        st.session_state.current_page = "h2h"
+        st.rerun()
+
+with nav_col4:
+    if st.button("📈 Form", key="nav_4", use_container_width=True):
+        st.session_state.current_page = "form"
+        st.rerun()
